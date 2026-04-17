@@ -2,6 +2,19 @@
 // Adding interactivity and animations
 
 document.addEventListener('DOMContentLoaded', function() {
+    const inPagesDirectory = window.location.pathname.includes('/pages/');
+    const routes = {
+        home: inPagesDirectory ? '../index.html' : 'index.html',
+        notifications: inPagesDirectory ? 'notifications.html' : 'pages/notifications.html',
+        messages: inPagesDirectory ? 'messages.html' : 'pages/messages.html',
+        friends: inPagesDirectory ? 'friends.html' : 'pages/friends.html',
+        profile: inPagesDirectory ? 'profile.html' : 'pages/profile.html'
+    };
+
+    const navigateTo = (path) => {
+        window.location.href = path;
+    };
+
     // Hide loading screen
     const loadingScreen = document.getElementById('loadingScreen');
     if (loadingScreen) {
@@ -69,8 +82,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Navbar actions
     const navTargets = {
-        'Mensagens': 'pages/messages.html',
-        'Amigos': 'pages/friends.html'
+        'Notificações': routes.notifications,
+        'Mensagens': routes.messages,
+        'Amigos': routes.friends
     };
 
     const notificationIcon = document.querySelector('.nav-icon[title="Notificações"]');
@@ -111,7 +125,7 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
             <div class="notification-footer">
               <span>Toque para fechar.</span>
-              <a href="pages/notifications.html">Ver todas</a>
+                            <a href="${routes.notifications}">Ver todas</a>
             </div>
         `;
         return bubble;
@@ -137,19 +151,37 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    document.querySelectorAll('.nav-icon, .nav-avatar, .nav-logo').forEach(button => {
+        button.setAttribute('role', 'button');
+        button.setAttribute('tabindex', '0');
+    });
+
     document.querySelectorAll('.nav-icon').forEach(icon => {
         const target = navTargets[icon.title];
         if (target) {
             icon.addEventListener('click', () => {
-                window.location.href = target;
+                navigateTo(target);
+            });
+            icon.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    navigateTo(target);
+                }
             });
         }
     });
 
     const avatarButton = document.querySelector('.nav-avatar');
     if (avatarButton) {
+        avatarButton.style.cursor = 'pointer';
         avatarButton.addEventListener('click', () => {
-            window.location.href = 'profile.html';
+            navigateTo(routes.profile);
+        });
+        avatarButton.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                navigateTo(routes.profile);
+            }
         });
     }
 
@@ -157,7 +189,13 @@ document.addEventListener('DOMContentLoaded', function() {
     if (logoButton) {
         logoButton.style.cursor = 'pointer';
         logoButton.addEventListener('click', () => {
-            window.location.href = 'index.html';
+            navigateTo(routes.home);
+        });
+        logoButton.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                navigateTo(routes.home);
+            }
         });
     }
 
