@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mensagens - Esprokurt</title>
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+
+<!-- LOADING SCREEN -->
+<div class="loading-screen" id="loadingScreen">
+  <div class="loading-container">
+    <div class="loading-spinner">
+      <div class="spinner-circle"></div>
+      <div class="spinner-circle"></div>
+      <div class="spinner-circle"></div>
+    </div>
+  </div>
+</div>
+
+<!-- NAVBAR -->
+<nav>
+  <div class="nav-logo"><span>E</span>sprokurt</div>
+  <div class="nav-search">
+    <span>🔍</span>
+    <input type="text" placeholder="Buscar conversas…">
+  </div>
+  <div class="nav-icons">
+    <div class="nav-icon" title="Notificações">🔔<span class="badge">3</span></div>
+    <div class="nav-icon" title="Mensagens">💬<span class="badge">7</span></div>
+    <div class="nav-icon" title="Amigos">👥</div>
+    <div class="nav-avatar">
+      <div class="avatar-emoji">👩‍💻</div>
+    </div>
+  </div>
+</nav>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+  <!-- ── SIDEBAR LEFT ── -->
+  <aside class="sidebar-left">
+
+    <!-- Profile mini card -->
+    <div class="profile-card">
+      <div class="profile-cover"></div>
+      <div class="profile-body">
+        <div class="profile-avatar-wrap">
+          <div class="profile-avatar">
+            <div class="avatar-emoji">👩‍💻</div>
+          </div>
+        </div>
+        <div class="profile-name">Mariana Costa</div>
+        <div class="profile-handle">@mari.costa · ⭐ 4.9</div>
+        <div class="profile-stats">
+          <div class="stat"><div class="stat-num">312</div><div class="stat-label">amigos</div></div>
+          <div class="stat"><div class="stat-num">18</div><div class="stat-label">comunidades</div></div>
+          <div class="stat"><div class="stat-num">54</div><div class="stat-label">mensagens</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="sidebar-section">
+      <div class="sidebar-title">Menu</div>
+      <ul class="nav-menu">
+        <li><a href="../index.html"><span class="icon">🏠</span>Feed</a></li>
+        <li><a href="profile.html"><span class="icon">👤</span>Meu Perfil</a></li>
+        <li><a href="friends.html"><span class="icon">👥</span>Amigos</a></li>
+        <li><a href="communities.html"><span class="icon">🏘️</span>Comunidades</a></li>
+        <li><a href="messages.html" class="active"><span class="icon">✉️</span>Mensagens</a></li>
+        <li><a href="settings.html"><span class="icon">⚙️</span>Configurações</a></li>
+      </ul>
+    </div>
+
+  </aside>
+
+  <!-- ── MESSAGES CONTENT ── -->
+  <main class="feed">
+
+    <div>
+      <div class="feed-header">Mensagens ✦</div>
+      <div class="feed-sub">Converse com seus amigos</div>
+    </div>
+
+    <!-- Conversations List -->
+    <div class="conversations-panel">
+      <div class="conversations-header">
+        <h3>Conversas</h3>
+        <button class="btn-new-message">Nova conversa</button>
+      </div>
+      <div class="conversations-list">
+        <div class="conversation-item active">
+          <div class="conversation-avatar">
+            <div class="avatar-emoji">👨</div>
+            <div class="conversation-online"></div>
+          </div>
+          <div class="conversation-info">
+            <div class="conversation-name">Pedro Alves</div>
+            <div class="conversation-preview">Obrigado pela mensagem! Vamos marcar...</div>
+          </div>
+          <div class="conversation-time">2 min</div>
+        </div>
+
+        <div class="conversation-item">
+          <div class="conversation-avatar">
+            <div class="avatar-emoji">👩</div>
+          </div>
+          <div class="conversation-info">
+            <div class="conversation-name">Julia Ferreira</div>
+            <div class="conversation-preview">Que foto linda! Onde foi tirada?</div>
+          </div>
+          <div class="conversation-time">15 min</div>
+        </div>
+
+        <div class="conversation-item">
+          <div class="conversation-avatar">
+            <div class="avatar-emoji">👨</div>
+          </div>
+          <div class="conversation-info">
+            <div class="conversation-name">Lucas Mendes</div>
+            <div class="conversation-preview">Vamos jogar aquele jogo novo?</div>
+          </div>
+          <div class="conversation-time">1h</div>
+        </div>
+
+        <div class="conversation-item">
+          <div class="conversation-avatar">
+            <div class="avatar-emoji">👩</div>
+          </div>
+          <div class="conversation-info">
+            <div class="conversation-name">Ana Silva</div>
+            <div class="conversation-preview">Oi! Como você está?</div>
+          </div>
+          <div class="conversation-time">2h</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat Area -->
+    <div class="chat-area">
+      <div class="chat-header">
+        <div class="chat-user">
+          <div class="chat-avatar">
+            <div class="avatar-emoji">👨</div>
+            <div class="chat-online"></div>
+          </div>
+          <div class="chat-info">
+            <div class="chat-name">Pedro Alves</div>
+            <div class="chat-status">Online</div>
+          </div>
+        </div>
+        <div class="chat-actions">
+          <button class="chat-action">⋯</button>
+        </div>
+      </div>
+
+      <div class="chat-messages">
+        <div class="message received">
+          <div class="message-avatar">
+            <div class="avatar-emoji">👨</div>
+          </div>
+          <div class="message-content">
+            <div class="message-text">Oi Mariana! Vi sua publicação sobre a Chapada. Parece incrível!</div>
+            <div class="message-time">10:30</div>
+          </div>
+        </div>
+
+        <div class="message sent">
+          <div class="message-content">
+            <div class="message-text">Oi Pedro! Obrigada! Foi uma experiência incrível mesmo. As cachoeiras são de tirar o fôlego.</div>
+            <div class="message-time">10:32</div>
+          </div>
+        </div>
+
+        <div class="message received">
+          <div class="message-avatar">
+            <div class="avatar-emoji">👨</div>
+          </div>
+          <div class="message-content">
+            <div class="message-text">Quero muito conhecer! Você tem dicas de roteiro?</div>
+            <div class="message-time">10:33</div>
+          </div>
+        </div>
+
+        <div class="message sent">
+          <div class="message-content">
+            <div class="message-text">Claro! Vou te mandar algumas dicas. Também tenho fotos incríveis pra mostrar.</div>
+            <div class="message-time">10:35</div>
+          </div>
+        </div>
+
+        <div class="message received">
+          <div class="message-avatar">
+            <div class="avatar-emoji">👨</div>
+          </div>
+          <div class="message-content">
+            <div class="message-text">Obrigado pela mensagem! Vamos marcar um café pra você me contar tudo?</div>
+            <div class="message-time">10:36</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="chat-input">
+        <div class="input-container">
+          <input type="text" placeholder="Digite sua mensagem..." class="message-input">
+          <button class="btn-send-message">Enviar</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ── SIDEBAR RIGHT ── -->
+  <aside class="sidebar-right">
+
+    <!-- Quick Actions -->
+    <div class="widget">
+      <div class="widget-title">Ações Rápidas</div>
+      <div class="quick-actions">
+        <button class="quick-action">
+          <span class="action-icon">✦</span>
+          <span>Enviar mensagem</span>
+        </button>
+        <button class="quick-action">
+          <span class="action-icon">👥</span>
+          <span>Convidar Amigos</span>
+        </button>
+        <button class="quick-action">
+          <span class="action-icon">📝</span>
+          <span>Criar Grupo</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mensagens Recentes -->
+    <div class="widget">
+      <div class="widget-title">Mensagens recentes</div>
+      <div class="recent-messages">
+        <div class="recent-message">
+          <div class="message-sender">Julia Ferreira</div>
+          <div class="message-snippet">Você é incrível! Continue brilhando ✨</div>
+          <div class="message-date">2 dias atrás</div>
+        </div>
+
+        <div class="recent-message">
+          <div class="message-sender">Lucas Mendes</div>
+          <div class="message-snippet">Parabéns pelo novo projeto! Ficou show!</div>
+          <div class="message-date">5 dias atrás</div>
+        </div>
+
+        <div class="recent-message">
+          <div class="message-sender">Ana Silva</div>
+          <div class="message-snippet">Vamos marcar aquela viagem em breve? 🌊</div>
+          <div class="message-date">1 semana atrás</div>
+        </div>
+      </div>
+    </div>
+
+  </aside>
+
+</div>
+
+<script src="../js/app.js"></script>
+</body>
+</html>

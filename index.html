@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Esprokurt — Sua rede social independente</title>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<!-- LOADING SCREEN -->
+<div class="loading-screen" id="loadingScreen">
+  <div class="loading-container">
+    <div class="loading-spinner">
+      <div class="spinner-circle"></div>
+      <div class="spinner-circle"></div>
+      <div class="spinner-circle"></div>
+    </div>
+  </div>
+</div>
+
+<!-- NAVBAR -->
+<nav>
+  <div class="nav-logo"><span>E</span>sprokurt</div>
+  <div class="nav-search">
+    <span>🔍</span>
+    <input type="text" placeholder="Buscar pessoas, comunidades…">
+  </div>
+  <div class="nav-icons">
+    <div class="nav-icon" title="Notificações">🔔<span class="badge">3</span></div>
+    <div class="nav-icon" title="Mensagens">💬<span class="badge">7</span></div>
+    <div class="nav-icon" title="Amigos">👥</div>
+    <div class="nav-avatar">
+      <div class="avatar-emoji">👤</div>
+    </div>
+  </div>
+</nav>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+  <!-- ── SIDEBAR LEFT ── -->
+  <aside class="sidebar-left">
+
+    <!-- Profile mini card -->
+    <div class="profile-card">
+      <div class="profile-cover"></div>
+      <div class="profile-body">
+        <div class="profile-avatar-wrap">
+          <div class="profile-avatar">
+            <div class="avatar-emoji">👩‍💻</div>
+          </div>
+        </div>
+        <div class="profile-name">Mariana Costa</div>
+        <div class="profile-handle">@mari.costa · ⭐ 4.9</div>
+        <div class="profile-stats">
+          <div class="stat"><div class="stat-num">312</div><div class="stat-label">amigos</div></div>
+          <div class="stat"><div class="stat-num">18</div><div class="stat-label">comunidades</div></div>
+          <div class="stat"><div class="stat-num">54</div><div class="stat-label">mensagens</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="sidebar-section">
+      <div class="sidebar-title">Menu</div>
+      <ul class="nav-menu">
+        <li><a href="index.html" class="active"><span class="icon">🏠</span>Feed</a></li>
+        <li><a href="pages/profile.html"><span class="icon">👤</span>Meu Perfil</a></li>
+        <li><a href="pages/friends.html"><span class="icon">👥</span>Amigos</a></li>
+        <li><a href="pages/communities.html"><span class="icon">🏘️</span>Comunidades</a></li>
+        <li><a href="pages/messages.html"><span class="icon">✉️</span>Mensagens</a></li>
+        <li><a href="pages/settings.html"><span class="icon">⚙️</span>Configurações</a></li>
+      </ul>
+    </div>
+
+  </aside>
+
+  <!-- ── FEED ── -->
+  <main class="feed">
+
+    <div>
+      <div class="feed-header">Olá, Mariana ✦</div>
+      <div class="feed-sub">Veja o que está rolando no seu universo</div>
+    </div>
+
+    <!-- Stories -->
+    <div class="stories-row">
+      <div class="story-item story-add">
+        <div class="story-ring">
+          <div class="story-inner">+</div>
+        </div>
+        <div class="story-label">Seu story</div>
+      </div>
+      <div class="story-item">
+        <div class="story-ring">
+          <div class="story-inner">
+            <div class="avatar-emoji">👨</div>
+          </div>
+        </div>
+        <div class="story-label">Pedro</div>
+      </div>
+      <div class="story-item">
+        <div class="story-ring">
+          <div class="story-inner">
+            <div class="avatar-emoji">👩</div>
+          </div>
+        </div>
+        <div class="story-label">Julia</div>
+      </div>
+      <div class="story-item">
+        <div class="story-ring seen">
+          <div class="story-inner">
+            <div class="avatar-emoji">👨‍💼</div>
+          </div>
+        </div>
+        <div class="story-label">Lucas</div>
+      </div>
+      <div class="story-item">
+        <div class="story-ring">
+          <div class="story-inner">
+            <div class="avatar-emoji">👩‍🎨</div>
+          </div>
+        </div>
+        <div class="story-label">Ana</div>
+      </div>
+      <div class="story-item">
+        <div class="story-ring seen">
+          <div class="story-inner">
+            <div class="avatar-emoji">👨‍🎓</div>
+          </div>
+        </div>
+        <div class="story-label">Rafael</div>
+      </div>
+    </div>
+
+    <!-- Compose -->
+    <div class="compose-box">
+      <div class="compose-top">
+        <div class="compose-avatar">
+          <div class="avatar-emoji">👩‍💻</div>
+        </div>
+        <textarea class="compose-input" placeholder="O que está passando pela sua órbita?" rows="2"></textarea>
+      </div>
+      <div class="compose-actions">
+        <div class="compose-tools">
+          <button class="compose-tool">📷 Foto</button>
+          <button class="compose-tool">🎵 Música</button>
+          <button class="compose-tool">📍 Local</button>
+          <button class="compose-tool">😊 Humor</button>
+        </div>
+        <button class="btn-post">Publicar</button>
+      </div>
+    </div>
+
+    <!-- Post 1 -->
+    <div class="post-card">
+      <div class="post-header">
+        <div class="post-avatar">
+          <div class="avatar-emoji">👨</div>
+        </div>
+        <div class="post-meta">
+          <div class="post-author">Pedro Alves</div>
+          <div class="post-time">há 12 minutos · 😄 Feliz</div>
+        </div>
+        <button class="post-menu-btn">⋯</button>
+      </div>
+      <div class="post-text">
+        Acabei de voltar de Floripa e cara, o por do sol na Lagoinha foi simplesmente inacreditável 🌅 Alguém aí tem dicas de onde ir em Garopaba?
+      </div>
+      <img class="post-image" src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=80" alt="Praia">
+      <div class="post-tag-row">
+        <span class="post-tag">#viagem</span>
+        <span class="post-tag">#Floripa</span>
+        <span class="post-tag">#praia</span>
+      </div>
+      <div class="post-actions">
+        <button class="action-btn liked" onclick="toggleLike(this)">
+          <span>❤️</span> 84
+        </button>
+        <button class="action-btn">
+          <span>💬</span> 12
+        </button>
+        <button class="action-btn">
+          <span>🔁</span> 5
+        </button>
+        <div class="action-spacer"></div>
+        <button class="action-btn">🔖</button>
+      </div>
+    </div>
+
+    <!-- Post 3 -->
+    <div class="post-card">
+      <div class="post-header">
+        <div class="post-avatar">
+          <div class="avatar-emoji">👩‍🎨</div>
+        </div>
+        <div class="post-meta">
+          <div class="post-author">Ana Ribeiro</div>
+          <div class="post-time">há 3 horas · 🎵 ouvindo: Linkin Park</div>
+        </div>
+        <button class="post-menu-btn">⋯</button>
+      </div>
+      <div class="post-text">
+        Finalmente terminei aquele projeto maldito! 🎉 Três semanas de calls infinitas e reuniões desnecessárias, mas valeu. Quem mais sobrevive à era dos <a href="#">#ProjetosAgile</a> ?
+      </div>
+      <div class="post-tag-row">
+        <span class="post-tag">#trabalho</span>
+        <span class="post-tag">#finalmente</span>
+      </div>
+      <div class="post-actions">
+        <button class="action-btn" onclick="toggleLike(this)">
+          <span>🤍</span> 47
+        </button>
+        <button class="action-btn">
+          <span>💬</span> 9
+        </button>
+        <button class="action-btn">
+          <span>🔁</span> 2
+        </button>
+        <div class="action-spacer"></div>
+        <button class="action-btn">🔖</button>
+      </div>
+    </div>
+
+    <!-- Post 4 -->
+    <div class="post-card">
+      <div class="post-header">
+        <div class="post-avatar">
+          <div class="avatar-emoji">👨‍💼</div>
+        </div>
+        <div class="post-meta">
+          <div class="post-author">Lucas Mendes</div>
+          <div class="post-time">há 5 horas · 🍕 em: São Paulo</div>
+        </div>
+        <button class="post-menu-btn">⋯</button>
+      </div>
+      <div class="post-text">
+        O melhor rodízio de pizza da minha vida. Sem exagero. Endereço nos comentários pra quem quiser 🍕🔥
+      </div>
+      <img class="post-image" src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&q=80" alt="Pizza">
+      <div class="post-tag-row">
+        <span class="post-tag">#comida</span>
+        <span class="post-tag">#SP</span>
+        <span class="post-tag">#pizza</span>
+      </div>
+      <div class="post-actions">
+        <button class="action-btn" onclick="toggleLike(this)">
+          <span>🤍</span> 128
+        </button>
+        <button class="action-btn">
+          <span>💬</span> 33
+        </button>
+        <button class="action-btn">
+          <span>🔁</span> 14
+        </button>
+        <div class="action-spacer"></div>
+        <button class="action-btn">🔖</button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ── SIDEBAR RIGHT ── -->
+  <aside class="sidebar-right">
+
+    <!-- Friends -->
+    <div class="widget">
+      <div class="widget-title">Seus amigos <a href="#">312 →</a></div>
+      <div class="friends-grid">
+        <div class="friend-item">
+          <div class="friend-avatar"><div class="avatar-emoji">👩‍🎤</div></div>
+          <div class="friend-name">Carla</div>
+        </div>
+        <div class="friend-item">
+          <div class="friend-avatar"><div class="avatar-emoji">👨‍🎸</div></div>
+          <div class="friend-name">Felipe</div>
+        </div>
+        <div class="friend-item">
+          <div class="friend-avatar"><div class="avatar-emoji">👩‍🎨</div></div>
+          <div class="friend-name">Thais</div>
+        </div>
+        <div class="friend-item">
+          <div class="friend-avatar"><div class="avatar-emoji">👨‍💻</div></div>
+          <div class="friend-name">Guilherme</div>
+        </div>
+        <div class="friend-item">
+          <div class="friend-avatar"><div class="avatar-emoji">👩‍🎓</div></div>
+          <div class="friend-name">Lara</div>
+        </div>
+        <div class="friend-item">
+          <div class="friend-avatar"><div class="avatar-emoji">👨‍🏫</div></div>
+          <div class="friend-name">Bruno</div>
+        </div>
+        <div class="friend-item">
+          <div class="friend-avatar"><div class="avatar-emoji">👩‍🔬</div></div>
+          <div class="friend-name">Isabela</div>
+        </div>
+        <div class="friend-item">
+          <div class="friend-avatar" style="background:var(--surface2); color:var(--text-muted); font-size:0.8rem; font-family:system-ui,-apple-system,sans-serif; font-weight:700;">+304</div>
+          <div class="friend-name">mais</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Comunidades -->
+    <div class="widget">
+      <div class="widget-title">Comunidades <a href="#">explorar →</a></div>
+      <div class="community-list">
+        <div class="community-item">
+          <div class="community-icon" style="background:rgba(124,108,252,0.15);">🎮</div>
+          <div>
+            <div class="community-name">Gamers BR</div>
+            <div class="community-count">48.2k membros</div>
+          </div>
+        </div>
+        <div class="community-item">
+          <div class="community-icon" style="background:rgba(252,108,143,0.15);">🎵</div>
+          <div>
+            <div class="community-name">Indie Music</div>
+            <div class="community-count">12.7k membros</div>
+          </div>
+        </div>
+        <div class="community-item">
+          <div class="community-icon" style="background:rgba(108,252,212,0.15);">📚</div>
+          <div>
+            <div class="community-name">Clube do Livro</div>
+            <div class="community-count">9.1k membros</div>
+          </div>
+        </div>
+        <div class="community-item">
+          <div class="community-icon" style="background:rgba(240,192,96,0.15);">✈️</div>
+          <div>
+            <div class="community-name">Mochileiros</div>
+            <div class="community-count">31.5k membros</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </aside>
+
+</div>
+
+<script src="js/app.js"></script>
+</body>
+</html>

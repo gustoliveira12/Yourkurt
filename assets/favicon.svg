@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180">
+  <defs>
+    <style>
+      @media (prefers-color-scheme: dark) {
+        .bg { fill: #0d0e14; }
+        .fg { fill: #7c6cfc; }
+        .accent { fill: #fc6c8f; }
+      }
+      @media (prefers-color-scheme: light) {
+        .bg { fill: #f7f8fb; }
+        .fg { fill: #5e4cf5; }
+        .accent { fill: #d46c97; }
+      }
+    </style>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="180" height="180" class="bg" rx="45"/>
+  
+  <!-- Outer Circle -->
+  <circle cx="90" cy="90" r="70" fill="none" stroke="url(#grad1)" stroke-width="3" opacity="0.6"/>
+  
+  <!-- Middle Circle -->
+  <circle cx="90" cy="90" r="55" fill="none" stroke="url(#grad2)" stroke-width="2" opacity="0.4"/>
+  
+  <!-- Inner Circle with Letter E -->
+  <circle cx="90" cy="90" r="42" class="fg" opacity="0.1"/>
+  
+  <!-- Letter E -->
+  <text x="90" y="105" font-family="system-ui, sans-serif" font-size="56" font-weight="800" 
+        fill="url(#grad1)" text-anchor="middle" font-style="italic">E</text>
+  
+  <!-- Gradient Definitions -->
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#7c6cfc;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#fc6c8f;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="grad2" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#6cfcd4;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#7c6cfc;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+</svg>

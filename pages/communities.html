@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Comunidades - Esprokurt</title>
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+
+<!-- LOADING SCREEN -->
+<div class="loading-screen" id="loadingScreen">
+  <div class="loading-container">
+    <div class="loading-spinner">
+      <div class="spinner-circle"></div>
+      <div class="spinner-circle"></div>
+      <div class="spinner-circle"></div>
+    </div>
+  </div>
+</div>
+
+<!-- NAVBAR -->
+<nav>
+  <div class="nav-logo"><span>E</span>sprokurt</div>
+  <div class="nav-search">
+    <span>🔍</span>
+    <input type="text" placeholder="Buscar comunidades…">
+  </div>
+  <div class="nav-icons">
+    <div class="nav-icon" title="Notificações">🔔<span class="badge">3</span></div>
+    <div class="nav-icon" title="Mensagens">💬<span class="badge">7</span></div>
+    <div class="nav-icon" title="Amigos">👥</div>
+    <div class="nav-avatar">
+      <div class="avatar-emoji">👩‍💻</div>
+    </div>
+  </div>
+</nav>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+  <!-- ── SIDEBAR LEFT ── -->
+  <aside class="sidebar-left">
+
+    <!-- Profile mini card -->
+    <div class="profile-card">
+      <div class="profile-cover"></div>
+      <div class="profile-body">
+        <div class="profile-avatar-wrap">
+          <div class="profile-avatar">
+            <div class="avatar-emoji">👩‍💻</div>
+          </div>
+        </div>
+        <div class="profile-name">Mariana Costa</div>
+        <div class="profile-handle">@mari.costa · ⭐ 4.9</div>
+        <div class="profile-stats">
+          <div class="stat"><div class="stat-num">312</div><div class="stat-label">amigos</div></div>
+          <div class="stat"><div class="stat-num">18</div><div class="stat-label">comunidades</div></div>
+          <div class="stat"><div class="stat-num">54</div><div class="stat-label">mensagens</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="sidebar-section">
+      <div class="sidebar-title">Menu</div>
+      <ul class="nav-menu">
+        <li><a href="../index.html"><span class="icon">🏠</span>Feed</a></li>
+        <li><a href="profile.html"><span class="icon">👤</span>Meu Perfil</a></li>
+        <li><a href="friends.html"><span class="icon">👥</span>Amigos</a></li>
+        <li><a href="communities.html" class="active"><span class="icon">🏘️</span>Comunidades</a></li>
+        <li><a href="messages.html"><span class="icon">✉️</span>Mensagens</a></li>
+        <li><a href="settings.html"><span class="icon">⚙️</span>Configurações</a></li>
+      </ul>
+    </div>
+
+  </aside>
+
+  <!-- ── COMMUNITIES CONTENT ── -->
+  <main class="feed">
+
+    <div>
+      <div class="feed-header">Comunidades ✦</div>
+      <div class="feed-sub">Conecte-se com grupos de interesse</div>
+    </div>
+
+    <!-- My Communities -->
+    <div class="my-communities">
+      <h3 class="section-title">Minhas Comunidades</h3>
+      <div class="communities-grid">
+        <div class="community-card">
+          <div class="community-banner" style="background: linear-gradient(135deg, #7c6cfc, #fc6c8f);">
+            <div class="community-icon-large">🎨</div>
+          </div>
+          <div class="community-info">
+            <div class="community-name">Designers BR</div>
+            <div class="community-members">45.2k membros</div>
+            <div class="community-description">Comunidade para designers brasileiros compartilharem trabalhos e conhecimentos.</div>
+          </div>
+          <div class="community-actions">
+            <button class="btn-community-joined">Membro</button>
+          </div>
+        </div>
+
+        <div class="community-card">
+          <div class="community-banner" style="background: linear-gradient(135deg, #fc6c8f, #f0c060);">
+            <div class="community-icon-large">✈️</div>
+          </div>
+          <div class="community-info">
+            <div class="community-name">Viajantes</div>
+            <div class="community-members">89.1k membros</div>
+            <div class="community-description">Para amantes de viagens, dicas de destinos e histórias de aventura.</div>
+          </div>
+          <div class="community-actions">
+            <button class="btn-community-joined">Membro</button>
+          </div>
+        </div>
+
+        <div class="community-card">
+          <div class="community-banner" style="background: linear-gradient(135deg, #6cfcd4, #7c6cfc);">
+            <div class="community-icon-large">📚</div>
+          </div>
+          <div class="community-info">
+            <div class="community-name">Clube do Livro</div>
+            <div class="community-members">9.1k membros</div>
+            <div class="community-description">Discussões sobre literatura, indicações de leitura e resenhas.</div>
+          </div>
+          <div class="community-actions">
+            <button class="btn-community-joined">Membro</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Discover Communities -->
+    <div class="discover-communities">
+      <h3 class="section-title">Descobrir Comunidades</h3>
+      <div class="communities-grid">
+        <div class="community-card">
+          <div class="community-banner" style="background: linear-gradient(135deg, #f0c060, #6cfcd4);">
+            <div class="community-icon-large">🎵</div>
+          </div>
+          <div class="community-info">
+            <div class="community-name">Música Brasileira</div>
+            <div class="community-members">156.3k membros</div>
+            <div class="community-description">Tudo sobre música brasileira, de MPB a indie contemporâneo.</div>
+          </div>
+          <div class="community-actions">
+            <button class="btn-community-join">Participar</button>
+          </div>
+        </div>
+
+        <div class="community-card">
+          <div class="community-banner" style="background: linear-gradient(135deg, #7c6cfc, #6cfcd4);">
+            <div class="community-icon-large">🏃‍♀️</div>
+          </div>
+          <div class="community-info">
+            <div class="community-name">Corrida & Saúde</div>
+            <div class="community-members">67.8k membros</div>
+            <div class="community-description">Motivação, dicas e treinos para uma vida saudável.</div>
+          </div>
+          <div class="community-actions">
+            <button class="btn-community-join">Participar</button>
+          </div>
+        </div>
+
+        <div class="community-card">
+          <div class="community-banner" style="background: linear-gradient(135deg, #fc6c8f, #6cfcd4);">
+            <div class="community-icon-large">🎮</div>
+          </div>
+          <div class="community-info">
+            <div class="community-name">Gamers BR</div>
+            <div class="community-members">234.5k membros</div>
+            <div class="community-description">Comunidade gamer brasileira para discussões e amizades.</div>
+          </div>
+          <div class="community-actions">
+            <button class="btn-community-join">Participar</button>
+          </div>
+        </div>
+
+        <div class="community-card">
+          <div class="community-banner" style="background: linear-gradient(135deg, #6cfcd4, #f0c060);">
+            <div class="community-icon-large">🍳</div>
+          </div>
+          <div class="community-info">
+            <div class="community-name">Cozinha Criativa</div>
+            <div class="community-members">78.9k membros</div>
+            <div class="community-description">Receitas, dicas culinárias e inspiração gastronômica.</div>
+          </div>
+          <div class="community-actions">
+            <button class="btn-community-join">Participar</button>
+          </div>
+        </div>
+
+        <div class="community-card">
+          <div class="community-banner" style="background: linear-gradient(135deg, #f0c060, #fc6c8f);">
+            <div class="community-icon-large">📸</div>
+          </div>
+          <div class="community-info">
+            <div class="community-name">Fotografia</div>
+            <div class="community-members">45.6k membros</div>
+            <div class="community-description">Técnicas, equipamentos e compartilhamento de fotos.</div>
+          </div>
+          <div class="community-actions">
+            <button class="btn-community-join">Participar</button>
+          </div>
+        </div>
+
+        <div class="community-card">
+          <div class="community-banner" style="background: linear-gradient(135deg, #7c6cfc, #f0c060);">
+            <div class="community-icon-large">💻</div>
+          </div>
+          <div class="community-info">
+            <div class="community-name">Desenvolvimento</div>
+            <div class="community-members">98.7k membros</div>
+            <div class="community-description">Programação, tecnologia e inovação digital.</div>
+          </div>
+          <div class="community-actions">
+            <button class="btn-community-join">Participar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ── SIDEBAR RIGHT ── -->
+  <aside class="sidebar-right">
+
+    <!-- Create Community -->
+    <div class="widget">
+      <div class="widget-title">Criar Comunidade</div>
+      <div class="create-community">
+        <p class="create-description">Tem uma ideia para uma comunidade? Crie a sua própria!</p>
+        <button class="btn-create-community">Criar Comunidade</button>
+      </div>
+    </div>
+
+    <!-- Trending Communities -->
+    <div class="widget">
+      <div class="widget-title">Comunidades em Alta</div>
+      <div class="trending-list">
+        <div class="trending-item">
+          <div class="trending-rank">1</div>
+          <div class="trending-info">
+            <div class="trending-name">Tecnologia</div>
+            <div class="trending-growth">+2.3k membros hoje</div>
+          </div>
+        </div>
+
+        <div class="trending-item">
+          <div class="trending-rank">2</div>
+          <div class="trending-info">
+            <div class="trending-name">Arte Digital</div>
+            <div class="trending-growth">+1.8k membros hoje</div>
+          </div>
+        </div>
+
+        <div class="trending-item">
+          <div class="trending-rank">3</div>
+          <div class="trending-info">
+            <div class="trending-name">Esportes</div>
+            <div class="trending-growth">+1.5k membros hoje</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </aside>
+
+</div>
+
+<script src="../js/app.js"></script>
+</body>
+</html>
