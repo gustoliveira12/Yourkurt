@@ -4,15 +4,15 @@ export default function HeaderBar() {
   return (
     <header className="flex justify-between px-16 h-16 border-b border-zinc-800 w-dvw items-center py-2">
       <div>
-        <span className="text-xl font-black">
+        <span className="text-xl font-black flex">
           <span className="font-mono font-light">E</span> sprokurt
         </span>
       </div>
-      <div className="flex gap-2 px-4 rounded-lg border-zinc-800 border w-xl h-full items-center bg-zinc-950 ">
+      <div className="flex gap-2 px-4 rounded-full border-zinc-800 border w-xl h-full items-center bg-zinc-950 ">
         <Search />
         <input
           type="text"
-          className="text-sm font-medium"
+          className="text-sm font-medium w-full outline-none"
           placeholder="Buscar pessoas..."
         />
       </div>
