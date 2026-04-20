@@ -14,7 +14,7 @@ type NavlinkProps = {
 
 export default function LeftNavbar({ prop }: NavlinkProps) {
   return (
-    <div className="flex flex-col gap-8 max-w-96 ">
+    <div className="flex flex-col gap-8 max-w-96  ">
       <div className="flex flex-col rounded-xl bg-zinc-950 overflow-hidden h-fit border border-zinc-800">
         <div className="w-full h-16 bg-linear-to-l from-[#c892b8] via-[#9143e4] to-[#665BC5] relative ">
           <div className="size-16 rounded-full border-4 border-zinc-950 flex items-center justify-center mb-3 bg-purple-500  absolute -bottom-10 left-4 ">

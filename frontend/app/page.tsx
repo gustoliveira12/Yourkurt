@@ -2,6 +2,7 @@
 import HeaderBar from "@/components/Header";
 import LeftNavbar from "@/components/LeftNav";
 import Post from "@/components/Post";
+import PostCard from "@/components/PostCard";
 import RightNavbar from "@/components/RightNav";
 import Story from "@/components/Stories";
 import {
@@ -110,12 +111,13 @@ export default function Home() {
               />
             </div>
           </div>
-          <div className="flex flex-col w-full  ">
+          <div className="flex flex-col w-full gap-8">
             <Post
               alt="Pfp img"
               size={24}
               src="https://imgs.search.brave.com/CvAgmXxTi94acxEz7Et418I4Q90sN60BmSz3OsuCnLE/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pbWFn/ZW5zLm5lMTAudW9s/LmNvbS5ici92ZWlj/dWxvcy9fbWlkaWFz/L2pwZy8yMDI1LzEy/LzEwL2dheV93aGlu/ZGVyc3Nvbl9udW5l/c192b2x0YV9hX2Zh/bGFyX3NvYnJlX3N1/YV9zZXh1YWxpZGFk/ZS0zNjE2NTE3Ni5q/cGc_aW1zPTMwNXgx/NzM"
             />
+            <PostCard />
           </div>
         </div>
         <RightNavbar prop={Comunnities} />
