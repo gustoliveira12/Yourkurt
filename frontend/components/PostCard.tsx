@@ -20,7 +20,7 @@ export default function PostCard() {
 
   const Mensagem = "";
   const src =
-    "https://imgs.search.brave.com/CvAgmXxTi94acxEz7Et418I4Q90sN60BmSz3OsuCnLE/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pbWFn/ZW5zLm5lMTAudW9s/LmNvbS5ici92ZWlj/dWxvcy9fbWlkaWFz/L2pwZy8yMDI1LzEy/LzEwL2dheV93aGlu/ZGVyc3Nvbl9udW5l/c192b2x0YV9hX2Zh/bGFyX3NvYnJlX3N1/YV9zZXh1YWxpZGFk/ZS0zNjE2NTE3Ni5q/cGc_aW1zPTMwNXgx/NzM";
+    "https://i.pinimg.com/1200x/2a/63/1d/2a631d3d6664c0c84bf78db4a758a2a9.jpg";
   const tags = ["Viagem", "Floripa", "Praia"];
   return (
     <div className="flex flex-col px-6 py-4 w-full  bg-zinc-950 rounded-lg gap-2  border border-zinc-800 ">

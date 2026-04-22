@@ -84,13 +84,18 @@ export default function Home() {
     <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black gap-4">
       <HeaderBar />
       <main className="h-dvh w-full flex items-start  justify-center  ">
-        <LeftNavbar prop={NavLinks} />
+        <LeftNavbar
+          prop={NavLinks}
+          avatar={{
+            src: "https://i.pinimg.com/736x/bf/86/16/bf86169cb425cf8c1dc82d8ffb5c1fb5.jpg",
+            alt: "lindao",
+            size: 1,
+          }}
+        />
         <div className="flex flex-col gap-12 items-center min-w-3xl px-4 ">
           <div className="flex flex-col w-full ">
             <div className="flex flex-col items-start justify-start py-4  ">
-              <h1 className="text-xl text-zinc-100 font-black ">
-                Olá, Luciano!
-              </h1>
+              <h1 className="text-xl text-zinc-100 font-black ">Olá, Lucas!</h1>
               <span className="text-lg text-zinc-400 font-medium">
                 Veja oque está rolando no seu universo
               </span>
@@ -115,7 +120,7 @@ export default function Home() {
             <Post
               alt="Pfp img"
               size={24}
-              src="https://imgs.search.brave.com/CvAgmXxTi94acxEz7Et418I4Q90sN60BmSz3OsuCnLE/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pbWFn/ZW5zLm5lMTAudW9s/LmNvbS5ici92ZWlj/dWxvcy9fbWlkaWFz/L2pwZy8yMDI1LzEy/LzEwL2dheV93aGlu/ZGVyc3Nvbl9udW5l/c192b2x0YV9hX2Zh/bGFyX3NvYnJlX3N1/YV9zZXh1YWxpZGFk/ZS0zNjE2NTE3Ni5q/cGc_aW1zPTMwNXgx/NzM"
+              src="https://i.pinimg.com/736x/bf/86/16/bf86169cb425cf8c1dc82d8ffb5c1fb5.jpg"
             />
             <PostCard />
           </div>

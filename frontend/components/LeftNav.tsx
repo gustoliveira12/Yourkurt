@@ -1,6 +1,9 @@
 import { User, LucideIcon } from "lucide-react";
 import Link from "next/link";
 import type { UrlObject } from "url";
+import { AvatarProps } from "./Avatar";
+import Image from "next/image";
+import { useState } from "react";
 
 interface NavlinksItem {
   text: string;
@@ -10,21 +13,34 @@ interface NavlinksItem {
 
 type NavlinkProps = {
   prop: NavlinksItem[];
+  avatar: AvatarProps;
 };
 
-export default function LeftNavbar({ prop }: NavlinkProps) {
+export default function LeftNavbar({ prop, avatar }: NavlinkProps) {
+  const [error, setError] = useState(false);
   return (
     <div className="flex flex-col gap-8 max-w-96  ">
       <div className="flex flex-col rounded-xl bg-zinc-950 overflow-hidden h-fit border border-zinc-800">
         <div className="w-full h-16 bg-linear-to-l from-[#c892b8] via-[#9143e4] to-[#665BC5] relative ">
           <div className="size-16 rounded-full border-4 border-zinc-950 flex items-center justify-center mb-3 bg-purple-500  absolute -bottom-10 left-4 ">
-            <User size={32} />
+            {!avatar.src! || error ? (
+              <User className="text-purple-400" size={avatar.size!} />
+            ) : (
+              <Image
+                className="h-full w-full object-cover rounded-full"
+                height={avatar.size!}
+                width={avatar.size!}
+                alt={avatar.alt!}
+                src={avatar.src!}
+                onError={() => setError(true)}
+              />
+            )}
           </div>
         </div>
         <div className="flex flex-col px-6 py-4 gap-4 relative pt-10">
           <div className="flex flex-col">
-            <h2 className="text-lg text-purple-400 font-bold">Luciano Hulk</h2>
-            <span className="text-zinc-400">@Luciano.hulk</span>
+            <h2 className="text-lg text-purple-400 font-bold">Lucas Silva</h2>
+            <span className="text-zinc-400">@Lucas.Silva</span>
           </div>
           <div className="border-t border-zinc-800 flex justify-between py-2 px-2 gap-2">
             <div className="flex flex-col items-center justify-center">
