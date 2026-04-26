@@ -5,6 +5,7 @@ import type { UrlObject } from "url";
 import { ArrowRight } from "lucide-react";
 import Avatar from "./Avatar";
 import clsx from "clsx";
+import Post from "./Post";
 
 interface CommunityItems {
   text: string;
@@ -29,98 +30,9 @@ function getColorClass(color: string) {
 
 export default function RightNavbar({ prop }: NavlinkProps) {
   return (
-    <div className="flex flex-col gap-8 max-w-96 ">
-      <div className="flex flex-col rounded-xl bg-zinc-950 overflow-hidden h-fit border border-zinc-800 px-6 py-4 gap-2">
-        <div className="flex justify-between">
-          <h2 className=" flex items-center uppercase font-bold tracking-wide text-sm text-zinc-400 ">
-            Seus amigos
-          </h2>
-          <button className="flex items-center justify-center  text-purple-400 font-medium text-sm hover:bg-purple-500/15 px-2 py-1 rounded-sm transition-all duration-150 gap-1 ">
-            300
-            <ArrowRight size={12} />
-          </button>
-        </div>
-        <div className="flex flex-wrap gap-4">
-          <div className="flex flex-col justify-center items-center gap-2 text-xs text-zinc-400 truncate max-w-16 ">
-            <div className="flex flex-col rounded-full size-16 bg-purple-500/15 items-center justify-center ">
-              <Avatar size={32} alt="" src="" />
-            </div>
-            <span
-              title=" HingleMcGringleBerry"
-              className="w-full min-w-0 truncate"
-            >
-              HingleMcGringleBerry
-            </span>
-          </div>
-          <div className="flex flex-col justify-center items-center gap-2 text-xs text-zinc-400 truncate max-w-16 ">
-            <div className="flex flex-col rounded-full size-16 bg-purple-500/15 items-center justify-center ">
-              <Avatar size={32} alt="" src="" />
-            </div>
-            <span
-              title=" HingleMcGringleBerry"
-              className="w-full min-w-0 truncate"
-            >
-              HingleMcGringleBerry
-            </span>
-          </div>
-          <div className="flex flex-col justify-center items-center gap-2 text-xs text-zinc-400 truncate max-w-16 ">
-            <div className="flex flex-col rounded-full size-16 bg-purple-500/15 items-center justify-center ">
-              <Avatar size={32} alt="" src="" />
-            </div>
-            <span
-              title=" HingleMcGringleBerry"
-              className="w-full min-w-0 truncate"
-            >
-              HingleMcGringleBerry
-            </span>
-          </div>
-          <div className="flex flex-col justify-center items-center gap-2 text-xs text-zinc-400 truncate max-w-16 ">
-            <div className="flex flex-col rounded-full size-16 bg-purple-500/15 items-center justify-center ">
-              <Avatar size={32} alt="" src="" />
-            </div>
-            <span
-              title=" HingleMcGringleBerry"
-              className="w-full min-w-0 truncate"
-            >
-              HingleMcGringleBerry
-            </span>
-          </div>
-          <div className="flex flex-col justify-center items-center gap-2 text-xs text-zinc-400 truncate max-w-16 ">
-            <div className="flex flex-col rounded-full size-16 bg-purple-500/15 items-center justify-center ">
-              <Avatar size={32} alt="" src="" />
-            </div>
-            <span
-              title=" HingleMcGringleBerry"
-              className="w-full min-w-0 truncate"
-            >
-              HingleMcGringleBerry
-            </span>
-          </div>
-          <div className="flex flex-col justify-center items-center gap-2 text-xs text-zinc-400 truncate max-w-16 ">
-            <div className="flex flex-col rounded-full size-16 bg-purple-500/15 items-center justify-center ">
-              <Avatar size={32} alt="" src="" />
-            </div>
-            <span
-              title=" HingleMcGringleBerry"
-              className="w-full min-w-0 truncate"
-            >
-              HingleMcGringleBerry
-            </span>
-          </div>
-          <div className="flex flex-col justify-center items-center gap-2 text-xs text-zinc-400 truncate max-w-16 ">
-            <div className="flex flex-col rounded-full size-16 bg-purple-500/15 items-center justify-center ">
-              <Avatar size={32} alt="" src="" />
-            </div>
-            <span
-              title=" HingleMcGringleBerry"
-              className="w-full min-w-0 truncate"
-            >
-              HingleMcGringleBerry
-            </span>
-          </div>
-        </div>
-      </div>
-      <nav className="flex flex-col py-4 px-6 gap-2 bg-zinc-950 rounded-xl border border-zinc-800">
+    <div className="flex flex-col gap-8 max-w-136 ">
+      <Post src="" size={24} alt="pfp" />
+      {/* <nav className="flex flex-col py-4 px-6 gap-2 bg-zinc-950 rounded-xl border border-zinc-800">
         <div className="flex justify-between">
           <h2 className=" flex items-center uppercase font-bold tracking-wide text-sm text-zinc-400 ">
             Comunidades
@@ -162,7 +74,7 @@ export default function RightNavbar({ prop }: NavlinkProps) {
             );
           })}
         </ul>
-      </nav>
+      </nav> */}
     </div>
   );
 }

@@ -1,26 +1,93 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --neutral-1100: #010001;
+  --neutral-1000: #121212;
+  --neutral-900: #1c1c1c;
+  --neutral-700: #535252;
+  --neutral-600: #7c8084;
+  --neutral-500: #8f999c;
+  --neutral-400: #a5b0b3;
+  --neutral-300: #c3cccf;
+  --neutral-200: #dee6e8;
+  --neutral-100: #f0f4f5;
+
+  --brand-500: #d97a3a;
+  --brand-400: #ffa45b;
+  --brand-300: #ffb67b;
+
+  --background: var(--neutral-100);
+  --tag-brand: var(--brand-500);
+  --background-raised: var(--neutral-200);
+  --background-brand: var(--brand-500);
+
+  --border-base: var(--neutral-500);
+
+  --foreground: var(--neutral-1000);
+  --subtitle: var(--neutral-600);
+  --foreground-brand: var(--brand-500);
+  --foreground-inverted: var(--neutral-100);
+  --foreground-muted: var(--neutral-500);
 }
 
+/* TAILWIND VARIAVEIS 🔽 */
 @theme inline {
   --color-background: var(--background);
+  --color-background-raised: var(--background-raised);
+  --color-background-brand: var(--background-brand);
+  --color-tag-brand: var(--tag-brand);
+
   --color-foreground: var(--foreground);
+  --color-subtitle: var(--subtitle);
+  --color-foreground-inverted: var(--foreground-inverted);
+  --color-foreground-muted: var(--foreground-muted);
+
+  --color-border-base: var(--border-base);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  --color-neutral-1100: var(--neutral-1100);
+  --color-neutral-1000: var(--neutral-1000);
+  --color-neutral-900: var(--neutral-900);
+  --color-neutral-400: var(--neutral-400);
+  --color-neutral-100: var(--neutral-100);
+
+  --color-foreground-brand: var(--foreground-brand);
 }
+@theme {
+  --shadow-overflow-dark:
+    0 0 1px 0 rgba(1, 4, 4, 0.5), 0 0 12px 0 rgba(1, 4, 4, 0.56);
+  --shadow-overflow-light:
+    0 0 1px 0 rgb(30 31 33 /12%), 0 0 8px 0 rgb(30 31 33 /16%);
+}
+
+@layer components {
+  .gradient-to-l {
+    @apply bg-linear-to-l from-[#eabe76] via-[#d97a34] to-[#a740a0];
+  }
+}
+
 @layer base {
   :focus-visible {
     outline-offset: 3px;
-    outline: 2px solid #9333ea;
+    outline: 2px solid var(--foreground-brand);
   }
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: var(--neutral-1000);
+    --background-raised: var(--neutral-1100);
+    --background-brand: var(--brand-400);
+    --tag-brand: var(--brand-300);
+
+    --border-base: var(--neutral-700);
+
+    --foreground: var(--neutral-100);
+    --foreground-brand: var(--brand-400);
+    --foreground-inverted: var(--neutral-1000);
+    --foreground-muted: var(--neutral-700);
+    --subtitle: var(--neutral-500);
   }
 }
 

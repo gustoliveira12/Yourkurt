@@ -11,9 +11,9 @@ export interface AvatarProps {
 export default function Avatar({ src, alt, size = 40 }: AvatarProps) {
   const [error, setError] = useState(false);
   return (
-    <div className="size-12 rounded-full outline-2 outline-offset-2 outline-purple-500/25 bg-purple-500/15 flex flex-col items-center justify-center text-purple-400  ">
+    <div className="size-12 rounded-full outline-2 outline-offset-2 outline-background-brand/25 bg-background-brand/15 flex flex-col items-center justify-center text-purple-400  ">
       {!src || error ? (
-        <User className="text-purple-400" size={size} />
+        <User className="text-foreground-brand" size={size} />
       ) : (
         <Image
           className="h-full w-full object-cover rounded-full"

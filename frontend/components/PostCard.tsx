@@ -13,34 +13,38 @@ import Image from "next/image";
 import clsx from "clsx";
 import { useState } from "react";
 
-export default function PostCard() {
+type PostcardProp = { Mensagem: string };
+
+export default function PostCard({ Mensagem }: PostcardProp) {
   const [liked, setLiked] = useState(false);
   const [reposted, setReposted] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
 
-  const Mensagem = "";
   const src =
     "https://i.pinimg.com/1200x/2a/63/1d/2a631d3d6664c0c84bf78db4a758a2a9.jpg";
   const tags = ["Viagem", "Floripa", "Praia"];
   return (
-    <div className="flex flex-col px-6 py-4 w-full  bg-zinc-950 rounded-lg gap-2  border border-zinc-800 ">
-      <div className="flex flex-col gap-4">
-        <div className="flex justify-between items-center  ">
-          <div className="flex gap-4">
+    <div className="flex flex-col py-4 w-full rounded-lg gap-2">
+      <div className="flex flex-col gap-4 px-3">
+        <div className="flex justify-between items-center">
+          <div className="flex gap-4 ">
             <div>
               <Avatar size={32} alt="" src="" />
             </div>
-            <div className="flex flex-col">
-              <h3 className="text-lg font-bold">Pedro Alves</h3>
-              <div className="flex gap-4 text-zinc-400 ">
+            <div className="flex flex-col ">
+              <h3 className="text-lg font-bold text-foreground cursor-pointer">
+                Pedro Alves
+              </h3>
+              <div className="flex gap-4 text-subtitle">
                 <span> Há 12 minutos </span>
+                {/*TODO: TROCAR A COR DO LIGHT MODE */}
                 <span className="flex justify-center gap-2 items-center text-amber-400 ">
                   Feliz <Smile size={18} />{" "}
                 </span>
               </div>
             </div>
           </div>
-          <div className="p-2 rounded-sm hover:bg-zinc-400/10 transition-all duration-100 ease-out ">
+          <div className="p-2 rounded-sm hover:bg-background transition-all duration-100 ease-out text-foreground cursor-pointer">
             <Ellipsis />
           </div>
         </div>
@@ -55,36 +59,36 @@ export default function PostCard() {
         <div className="flex gap-2 max-w-full flex-wrap">
           {tags.map((hashtag) => (
             <div
-              className="px-3 py-1 rounded-full bg-purple-500/15 border border-purple-500 text-purple-500 w-fit font-semibold tracking-wide text-sm"
+              className="px-1 rounded-sm bg-tag-brand text-foreground-inverted w-fit font-bold tracking-wide text-sm"
               key={hashtag}
             >
-              #{hashtag}
+              {hashtag}
             </div>
           ))}
         </div>
-        <div className="h-0.5 w-full bg-zinc-800"></div>
         <div className="flex justify-between items-center">
           <div className="flex gap-6 items-center">
+            {/* TODO: MUDAR COR DO HOVER */}
             <button
               onClick={() => setLiked(!liked)}
               className={clsx(
                 "flex gap-2 items-center group",
                 liked
                   ? "text-rose-500 hover:text-rose-600 fill-rose-500 "
-                  : "text-zinc-200 hover:text-rose-300",
+                  : "text-foreground hover:text-rose-300",
               )}
             >
               <Heart
                 className={clsx(
                   "flex gap-2 items-center group-hover:text-rose-300 ",
-                  liked ? "text-rose-500 fill-rose-500 " : "text-zinc-200",
+                  liked ? "text-rose-500 fill-rose-500 " : "text-foreground",
                 )}
               />
               <span>50</span>
             </button>
             <button
               className={clsx(
-                "flex gap-2 items-center hover:text-zinc-600 text-zinc-200 ",
+                "flex gap-2 items-center hover:text-zinc-600 text-foreground ",
               )}
             >
               <MessageSquare className={clsx("flex gap-2 items-center")} />
@@ -96,7 +100,7 @@ export default function PostCard() {
                 "flex gap-2 items-center ",
                 reposted
                   ? "text-sky-500 fill-sky-500"
-                  : "text-zinc-200 hover:text-sky-200",
+                  : "text-foreground hover:text-sky-200",
               )}
             >
               <Repeat2 className={clsx("flex gap-2 items-center")} />
@@ -105,9 +109,13 @@ export default function PostCard() {
           </div>
           <button
             onClick={() => setBookmarked(!bookmarked)}
-            className="py-2 px-4 text-zinc-400 rounded-sm hover:bg-purple-500/15 hover:text-purple-500 transition-all duration-150"
+            className="py-2 px-4 text-foreground rounded-sm hover:bg-background-brand/15 hover:text-foreground-brand transition-all duration-150"
           >
-            <Bookmark className={clsx(bookmarked ? "fill-purple-500" : "")} />
+            <Bookmark
+              className={clsx(
+                bookmarked ? "fill-background-brand text-foreground-brand" : "",
+              )}
+            />
           </button>
         </div>
       </div>
