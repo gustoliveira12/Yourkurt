@@ -64,7 +64,7 @@
 
 @layer components {
   .gradient-to-l {
-    @apply bg-linear-to-l from-[#eabe76] via-[#d97a34] to-[#a740a0];
+    @apply bg-linear-to-l from-[#eec88b] via-[#e09056] to-[#da6fd2] dark:from-[#d6a85f] dark:via-[#be6729] dark:to-[#a740a0];
   }
 }
 

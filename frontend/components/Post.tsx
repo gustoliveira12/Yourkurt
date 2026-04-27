@@ -16,24 +16,34 @@ export default function Post({ src, alt, size }: AvatarProps) {
       </div>
       <div className="flex gap-4 h-10">
         <div className="flex gap-2">
-          <button className="text-sm font-medium flex border border-zinc-800 text-zinc-400 rounded-sm px-2 h-full gap-2 items-center hover:border-purple-400 hover:bg-purple-500/5 transition-all duration-150 ease-out">
-            <Camera size={18} className="text-purple-400" />
+          <button className="text-sm font-medium flex border border-border-base text-foreground rounded-sm px-2 h-full gap-2 items-center hover:bg-purple-200 hover:border-purple-600  dark:hover:border-purple-400 dark:hover:bg-purple-500/10 transition-all duration-150 ease-out">
+            <Camera
+              size={18}
+              className="dark:text-purple-400 text-purple-600"
+            />
             Foto
           </button>
-          <button className="text-sm font-medium flex border border-zinc-800 text-zinc-400 rounded-sm px-2 h-full gap-2 items-center  hover:border-emerald-400 hover:bg-emerald-500/5 transition-all duration-150 ease-out">
-            <Music className="text-emerald-500" size={16} />
+          <button className="text-sm font-medium flex border border-border-base text-foreground rounded-sm px-2 h-full gap-2 items-center hover:bg-emerald-100 hover:border-emerald-600 dark:hover:border-emerald-400 dark:hover:bg-emerald-500/10 transition-all duration-150 ease-out">
+            <Music
+              className="dark:text-emerald-500 text-emerald-600"
+              size={16}
+            />
             Musica
           </button>
-          <button className="text-sm font-medium flex border border-zinc-800 text-zinc-400 rounded-sm px-2 h-full gap-2 items-center  hover:border-red-400 hover:bg-red-500/5 transition-all duration-150 ease-out">
-            <Pin className="text-red-400" size={16} />
+          <button className="text-sm font-medium flex border border-border-base text-foreground rounded-sm px-2 h-full gap-2 items-center hover:border-red-500 hover:bg-red-200 dark:hover:border-red-400 dark:hover:bg-red-500/10 transition-all duration-150 ease-out">
+            <Pin className="dark:text-red-400 text-red-600" size={16} />
             Local
           </button>
-          <button className="text-sm font-medium flex border border-zinc-800 text-zinc-400 rounded-sm px-2 h-full gap-2 items-center  hover:border-amber-400 hover:bg-amber-500/5 transition-all duration-150 ease-out">
-            <SmilePlus className="text-amber-400" size={16} />
+          <button className="text-sm font-medium flex border border-border-base text-foreground rounded-sm px-2 h-full gap-2 items-center hover:border-yellow-700 dark:hover:border-yellow-500 hover:bg-yellow-200 dark:hover:bg-yellow-500/10 transition-all duration-150 ease-out">
+            <SmilePlus
+              strokeWidth={3}
+              className="text-yellow-600 dark:text-yellow-400"
+              size={16}
+            />
             Humor
           </button>
         </div>
-        <button className="brightness-90 flex justify-center items-center h-full w-12 bg-linear-to-r from-[#eabe76] via-[#d97a34] to-[#a740a0] rounded-sm font-bold text-foreground hover:brightness-80">
+        <button className="brightness-90 flex justify-center items-center h-full w-12 gradient-to-l rounded-sm font-bold text-foreground hover:brightness-80">
           <Send size={20} />
         </button>
       </div>

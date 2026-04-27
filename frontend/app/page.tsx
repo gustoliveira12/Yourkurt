@@ -1,30 +1,57 @@
 "use client";
-import PageAside from "@/components/Header";
+import PageAside from "@/components/NavBar";
 import LeftNavbar from "@/components/LeftNav";
 import Post from "@/components/Post";
 import PostCard from "@/components/PostCard";
 import RightNavbar from "@/components/RightNav";
 import Story from "@/components/Stories";
 import {
-  House,
-  User,
-  Group,
-  MessageCircle,
-  Settings,
-  Handshake,
-  Plus,
-  Gamepad2,
-  Music,
-  Book,
-  Plane,
-  HomeIcon,
-} from "lucide-react";
+  HouseIcon,
+  UsersIcon,
+  UserIcon,
+  UsersFourIcon,
+  ChatIcon,
+  GearSixIcon,
+  PlusIcon,
+  GameControllerIcon,
+  MusicNotesIcon,
+  BookIcon,
+  AirplaneIcon,
+} from "@phosphor-icons/react";
 import Link from "next/link";
 import { useState } from "react";
 
 const NAV_ITEMS = [
-  { label: "Home", icon: HomeIcon, to: "/" },
-  { label: "Perfil", icon: User, to: "/perfil" },
+  {
+    label: "Feed",
+    to: "/",
+    icon: HouseIcon,
+  },
+  {
+    label: "Perfil",
+    to: "/perfil",
+    icon: UserIcon,
+  },
+  {
+    label: "Amigos",
+    to: "/friends",
+    icon: UsersIcon,
+  },
+  {
+    label: "Comunidade",
+    to: "/communities",
+    icon: UsersFourIcon,
+  },
+  {
+    label: "Mensagens",
+    to: "/messages",
+    icon: ChatIcon,
+  },
+  {
+    label: "Configurações",
+    to: "/settings",
+    icon: GearSixIcon,
+  },
 ];
 
 export default function Home() {
@@ -32,57 +59,57 @@ export default function Home() {
     {
       text: "Feed",
       redirect: "/",
-      icon: House,
+      icon: HouseIcon,
     },
     {
       text: "Perfil",
       redirect: "/",
-      icon: User,
+      icon: UserIcon,
     },
     {
       text: "Amigos",
       redirect: "/",
-      icon: Group,
+      icon: UsersIcon,
     },
     {
       text: "Comunidade",
       redirect: "/",
-      icon: Handshake,
+      icon: UsersFourIcon,
     },
     {
       text: "Mensagens",
       redirect: "/",
-      icon: MessageCircle,
+      icon: ChatIcon,
     },
     {
       text: "Configurações",
       redirect: "/",
-      icon: Settings,
+      icon: GearSixIcon,
     },
   ];
   const Comunnities = [
     {
       text: "GamersBr",
       redirect: "/",
-      icon: Gamepad2,
+      icon: GameControllerIcon,
       color: "rose",
     },
     {
       text: "Indie Music",
       redirect: "/",
-      icon: Music,
+      icon: MusicNotesIcon,
       color: "emerald",
     },
     {
       text: "Clube do livro",
       redirect: "/",
-      icon: Book,
+      icon: BookIcon,
       color: "sky",
     },
     {
       text: "Mochileiros",
       redirect: "/",
-      icon: Plane,
+      icon: AirplaneIcon,
       color: "amber",
     },
   ];
@@ -103,7 +130,7 @@ export default function Home() {
             <div className="flex gap-4 justify-start items-center ">
               <div className="flex flex-col justify-center items-center gap-1.5 ">
                 <div className="size-12 rounded-full outline-2 outline-offset-2 outline-purple-500/25 bg-purple-500/15 flex flex-col items-center justify-center text-purple-400  ">
-                  <Plus />
+                  <PlusIcon />
                 </div>
                 <span className="text-xs text-zinc-400 truncate">
                   Seu story

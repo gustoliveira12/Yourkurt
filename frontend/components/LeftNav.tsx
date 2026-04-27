@@ -1,14 +1,15 @@
-import { User, LucideIcon, ArrowRight } from "lucide-react";
+import { User, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import type { UrlObject } from "url";
 import Avatar, { AvatarProps } from "./Avatar";
 import Image from "next/image";
 import { useState } from "react";
+import { type Icon, UserIcon, ArrowRightIcon } from "@phosphor-icons/react";
 
-interface NavlinksItem {
+export interface NavlinksItem {
   text: string;
   redirect: UrlObject | string;
-  icon: LucideIcon;
+  icon: Icon;
 }
 
 type NavlinkProps = {
@@ -24,7 +25,7 @@ export default function LeftNavbar({ prop, avatar }: NavlinkProps) {
         <div className="w-full h-16 gradient-to-l relative ">
           <div className="size-16 rounded-full border-4 border-background-raised flex items-center justify-center mb-3 bg-purple-500  absolute -bottom-10 left-4 ">
             {!avatar.src! || error ? (
-              <User className="text-purple-400" size={avatar.size!} />
+              <UserIcon className="text-purple-400" size={avatar.size!} />
             ) : (
               <Image
                 className="h-full w-full object-cover rounded-full"
@@ -74,7 +75,7 @@ export default function LeftNavbar({ prop, avatar }: NavlinkProps) {
           </h2>
           <button className="flex items-center justify-center  text-foreground-brand font-medium text-sm hover:bg-foreground-brand/15 px-2 py-1 rounded-sm transition-all duration-150 gap-1 cursor-pointer ">
             300
-            <ArrowRight size={12} />
+            <ArrowRightIcon size={12} />
           </button>
         </div>
         <div className="flex flex-wrap gap-4">

@@ -1,5 +1,10 @@
 import { useReducer } from "react";
-import { PanelLeftClose, PanelLeftOpen, type LucideIcon } from "lucide-react";
+
+import {
+  type Icon,
+  AlignLeftIcon,
+  AlignTopSimpleIcon,
+} from "@phosphor-icons/react";
 import clsx from "clsx";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -37,7 +42,7 @@ function asideReducer(state: AsideState, action: AsideAction): AsideState {
 
 export type NavItem = {
   to: string;
-  icon: LucideIcon;
+  icon: Icon;
   label: string;
   exact?: boolean;
 };
@@ -61,7 +66,7 @@ const PageAside = ({ items }: PageAsideProps) => {
       <aside
         className={clsx(
           "transition-all duration-200 ease-in-out flex flex-col relative",
-          isOpen ? "w-64" : "w-14",
+          isOpen ? "w-64" : "w-16",
         )}
         onMouseEnter={() => dispatch({ type: "ENTER" })}
         onMouseLeave={() => dispatch({ type: "LEAVE" })}
@@ -72,7 +77,7 @@ const PageAside = ({ items }: PageAsideProps) => {
           </h1>
         </div>
         <nav className="flex flex-col justify-center flex-1 p-2">
-          <ul className="flex flex-col gap-2">
+          <ul className="flex flex-col gap-1">
             {items.map(({ to, icon: Icon, label, exact }) => {
               const isActive = exact
                 ? pathname === to
@@ -82,15 +87,23 @@ const PageAside = ({ items }: PageAsideProps) => {
                   <Link
                     href={to}
                     className={clsx(
-                      "flex items-center w-full py-1.5 px-2.5 gap-3 font-gabarito rounded-lg hover:bg-foreground-muted text-foreground",
-                      { "bg-background-raised text-subtitle": isActive },
+                      "hover:bg-background-raised flex items-center w-full py-4 px-2.5 gap-3 font-bold uppercase rounded-lg text-subtitle",
+                      isActive ? "" : "",
                     )}
                   >
-                    <Icon className="size-5 shrink-0" />
+                    {" "}
+                    {/* TODO: MUDAR COR DE TEXTO PARA USAR VARIAVEIS */}
+                    <Icon
+                      color={isActive ? "var(--foreground)" : "var(--subtitle)"}
+                      className="shrink-0"
+                      size={28}
+                      weight={isActive ? "fill" : "bold"}
+                    />
                     <span
                       className={clsx(
                         "transition-all duration-300 whitespace-nowrap",
                         isOpen ? "opacity-100 visible" : "opacity-0 invisible",
+                        isActive ? "text-foreground" : "text-subtitle",
                       )}
                     >
                       {label}
@@ -105,21 +118,21 @@ const PageAside = ({ items }: PageAsideProps) => {
         <div className="flex flex-col items-center justify-center w-14 dark:text-gray-400 pb-4 gap-1">
           <button
             title="Manter minimizado"
-            className={clsx("p-2 dark:hover:bg-gray-800 rounded-lg", {
-              "dark:text-gray-200 dark:bg-gray-800": state.isKeepMinimized,
+            className={clsx("p-2 hover:bg-background-raised rounded-lg", {
+              "text-foreground bg-background-raised": state.isKeepMinimized,
             })}
             onClick={() => dispatch({ type: "KEEP_MINIMIZED" })}
           >
-            <PanelLeftClose className="size-5" />
+            <AlignLeftIcon weight="fill" size={28} />
           </button>
           <button
             title="Fixar aberta"
-            className={clsx("p-2 dark:hover:bg-gray-800 rounded-lg", {
-              "dark:text-gray-200 dark:bg-gray-800": state.isPinned,
+            className={clsx("p-2 hover:bg-background-raised rounded-lg", {
+              "text-foreground bg-background-raised": state.isPinned,
             })}
             onClick={() => dispatch({ type: "KEEP_PINNED" })}
           >
-            <PanelLeftOpen className="size-5" />
+            <AlignTopSimpleIcon weight="fill" size={28} />
           </button>
         </div>
       </aside>

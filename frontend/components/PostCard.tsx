@@ -37,9 +37,8 @@ export default function PostCard({ Mensagem }: PostcardProp) {
               </h3>
               <div className="flex gap-4 text-subtitle">
                 <span> Há 12 minutos </span>
-                {/*TODO: TROCAR A COR DO LIGHT MODE */}
-                <span className="flex justify-center gap-2 items-center text-amber-400 ">
-                  Feliz <Smile size={18} />{" "}
+                <span className="font-medium flex justify-center gap-2 items-center dark:text-yellow-400 text-yellow-600 ">
+                  Feliz <Smile strokeWidth={3} size={18} />{" "}
                 </span>
               </div>
             </div>
@@ -59,7 +58,7 @@ export default function PostCard({ Mensagem }: PostcardProp) {
         <div className="flex gap-2 max-w-full flex-wrap">
           {tags.map((hashtag) => (
             <div
-              className="px-1 rounded-sm bg-tag-brand text-foreground-inverted w-fit font-bold tracking-wide text-sm"
+              className="px-1 rounded-sm bg-tag-brand text-foreground-inverted w-fit font-bold tracking-wide text-xs uppercase cursor-pointer hover:bg-[var(--brand-500)]"
               key={hashtag}
             >
               {hashtag}
@@ -68,27 +67,22 @@ export default function PostCard({ Mensagem }: PostcardProp) {
         </div>
         <div className="flex justify-between items-center">
           <div className="flex gap-6 items-center">
-            {/* TODO: MUDAR COR DO HOVER */}
+            {/* TODO: ADD ANIMATIONS */}
             <button
               onClick={() => setLiked(!liked)}
               className={clsx(
-                "flex gap-2 items-center group",
+                "flex gap-2 items-center group cursor-pointer",
                 liked
-                  ? "text-rose-500 hover:text-rose-600 fill-rose-500 "
-                  : "text-foreground hover:text-rose-300",
+                  ? "text-rose-500 hover:text-rose-600 fill-rose-500 [&_svg]:fill-rose-500"
+                  : "text-foreground dark:hover:text-rose-300 hover:text-rose-600",
               )}
             >
-              <Heart
-                className={clsx(
-                  "flex gap-2 items-center group-hover:text-rose-300 ",
-                  liked ? "text-rose-500 fill-rose-500 " : "text-foreground",
-                )}
-              />
+              <Heart />
               <span>50</span>
             </button>
             <button
               className={clsx(
-                "flex gap-2 items-center hover:text-zinc-600 text-foreground ",
+                "flex gap-2 items-center hover:text-zinc-600 text-foreground cursor-pointer",
               )}
             >
               <MessageSquare className={clsx("flex gap-2 items-center")} />
@@ -97,10 +91,10 @@ export default function PostCard({ Mensagem }: PostcardProp) {
             <button
               onClick={() => setReposted(!reposted)}
               className={clsx(
-                "flex gap-2 items-center ",
+                "flex gap-2 items-center cursor-pointer",
                 reposted
                   ? "text-sky-500 fill-sky-500"
-                  : "text-foreground hover:text-sky-200",
+                  : "text-foreground dark:hover:text-sky-200 hover:text-sky-600  ",
               )}
             >
               <Repeat2 className={clsx("flex gap-2 items-center")} />
@@ -109,7 +103,7 @@ export default function PostCard({ Mensagem }: PostcardProp) {
           </div>
           <button
             onClick={() => setBookmarked(!bookmarked)}
-            className="py-2 px-4 text-foreground rounded-sm hover:bg-background-brand/15 hover:text-foreground-brand transition-all duration-150"
+            className="cursor-pointer py-2 px-4 text-foreground rounded-sm hover:bg-background-brand/15 hover:text-foreground-brand transition-all duration-150"
           >
             <Bookmark
               className={clsx(
