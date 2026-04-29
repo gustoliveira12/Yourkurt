@@ -1,13 +1,13 @@
 import { Camera, Music, Pin, Send, SmilePlus } from "lucide-react";
-import Avatar from "./Avatar";
+import { Avatar } from "./Avatar";
 import { AvatarProps } from "./Avatar";
 
-export default function Post({ src, alt, size }: AvatarProps) {
+export default function Post({ src }: AvatarProps) {
   return (
     <div className="flex flex-col w-full px-6 py-4 rounded-lg bg-background-raised gap-4 ">
       <div className="flex gap-4">
         <div className="rounded-full flex items-start justify-center w-fit h-fit mt-1">
-          <Avatar size={size} src={src} alt={alt} />
+          <Avatar src={src} />
         </div>
         <textarea
           placeholder="O que está passando pela sua órbita?"

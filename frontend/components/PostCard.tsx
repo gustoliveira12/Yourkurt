@@ -8,7 +8,7 @@ import {
   Repeat2,
   Smile,
 } from "lucide-react";
-import Avatar from "./Avatar";
+import { Avatar } from "./Avatar";
 import Image from "next/image";
 import clsx from "clsx";
 import { useState } from "react";
@@ -29,7 +29,7 @@ export default function PostCard({ Mensagem }: PostcardProp) {
         <div className="flex justify-between items-center">
           <div className="flex gap-4 ">
             <div>
-              <Avatar size={32} alt="" src="" />
+              <Avatar src="" />
             </div>
             <div className="flex flex-col ">
               <h3 className="text-lg font-bold text-foreground cursor-pointer">

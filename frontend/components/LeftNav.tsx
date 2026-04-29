@@ -1,7 +1,7 @@
 import { User, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import type { UrlObject } from "url";
-import Avatar, { AvatarProps } from "./Avatar";
+import { Avatar, AvatarProps } from "./Avatar";
 import Image from "next/image";
 import { useState } from "react";
 import { type Icon, UserIcon, ArrowRightIcon } from "@phosphor-icons/react";
@@ -15,9 +15,11 @@ export interface NavlinksItem {
 type NavlinkProps = {
   prop: NavlinksItem[];
   avatar: AvatarProps;
+  size: number;
+  alt: string;
 };
 
-export default function LeftNavbar({ prop, avatar }: NavlinkProps) {
+export default function LeftNavbar({ prop, avatar, size, alt }: NavlinkProps) {
   const [error, setError] = useState(false);
   return (
     <div className="flex flex-col gap-8 max-w-80 ">
@@ -25,13 +27,13 @@ export default function LeftNavbar({ prop, avatar }: NavlinkProps) {
         <div className="w-full h-16 gradient-to-l relative ">
           <div className="size-16 rounded-full border-4 border-background-raised flex items-center justify-center mb-3 bg-purple-500  absolute -bottom-10 left-4 ">
             {!avatar.src! || error ? (
-              <UserIcon className="text-purple-400" size={avatar.size!} />
+              <UserIcon className="text-purple-400" size={avatar.sizes!} />
             ) : (
               <Image
                 className="h-full w-full object-cover rounded-full"
-                height={avatar.size!}
-                width={avatar.size!}
-                alt={avatar.alt!}
+                height={size!}
+                width={size!}
+                alt={alt!}
                 src={avatar.src!}
                 onError={() => setError(true)}
               />
@@ -81,7 +83,7 @@ export default function LeftNavbar({ prop, avatar }: NavlinkProps) {
         <div className="flex flex-wrap gap-4">
           <div className="flex flex-col justify-center items-center gap-2 text-xs text-zinc-400 truncate max-w-16 ">
             <div className="flex flex-col rounded-full size-16  items-center justify-center ">
-              <Avatar size={32} alt="" src="" />
+              <Avatar src="" />
             </div>
             <span
               title=" HingleMcGringleBerry"
