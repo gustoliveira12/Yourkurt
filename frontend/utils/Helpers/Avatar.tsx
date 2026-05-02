@@ -5,7 +5,7 @@ export function getInitials(name?: string): string {
   return parts[0].charAt(0) + parts[parts.length - 1].charAt(0).toUpperCase();
 }
 
-export type AvatarSize = "sm" | "md" | "lg";
+export type AvatarSize = "lg" | "xl" | "2xl" | "3xl";
 export const SIZE_MAP: Record<
   AvatarSize,
   {
@@ -16,26 +16,33 @@ export const SIZE_MAP: Record<
     statusPos: string;
   }
 > = {
-  sm: {
-    px: 32,
-    text: "text-xs",
-    ring: "ring-2",
-    statusSize: "w-2.5 h-2.5",
-    statusPos: "bottom-0 right-0",
-  },
-  md: {
-    px: 40,
-    text: "text-sm",
-    ring: "ring-2",
-    statusSize: "w-3 h-3",
-    statusPos: "bottom-0 right-0",
-  },
   lg: {
     px: 56,
     text: "text-base",
     ring: "ring-[2.5px]",
     statusSize: "w-3.5 h-3.5",
     statusPos: "bottom-0.5 right-0.5",
+  },
+  xl: {
+    px: 72,
+    text: "text-lg",
+    ring: "ring-[3px]",
+    statusSize: "w-4 h-4",
+    statusPos: "bottom-1 right-1",
+  },
+  "2xl": {
+    px: 96,
+    text: "text-xl",
+    ring: "ring-[3.5px]",
+    statusSize: "w-5 h-5",
+    statusPos: "bottom-1 right-1",
+  },
+  "3xl": {
+    px: 128,
+    text: "text-2xl",
+    ring: "ring-4",
+    statusSize: "w-6 h-6",
+    statusPos: "bottom-1.5 right-1.5",
   },
 };
 

@@ -12,6 +12,14 @@ export interface NavlinksItem {
   icon: Icon;
 }
 
+interface NavProps extends AvatarProps {
+  prop: NavlinksItem[];
+  size: number;
+  alt: string;
+  name: string;
+  at: string;
+}
+
 type NavlinkProps = {
   prop: NavlinksItem[];
   avatar: AvatarProps;
@@ -19,22 +27,30 @@ type NavlinkProps = {
   alt: string;
 };
 
-export default function LeftNavbar({ prop, avatar, size, alt }: NavlinkProps) {
+export default function LeftNavbar({
+  prop,
+  size,
+  alt,
+  sizes,
+  src,
+  name,
+  at,
+}: NavProps) {
   const [error, setError] = useState(false);
   return (
     <div className="flex flex-col gap-8 max-w-80 ">
       <div className="flex flex-col rounded-xl bg-background-raised overflow-hidden h-fit ">
         <div className="w-full h-16 gradient-to-l relative ">
-          <div className="size-16 rounded-full border-4 border-background-raised flex items-center justify-center mb-3 bg-purple-500  absolute -bottom-10 left-4 ">
-            {!avatar.src! || error ? (
-              <UserIcon className="text-purple-400" size={avatar.sizes!} />
+          <div className="overflow-hidden size-16 rounded-full border-4 border-background-raised flex items-center justify-center mb-3 bg-purple-500  absolute -bottom-10 left-4 ">
+            {!src! || error ? (
+              <UserIcon className="text-purple-400" size={sizes!} />
             ) : (
               <Image
-                className="h-full w-full object-cover rounded-full"
-                height={size!}
-                width={size!}
+                className=""
+                fill
+                quality={90}
                 alt={alt!}
-                src={avatar.src!}
+                src={src!}
                 onError={() => setError(true)}
               />
             )}
@@ -43,12 +59,12 @@ export default function LeftNavbar({ prop, avatar, size, alt }: NavlinkProps) {
         <div className="flex flex-col px-6 py-4 gap-4 relative pt-10">
           <div className="flex flex-col w-full">
             <div className="flex w-full justify-between">
-              <h2 className="text-xl text-foreground font-bold">Lucas Silva</h2>
+              <h2 className="text-xl text-foreground font-bold">{name}</h2>
               <button className="text-sm text-foreground-brand cursor-pointer">
                 trocar
               </button>
             </div>
-            <span className="text-subtitle">@Lucas.Silva</span>
+            <span className="text-subtitle">@{at}</span>
           </div>
           <div className="border-t border-zinc-800 flex justify-between p-2 gap-2">
             <div className="flex flex-col items-center justify-center">

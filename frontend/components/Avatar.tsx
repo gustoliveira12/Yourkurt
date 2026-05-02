@@ -1,6 +1,7 @@
 "use client";
 
 import { AvatarFallback, AvatarSize, SIZE_MAP } from "@/utils/Helpers/Avatar";
+import clsx from "clsx";
 import Image from "next/image";
 import { useState } from "react";
 
@@ -10,6 +11,8 @@ export interface AvatarProps {
   sizes?: AvatarSize;
   className?: string;
   quality?: number;
+  isStory?: boolean;
+  isRead?: boolean;
 }
 
 export function Avatar({
@@ -17,7 +20,9 @@ export function Avatar({
   name,
   sizes = "lg",
   className = "",
-  quality = 95,
+  quality = 100,
+  isStory = false,
+  isRead = false,
 }: AvatarProps) {
   const [imgError, setImgError] = useState(false);
   const showImage = !!src && !imgError;
@@ -28,13 +33,16 @@ export function Avatar({
     <span
       role="img"
       aria-label={name ?? "User avatar"}
-      className={`
+      className={clsx(
+        `
         relative inline-flex shrink-0 items-center justify-center
         overflow-hidden rounded-full
-        ${ring} ring-white/10 dark:ring-white/10
-        bg-zinc-200 dark:bg-zinc-700
+        bg-foreground-muted text-foreground-inverted dark:bg-zinc-700
         ${className}
-      `}
+      `,
+        isStory && [isRead ? "outline-background-brand" : "outline-white/10"],
+        { "outline-offset-3 outline-3 ": isStory },
+      )}
       style={{ width: px, height: px }}
     >
       <AvatarFallback name={name} textClass={text} />
