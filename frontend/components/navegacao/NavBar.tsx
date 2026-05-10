@@ -62,7 +62,7 @@ const PageAside = ({ items }: PageAsideProps) => {
   const pathname = usePathname();
 
   return (
-    <div className="top-0 left-0 fixed flex h-dvh z-40 bg-background shadow-overflow-light dark:shadow-overflow-dark">
+    <div className="top-0 left-0 fixed sm:flex h-dvh z-40 bg-background shadow-overflow-light dark:shadow-overflow-dark hidden">
       <aside
         className={clsx(
           "transition-all duration-200 ease-in-out flex flex-col relative",
