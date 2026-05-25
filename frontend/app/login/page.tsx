@@ -24,24 +24,12 @@ export default function LoginPage() {
           )}
         >
           {/**Esquerda */}
-          <div className="bg-black dark:bg-white flex flex-col w-full h-full justify-between px-12 py-8 rounded-[20px]">
-            <span className="text-foreground-brand text-xl tracking-widest uppercase">
-              Esprokurt
-            </span>
-            <div className="flex flex-col gap-3 text-foreground">
-              <span className="w-1.5 text-6xl tracking-wider text-white font-semibold dark:text-foreground">
-                Conecte. Compartilhe. Inspire.
-              </span>
-              <span className="text-xl text-white">
-                Entre e descubra pessoas, ideias e momentos incríveis
-              </span>
-            </div>
-          </div>
+          <div className="bg-black dark:bg-white flex flex-col w-full h-full justify-between px-12 py-8 rounded-[20px]"></div>
           {/** Direita */}
           <div className="justify-between px-12 py-8 flex flex-col w-full h-full rounded-[20px] items-center"></div>
         </div>
       </div>
-      <div className="bg-black dark:bg-white flex flex-col h-full justify-between px-12 py-8 rounded-[20px] absolute top-0 left-0 w-1/2">
+      <div className="flex flex-col h-full justify-between px-12 py-8 rounded-[20px] absolute top-0 left-0 w-1/2">
         <span className="text-foreground-brand text-xl tracking-widest uppercase">
           Esprokurt
         </span>
