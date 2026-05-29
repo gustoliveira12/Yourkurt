@@ -1,10 +1,10 @@
 "use client";
 import { user } from "@/lib/user";
-import PageAside from "@/components/NavBar";
-import LeftNavbar from "@/components/LeftNav";
-import Post from "@/components/Post";
-import PostCard from "@/components/PostCard";
-import RightNavbar from "@/components/RightNav";
+import PageAside from "@/components/navegacao/NavBar";
+import ProfileSidebar from "@/components/navegacao/ProfileSidebar";
+import Post from "@/components/CreatePostbox";
+import PostCard from "@/components/UserPost";
+import RightNavbar from "@/components/PostComposer";
 import Story from "@/components/Stories";
 import {
   HouseIcon,
@@ -21,6 +21,8 @@ import {
 } from "@phosphor-icons/react";
 import Link from "next/link";
 import { useState } from "react";
+import MobileNav from "@/components/navegacao/MobileNav";
+import MobileHeader from "@/components/navegacao/MobileHeader";
 
 const NAV_ITEMS = [
   {
@@ -117,8 +119,9 @@ export default function Home() {
   return (
     <div className="w-dvw min-h-dvh overflow-hidden relative flex h-screen items-center justify-center bg-background font-sans gap-4">
       <PageAside items={NAV_ITEMS} />
-      <main className="overflow-auto h-dvh flex-1 w-full flex items-start justify-center pt-12 gap-4 ">
-        <LeftNavbar
+      <MobileHeader />
+      <main className="overflow-auto h-dvh flex-1 w-full flex items-start justify-center pt-20 gap-4 sm:pt-12">
+        <ProfileSidebar
           alt="string"
           size={1}
           prop={NavLinks}
@@ -126,9 +129,9 @@ export default function Home() {
           at="lucas.silva"
           src={user.img}
         />
-        <div className="flex flex-col gap-12 items-center min-w-152 px-4">
+        <div className="flex flex-col md:gap-12 items-center md:min-w-152 md:px-4">
           <div className="flex flex-col w-full ">
-            <div className="flex gap-6 justify-start items-center max-w-xl overflow-hidden px-2">
+            <div className="flex md:gap-6 justify-start items-center max-w-dvw lg:max-w-176 overflow-hidden px-2">
               {/* TODO: TROCAR O OUTLINE DOS STORIES, PORQUE ESTA HARDCODED */}
               <Story hasStory name={user.name} src={user.img} />
               <Story hasStory name="Renata" src="/imagem_foda.webp" />
@@ -179,7 +182,7 @@ export default function Home() {
               />
             </div>
           </div>
-          <div className="flex flex-col w-full gap-8 max-w-lg">
+          <div className="flex flex-col w-full gap-8 max-w-xl">
             <PostCard Mensagem="Acabei de voltar de Floripa, o pôr do sol na lagoinha tava do caralho" />
             <PostCard Mensagem="Acabei de voltar de Floripa, o pôr do sol na lagoinha tava do caralho" />
             <PostCard Mensagem="Acabei de voltar de Floripa, o pôr do sol na lagoinha tava do caralho" />
@@ -187,6 +190,7 @@ export default function Home() {
         </div>
         <RightNavbar prop={Comunnities} />
       </main>
+      <MobileNav />
     </div>
   );
 }

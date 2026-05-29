@@ -1,7 +1,7 @@
 import { User, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import type { UrlObject } from "url";
-import { Avatar, AvatarProps } from "./Avatar";
+import { Avatar, AvatarProps } from "../Avatar";
 import Image from "next/image";
 import { useState } from "react";
 import { type Icon, UserIcon, ArrowRightIcon } from "@phosphor-icons/react";
@@ -38,7 +38,7 @@ export default function LeftNavbar({
 }: NavProps) {
   const [error, setError] = useState(false);
   return (
-    <div className="flex flex-col gap-8 max-w-80 ">
+    <div className="hidden md:flex flex-col gap-8 max-w-80">
       <div className="flex flex-col rounded-xl bg-background-raised overflow-hidden h-fit ">
         <div className="w-full h-16 gradient-to-l relative ">
           <div className="overflow-hidden size-16 rounded-full border-4 border-background-raised flex items-center justify-center mb-3 bg-purple-500  absolute -bottom-10 left-4 ">

@@ -24,14 +24,14 @@ export default function PostCard({ Mensagem }: PostcardProp) {
     "https://i.pinimg.com/1200x/2a/63/1d/2a631d3d6664c0c84bf78db4a758a2a9.jpg";
   const tags = ["Viagem", "Floripa", "Praia"];
   return (
-    <div className="flex flex-col py-4 w-full rounded-lg gap-2">
+    <div className="flex flex-col md:py-4 md:w-full md:rounded-lg gap-2 w-dvw">
       <div className="flex flex-col gap-4 px-3">
         <div className="flex justify-between items-center">
           <div className="flex gap-4 ">
             <div>
               <Avatar src="" />
             </div>
-            <div className="flex flex-col ">
+            <div className="flex flex-col">
               <h3 className="text-lg font-bold text-foreground cursor-pointer">
                 Pedro Alves
               </h3>
@@ -49,7 +49,7 @@ export default function PostCard({ Mensagem }: PostcardProp) {
         </div>
         <div>{Mensagem && <span className="font-medium">{Mensagem}</span>}</div>
       </div>
-      <div className="w-full relative max-w-full max-h-96 aspect-video rounded-xl overflow-hidden flex justify-center items-center ">
+      <div className="w-full relative max-w-full max-h-96 aspect-video md:rounded-xl overflow-hidden flex justify-center items-center ">
         {src && (
           <Image className="object-contain" fill alt="foda-se" src={src} />
         )}{" "}

@@ -9,7 +9,7 @@ interface StoryProps extends AvatarProps {
 //TODO: CREATE HOVER | IDENTIFY POSTED STORIES
 export default function Story({ src, name, hasStory }: StoryProps) {
   return (
-    <div className="flex flex-col justify-center items-center gap-1.5 h-32">
+    <div className="flex flex-col justify-center items-center gap-1.5 h-32 max-w-dvw">
       <Avatar isRead isStory sizes="xl" src={src} />
       <span
         title={name}

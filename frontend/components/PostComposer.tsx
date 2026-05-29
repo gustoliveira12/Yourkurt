@@ -5,7 +5,7 @@ import type { UrlObject } from "url";
 import { ArrowRight } from "lucide-react";
 import { Avatar } from "./Avatar";
 import clsx from "clsx";
-import Post from "./Post";
+import Post from "./CreatePostbox";
 import { user } from "@/lib/user";
 
 interface CommunityItems {
@@ -31,7 +31,7 @@ function getColorClass(color: string) {
 
 export default function RightNavbar({ prop }: NavlinkProps) {
   return (
-    <div className="flex flex-col gap-8 max-w-136 ">
+    <div className="flex flex-col gap-8 max-w-136">
       <Post src={user.img} />
       {/* <nav className="flex flex-col py-4 px-6 gap-2 bg-zinc-950 rounded-xl border border-zinc-800">
         <div className="flex justify-between">
