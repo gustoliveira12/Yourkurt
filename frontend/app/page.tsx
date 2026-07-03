@@ -1,8 +1,9 @@
 "use client";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { user } from "@/lib/user";
 import PageAside from "@/components/navegacao/NavBar";
 import ProfileSidebar from "@/components/navegacao/ProfileSidebar";
-import Post from "@/components/CreatePostbox";
 import PostCard from "@/components/UserPost";
 import RightNavbar from "@/components/PostComposer";
 import Story from "@/components/Stories";
@@ -13,14 +14,11 @@ import {
   UsersFourIcon,
   ChatIcon,
   GearSixIcon,
-  PlusIcon,
   GameControllerIcon,
   MusicNotesIcon,
   BookIcon,
   AirplaneIcon,
 } from "@phosphor-icons/react";
-import Link from "next/link";
-import { useState } from "react";
 import MobileNav from "@/components/navegacao/MobileNav";
 import MobileHeader from "@/components/navegacao/MobileHeader";
 
@@ -58,6 +56,8 @@ const NAV_ITEMS = [
 ];
 
 export default function Home() {
+  const router = useRouter();
+
   const NavLinks = [
     {
       text: "Feed",
@@ -116,6 +116,14 @@ export default function Home() {
       color: "amber",
     },
   ];
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (!storedUser) {
+      router.push("/login");
+    }
+  }, [router]);
+
   return (
     <div className="w-dvw min-h-dvh overflow-hidden relative flex h-screen items-center justify-center bg-background font-sans gap-4">
       <PageAside items={NAV_ITEMS} />

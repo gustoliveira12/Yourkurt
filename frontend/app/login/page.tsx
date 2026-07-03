@@ -28,22 +28,20 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const { data, error } = await supabase
-        .from("users")
-        .select("*")
-        .eq("email", email.trim())
-        .eq("password", password.trim())
-        .maybeSingle();
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password: password.trim(),
+      });
 
       if (error) {
         throw new Error(error.message);
       }
 
-      if (!data) {
+      if (!data.session || !data.user) {
         throw new Error("Email ou senha inválidos");
       }
 
-      localStorage.setItem("user", JSON.stringify(data));
+      localStorage.setItem("user", JSON.stringify(data.user));
       router.push("/");
     } catch (err) {
       console.error(err);
