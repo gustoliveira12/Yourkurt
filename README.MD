@@ -1,19 +1,27 @@
-# EsproKurt codebase
+# EsproKurt
 
-A arquitetura do EsproKurt é monolítica e este é o monorepo principal.
+O EsproKurt e uma rede social interna inspirada no Orkut.
 
-## Instruções
+Este repositorio e o monorepo principal do projeto e concentra o desenvolvimento da aplicacao web, autenticacao com Supabase e a base para expansao futura do backend.
 
-Para rodar o frontend:
+## Tecnologias
 
-```bash
-pnpm install
-pnpm dev:front
+- Next.js
+- TypeScript
+- Tailwind CSS
+- Supabase
+
+## Estrutura
+
+```text
+.
+├─ frontend/    Aplicacao web
+└─ backend/     Espaco reservado para backend futuro
 ```
 
-Para rodar o backend:
+## Status do Projeto
 
-```bash
-pnpm install
-pnpm dev:back
-```
+- Frontend em desenvolvimento ativo
+- Autenticacao integrada com Supabase
+- Backend dedicado ainda em planejamento
+
