@@ -5,7 +5,10 @@ import * as Checkbox from "@radix-ui/react-checkbox";
 import clsx from "clsx";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import supabase from "../../lib/api";
+import Link from "next/link";
+import { createClient } from "@/lib/supabase/client";
+
+const supabase = createClient();
 
 export default function LoginPage() {
   const router = useRouter();
@@ -27,8 +30,7 @@ export default function LoginPage() {
       if (error) throw new Error(error.message);
       if (!data.session || !data.user) throw new Error("Email ou senha inválidos");
 
-      localStorage.setItem("user", JSON.stringify(data.user));
-      router.push("/");
+      router.replace("/");
     } catch (err) {
       console.error(err);
       alert(err instanceof Error ? err.message : "Erro ao fazer login");
@@ -125,7 +127,12 @@ export default function LoginPage() {
           </form>
         </div>
 
-        <span>Não tem uma conta? Registrar</span>
+        <span>
+          Não tem uma conta?{" "}
+          <Link href="/cadastro" className="text-foreground-brand underline">
+            Registrar
+          </Link>
+        </span>
       </div>
     </>
   );

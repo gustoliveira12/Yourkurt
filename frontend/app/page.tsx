@@ -1,6 +1,4 @@
 "use client";
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { user } from "@/lib/user";
 import PageAside from "@/components/navegacao/NavBar";
 import ProfileSidebar from "@/components/navegacao/ProfileSidebar";
@@ -56,7 +54,6 @@ const NAV_ITEMS = [
 ];
 
 export default function Home() {
-  const router = useRouter();
 
   const NavLinks = [
     {
@@ -116,13 +113,6 @@ export default function Home() {
       color: "amber",
     },
   ];
-
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (!storedUser) {
-      router.push("/login");
-    }
-  }, [router]);
 
   return (
     <div className="w-dvw min-h-dvh overflow-hidden relative flex h-screen items-center justify-center bg-background font-sans gap-4">
