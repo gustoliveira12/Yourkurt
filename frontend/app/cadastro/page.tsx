@@ -29,7 +29,7 @@ export default function CadastroPage() {
     try {
       const { error } = await supabase.auth.signUp({
         email: email.trim(),
-        password: password.trim(),
+        password,
       });
 
       if (error) throw new Error(error.message);

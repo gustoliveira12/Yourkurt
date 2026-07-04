@@ -6,6 +6,20 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 const AUTH_ROUTES = new Set(["/login", "/cadastro"]);
 
+function withPreservedHeaders(baseResponse: NextResponse, redirectResponse: NextResponse) {
+  baseResponse.headers.forEach((value, key) => {
+    if (key.toLowerCase() !== "location") {
+      redirectResponse.headers.set(key, value);
+    }
+  });
+
+  baseResponse.cookies.getAll().forEach((cookie) => {
+    redirectResponse.cookies.set(cookie);
+  });
+
+  return redirectResponse;
+}
+
 export async function middleware(request: NextRequest) {
   if (!supabaseUrl || !supabaseAnonKey) {
     return NextResponse.next({ request });
@@ -42,13 +56,13 @@ export async function middleware(request: NextRequest) {
   if (!user && !isAuthRoute) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
-    return NextResponse.redirect(url);
+    return withPreservedHeaders(response, NextResponse.redirect(url));
   }
 
   if (user && isAuthRoute) {
     const url = request.nextUrl.clone();
     url.pathname = "/";
-    return NextResponse.redirect(url);
+    return withPreservedHeaders(response, NextResponse.redirect(url));
   }
 
   return response;
