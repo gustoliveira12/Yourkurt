@@ -1,3 +1,5 @@
+"use client";
+
 import { Avatar } from "../Avatar";
 import { useCurrentProfile } from "@/lib/hooks/useCurrentProfile";
 

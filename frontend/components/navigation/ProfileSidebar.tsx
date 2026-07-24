@@ -1,4 +1,5 @@
-import { User, ArrowRight } from "lucide-react";
+"use client";
+
 import type { UrlObject } from "url";
 import { Avatar, AvatarProps } from "../Avatar";
 import Image from "next/image";
@@ -56,7 +57,7 @@ export default function LeftNavbar({
             <div className="gradient-to-l absolute inset-0" />
           )}
           <div className="overflow-hidden size-16 rounded-full border-4 border-background-raised flex items-center justify-center mb-3 bg-purple-500 absolute -bottom-10 left-4">
-            {!src! || error ? (
+            {!src || error ? (
               <UserIcon className="text-foreground-inverted" size={34} weight="fill" />
             ) : (
               <Image

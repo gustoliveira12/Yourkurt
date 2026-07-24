@@ -63,7 +63,7 @@ begin
   )
   on conflict (id) do update
   set
-    email = excluded.email,
+    email = coalesce(excluded.email, public.profiles.email),
     name = coalesce(excluded.name, public.profiles.name),
     username = coalesce(excluded.username, public.profiles.username),
     bio = coalesce(excluded.bio, public.profiles.bio),
