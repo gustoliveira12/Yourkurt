@@ -51,7 +51,13 @@ export default function PostCard({ Mensagem }: PostcardProp) {
       </div>
       <div className="w-full relative max-w-full max-h-96 aspect-video md:rounded-xl overflow-hidden flex justify-center items-center ">
         {src && (
-          <Image className="object-contain" fill alt="foda-se" src={src} />
+          <Image
+            className="object-contain"
+            fill
+            sizes="(max-width: 768px) 100vw, 768px"
+            alt="Imagem da publicação"
+            src={src}
+          />
         )}{" "}
       </div>
       <div className="flex flex-col gap-2">

@@ -1,3 +1,5 @@
+import Script from "next/script";
+
 export default function ThemeScript() {
   const script = `
 (() => {
@@ -13,5 +15,9 @@ export default function ThemeScript() {
   }
 })();`;
 
-  return <script dangerouslySetInnerHTML={{ __html: script }} />;
+  return (
+    <Script id="esprokurt-theme-script" strategy="beforeInteractive">
+      {script}
+    </Script>
+  );
 }

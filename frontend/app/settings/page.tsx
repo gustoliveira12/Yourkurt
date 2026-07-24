@@ -5,7 +5,7 @@ import MobileNav from "@/components/navigation/MobileNav";
 import PageAside from "@/components/navigation/NavBar";
 import ProfileSidebar from "@/components/navigation/ProfileSidebar";
 import ThemeToggle from "@/components/theme/ThemeToggle";
-import { user } from "@/lib/user";
+import { useCurrentProfile } from "@/lib/hooks/useCurrentProfile";
 import {
   BellIcon,
   ChatIcon,
@@ -117,6 +117,8 @@ function SettingsCard({
 }
 
 export default function SettingsPage() {
+  const { profile } = useCurrentProfile();
+
   return (
     <div className="w-dvw min-h-dvh overflow-hidden relative flex h-screen items-center justify-center bg-background font-sans gap-4">
       <PageAside items={NAV_ITEMS} />
@@ -127,9 +129,10 @@ export default function SettingsPage() {
           alt="Foto de perfil"
           size={1}
           prop={PROFILE_LINKS}
-          name="Lucas Silva"
-          at="lucas.silva"
-          src={user.img}
+          name={profile?.name ?? "Carregando..."}
+          at={profile?.username ?? "usuario"}
+          src={profile?.avatarUrl ?? null}
+          headerUrl={profile?.headerUrl}
         />
 
         <section className="w-full max-w-4xl px-3 md:px-4 pb-24 sm:pb-10">

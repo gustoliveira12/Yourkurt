@@ -1,10 +1,10 @@
 import { User, ArrowRight } from "lucide-react";
-import Link from "next/link";
 import type { UrlObject } from "url";
 import { Avatar, AvatarProps } from "../Avatar";
 import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
-import { type Icon, UserIcon, ArrowRightIcon } from "@phosphor-icons/react";
+import { type Icon, ArrowRightIcon, UserIcon } from "@phosphor-icons/react";
 
 export interface NavlinksItem {
   text: string;
@@ -18,6 +18,7 @@ interface NavProps extends AvatarProps {
   alt: string;
   name: string;
   at: string;
+  headerUrl?: string | null;
 }
 
 type NavlinkProps = {
@@ -35,19 +36,33 @@ export default function LeftNavbar({
   src,
   name,
   at,
+  headerUrl,
 }: NavProps) {
   const [error, setError] = useState(false);
   return (
     <div className="hidden md:flex flex-col gap-8 max-w-80">
       <div className="flex flex-col rounded-xl bg-background-raised overflow-hidden h-fit ">
-        <div className="w-full h-16 gradient-to-l relative ">
-          <div className="overflow-hidden size-16 rounded-full border-4 border-background-raised flex items-center justify-center mb-3 bg-purple-500  absolute -bottom-10 left-4 ">
+        <Link href="/perfil" className="w-full h-16 relative block" aria-label="Abrir perfil">
+          {headerUrl ? (
+            <Image
+              fill
+              sizes="320px"
+              quality={90}
+              alt={`Capa de ${name}`}
+              src={headerUrl}
+              className="object-cover"
+            />
+          ) : (
+            <div className="gradient-to-l absolute inset-0" />
+          )}
+          <div className="overflow-hidden size-16 rounded-full border-4 border-background-raised flex items-center justify-center mb-3 bg-purple-500 absolute -bottom-10 left-4">
             {!src! || error ? (
-              <UserIcon className="text-purple-400" size={sizes!} />
+              <UserIcon className="text-foreground-inverted" size={34} weight="fill" />
             ) : (
               <Image
                 className=""
                 fill
+                sizes="64px"
                 quality={90}
                 alt={alt!}
                 src={src!}
@@ -55,16 +70,20 @@ export default function LeftNavbar({
               />
             )}
           </div>
-        </div>
+        </Link>
         <div className="flex flex-col px-6 py-4 gap-4 relative pt-10">
           <div className="flex flex-col w-full">
             <div className="flex w-full justify-between">
-              <h2 className="text-xl text-foreground font-bold">{name}</h2>
+              <Link href="/perfil" className="text-xl text-foreground font-bold hover:underline">
+                {name}
+              </Link>
               <button className="text-sm text-foreground-brand cursor-pointer">
                 trocar
               </button>
             </div>
-            <span className="text-subtitle">@{at}</span>
+            <Link href="/perfil" className="text-subtitle hover:underline w-fit">
+              @{at}
+            </Link>
           </div>
           <div className="border-t border-zinc-800 flex justify-between p-2 gap-2">
             <div className="flex flex-col items-center justify-center">
@@ -80,7 +99,7 @@ export default function LeftNavbar({
             <div className="flex flex-col items-center justify-center">
               <h3 className="text-lg font-bold">6</h3>
               <span className="text-sm text-subtitle font-medium ">
-                Mensagens
+                Publicações
               </span>
             </div>
           </div>

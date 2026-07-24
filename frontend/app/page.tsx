@@ -1,5 +1,5 @@
 "use client";
-import { user } from "@/lib/user";
+import { useCurrentProfile } from "@/lib/hooks/useCurrentProfile";
 import PageAside from "@/components/navigation/NavBar";
 import ProfileSidebar from "@/components/navigation/ProfileSidebar";
 import PostCard from "@/components/UserPost";
@@ -54,6 +54,7 @@ const NAV_ITEMS = [
 ];
 
 export default function Home() {
+  const { profile } = useCurrentProfile();
 
   const NavLinks = [
     {
@@ -123,15 +124,20 @@ export default function Home() {
           alt="string"
           size={1}
           prop={NavLinks}
-          name="Lucas Silva"
-          at="lucas.silva"
-          src={user.img}
+          name={profile?.name ?? "Carregando..."}
+          at={profile?.username ?? "usuario"}
+          src={profile?.avatarUrl ?? null}
+          headerUrl={profile?.headerUrl}
         />
         <div className="flex flex-col md:gap-12 items-center md:min-w-152 md:px-4">
           <div className="flex flex-col w-full ">
             <div className="flex md:gap-6 justify-start items-center max-w-dvw lg:max-w-176 overflow-hidden px-2">
               {/* TODO: TROCAR O OUTLINE DOS STORIES, PORQUE ESTA HARDCODED */}
-              <Story hasStory name={user.name} src={user.img} />
+              <Story
+                hasStory
+                name={profile?.name ?? "Usuário"}
+                src={profile?.avatarUrl ?? null}
+              />
               <Story hasStory name="Renata" src="/imagem_foda.webp" />
               <Story
                 hasStory

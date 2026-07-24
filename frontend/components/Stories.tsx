@@ -10,7 +10,7 @@ interface StoryProps extends AvatarProps {
 export default function Story({ src, name, hasStory }: StoryProps) {
   return (
     <div className="flex flex-col justify-center items-center gap-1.5 h-32 max-w-dvw">
-      <Avatar isRead isStory sizes="xl" src={src} />
+      <Avatar isRead isStory sizes="xl" src={src} name={name} />
       <span
         title={name}
         className="text-center text-zinc-400 truncate min-w-full w-0 block"

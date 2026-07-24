@@ -51,6 +51,26 @@ export type PageAsideProps = {
   items: NavItem[];
 };
 
+function normalizePath(path: string): string {
+  if (!path) return "/";
+  return path.length > 1 && path.endsWith("/") ? path.slice(0, -1) : path;
+}
+
+function isPathActive(pathname: string, to: string, exact?: boolean): boolean {
+  const current = normalizePath(pathname);
+  const target = normalizePath(to);
+
+  if (target === "/") {
+    return current === "/";
+  }
+
+  if (exact) {
+    return current === target;
+  }
+
+  return current === target || current.startsWith(`${target}/`);
+}
+
 const PageAside = ({ items }: PageAsideProps) => {
   const [state, dispatch] = useReducer(asideReducer, {
     isExpanded: false,
@@ -79,9 +99,7 @@ const PageAside = ({ items }: PageAsideProps) => {
         <nav className="flex flex-col justify-center flex-1 p-2">
           <ul className="flex flex-col gap-1">
             {items.map(({ to, icon: Icon, label, exact }) => {
-              const isActive = exact
-                ? pathname === to
-                : pathname.startsWith(to);
+              const isActive = isPathActive(pathname, to, exact);
               return (
                 <li key={to}>
                   <Link
