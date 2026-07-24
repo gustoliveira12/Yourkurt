@@ -2,7 +2,10 @@
 
 O EsproKurt e uma rede social interna inspirada no Orkut.
 
-Este repositorio e o monorepo principal do projeto e concentra o desenvolvimento da aplicacao web, autenticacao com Supabase e a base para expansao futura do backend.
+Este repositorio e o monorepo principal do projeto e concentra:
+- aplicacao web em Next.js
+- autenticacao e dados com Supabase
+- estrutura para expansao futura do backend
 
 ## Tecnologias
 
@@ -15,13 +18,23 @@ Este repositorio e o monorepo principal do projeto e concentra o desenvolvimento
 
 ```text
 .
-├─ frontend/    Aplicacao web
-└─ backend/     Espaco reservado para backend futuro
+├─ frontend/    Aplicacao web (App Router)
+├─ backend/     Espaco reservado para backend futuro
+└─ supabase/    Configuracao e migracoes SQL
 ```
+
+## Paginas Ja Implementadas
+
+- `/` feed principal
+- `/login` autenticacao
+- `/signup` criacao de conta
+- `/perfil` perfil do usuario
+- `/settings` preferencias e conta
 
 ## Status do Projeto
 
 - Frontend em desenvolvimento ativo
-- Autenticacao integrada com Supabase
+- Fluxo de autenticacao com Supabase funcionando
+- Perfil com leitura/edicao e upload de avatar/header
 - Backend dedicado ainda em planejamento
 
