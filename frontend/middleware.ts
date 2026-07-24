@@ -4,7 +4,7 @@ import { NextResponse, type NextRequest } from "next/server";
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-const AUTH_ROUTES = new Set(["/login", "/cadastro"]);
+const AUTH_ROUTES = new Set(["/login", "/signup"]);
 
 function withPreservedHeaders(baseResponse: NextResponse, redirectResponse: NextResponse) {
   baseResponse.headers.forEach((value, key) => {

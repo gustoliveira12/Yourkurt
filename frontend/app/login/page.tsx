@@ -129,7 +129,7 @@ export default function LoginPage() {
 
         <span>
           Não tem uma conta?{" "}
-          <Link href="/cadastro" className="text-foreground-brand underline">
+          <Link href="/signup" className="text-foreground-brand underline">
             Registrar
           </Link>
         </span>

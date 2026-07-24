@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --neutral-1100: #010001;
   --neutral-1000: #121212;
@@ -89,6 +91,36 @@
     --foreground-muted: var(--neutral-700);
     --subtitle: var(--neutral-500);
   }
+}
+
+:root[data-theme="light"] {
+  --background: var(--neutral-100);
+  --background-raised: var(--neutral-200);
+  --background-brand: var(--brand-500);
+  --tag-brand: var(--brand-500);
+
+  --border-base: var(--neutral-500);
+
+  --foreground: var(--neutral-1000);
+  --foreground-brand: var(--brand-500);
+  --foreground-inverted: var(--neutral-100);
+  --foreground-muted: var(--neutral-500);
+  --subtitle: var(--neutral-600);
+}
+
+:root[data-theme="dark"] {
+  --background: var(--neutral-1000);
+  --background-raised: var(--neutral-1100);
+  --background-brand: var(--brand-400);
+  --tag-brand: var(--brand-300);
+
+  --border-base: var(--neutral-700);
+
+  --foreground: var(--neutral-100);
+  --foreground-brand: var(--brand-400);
+  --foreground-inverted: var(--neutral-1000);
+  --foreground-muted: var(--neutral-700);
+  --subtitle: var(--neutral-500);
 }
 
 body {

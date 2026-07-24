@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 
 const supabase = createClient();
 
-export default function CadastroPage() {
+export default function SignupPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

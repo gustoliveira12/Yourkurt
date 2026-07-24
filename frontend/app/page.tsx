@@ -1,7 +1,7 @@
 "use client";
 import { user } from "@/lib/user";
-import PageAside from "@/components/navegacao/NavBar";
-import ProfileSidebar from "@/components/navegacao/ProfileSidebar";
+import PageAside from "@/components/navigation/NavBar";
+import ProfileSidebar from "@/components/navigation/ProfileSidebar";
 import PostCard from "@/components/UserPost";
 import RightNavbar from "@/components/PostComposer";
 import Story from "@/components/Stories";
@@ -17,8 +17,8 @@ import {
   BookIcon,
   AirplaneIcon,
 } from "@phosphor-icons/react";
-import MobileNav from "@/components/navegacao/MobileNav";
-import MobileHeader from "@/components/navegacao/MobileHeader";
+import MobileNav from "@/components/navigation/MobileNav";
+import MobileHeader from "@/components/navigation/MobileHeader";
 
 const NAV_ITEMS = [
   {
