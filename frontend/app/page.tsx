@@ -1,8 +1,10 @@
 "use client";
 import { useCurrentProfile } from "@/lib/hooks/useCurrentProfile";
+import { usePosts } from "@/lib/hooks/usePosts";
 import PageAside from "@/components/navigation/NavBar";
 import ProfileSidebar from "@/components/navigation/ProfileSidebar";
 import PostCard from "@/components/UserPost";
+import CreatePostbox from "@/components/CreatePostbox";
 import RightNavbar from "@/components/PostComposer";
 import Story from "@/components/Stories";
 import {
@@ -55,6 +57,7 @@ const NAV_ITEMS = [
 
 export default function Home() {
   const { profile } = useCurrentProfile();
+  const { posts, loading, addPost } = usePosts();
 
   const NavLinks = [
     {
@@ -186,10 +189,28 @@ export default function Home() {
               />
             </div>
           </div>
-          <div className="flex flex-col w-full gap-8 max-w-xl">
-            <PostCard Mensagem="Acabei de voltar de Floripa, o pôr do sol na lagoinha tava do caralho" />
-            <PostCard Mensagem="Acabei de voltar de Floripa, o pôr do sol na lagoinha tava do caralho" />
-            <PostCard Mensagem="Acabei de voltar de Floripa, o pôr do sol na lagoinha tava do caralho" />
+          <div className="flex flex-col w-full gap-4 max-w-xl">
+            {profile && (
+              <CreatePostbox
+                avatarUrl={profile.avatarUrl}
+                userId={profile.id}
+                profile={{
+                  name: profile.name,
+                  username: profile.username,
+                  avatar_url: profile.avatarUrl,
+                }}
+                onPostCreated={addPost}
+              />
+            )}
+            {loading && (
+              <p className="text-center text-foreground-muted py-8">Carregando posts...</p>
+            )}
+            {!loading && posts.length === 0 && (
+              <p className="text-center text-foreground-muted py-8">Nenhum post ainda. Seja o primeiro!</p>
+            )}
+            {posts.map((post) => (
+              <PostCard key={post.id} post={post} />
+            ))}
           </div>
         </div>
         <RightNavbar prop={Comunnities} />
