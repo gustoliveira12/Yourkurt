@@ -11,6 +11,7 @@ import { Avatar } from "./Avatar";
 import Image from "next/image";
 import clsx from "clsx";
 import { useState } from "react";
+import { useLikes } from "@/lib/hooks/useLikes";
 import type { Post } from "@/lib/hooks/usePosts";
 
 function timeAgo(dateStr: string): string {
@@ -22,19 +23,11 @@ function timeAgo(dateStr: string): string {
 }
 
 export default function PostCard({ post }: { post: Post }) {
-  const [liked, setLiked] = useState(false);
   const [reposted, setReposted] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
-  const [likesCount, setLikesCount] = useState(post.likes_count);
+  const { liked, likesCount, toggleLike } = useLikes(post.id, post.likes_count);
 
   const author = post.profiles;
-
-  function handleLike() {
-    setLiked((prev) => {
-      setLikesCount((c) => (prev ? c - 1 : c + 1));
-      return !prev;
-    });
-  }
 
   return (
     <div className="flex flex-col md:py-4 md:w-full md:rounded-lg gap-2 w-dvw">
@@ -77,9 +70,9 @@ export default function PostCard({ post }: { post: Post }) {
         <div className="flex justify-between items-center">
           <div className="flex gap-6 items-center">
             <button
-              onClick={handleLike}
+              onClick={() => void toggleLike()}
               className={clsx(
-                "flex gap-2 items-center group cursor-pointer",
+                "flex gap-2 items-center group cursor-pointer transition-colors duration-150",
                 liked
                   ? "text-rose-500 hover:text-rose-600 [&_svg]:fill-rose-500"
                   : "text-foreground dark:hover:text-rose-300 hover:text-rose-600",
