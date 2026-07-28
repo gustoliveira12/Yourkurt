@@ -4,7 +4,6 @@ import { usePosts } from "@/lib/hooks/usePosts";
 import PageAside from "@/components/navigation/NavBar";
 import ProfileSidebar from "@/components/navigation/ProfileSidebar";
 import PostCard from "@/components/UserPost";
-import CreatePostbox from "@/components/CreatePostbox";
 import RightNavbar from "@/components/PostComposer";
 import Story from "@/components/Stories";
 import {
@@ -190,18 +189,6 @@ export default function Home() {
             </div>
           </div>
           <div className="flex flex-col w-full gap-4 max-w-xl">
-            {profile && (
-              <CreatePostbox
-                avatarUrl={profile.avatarUrl}
-                userId={profile.id}
-                profile={{
-                  name: profile.name,
-                  username: profile.username,
-                  avatar_url: profile.avatarUrl,
-                }}
-                onPostCreated={addPost}
-              />
-            )}
             {loading && (
               <p className="text-center text-foreground-muted py-8">Carregando posts...</p>
             )}
@@ -213,7 +200,7 @@ export default function Home() {
             ))}
           </div>
         </div>
-        <RightNavbar prop={Comunnities} />
+        <RightNavbar prop={Comunnities} onPostCreated={addPost} />
       </main>
       <MobileNav />
     </div>

@@ -5,6 +5,8 @@ import MobileHeader from "@/components/navigation/MobileHeader";
 import MobileNav from "@/components/navigation/MobileNav";
 import PageAside from "@/components/navigation/NavBar";
 import ProfileSidebar from "@/components/navigation/ProfileSidebar";
+import PostCard from "@/components/UserPost";
+import { usePosts } from "@/lib/hooks/usePosts";
 import { createClient } from "@/lib/supabase/client";
 import {
   CameraIcon,
@@ -123,30 +125,6 @@ const TABS: { key: TabKey; label: string }[] = [
   { key: "media", label: "Mídia" },
 ];
 
-const POST_ITEMS = [
-  {
-    id: "1",
-    mood: "Hoje",
-    text: "Desenhando a nova experiência de perfil do Esprokurt. Quero algo direto, bonito e com personalidade.",
-    likes: 37,
-    comments: 12,
-  },
-  {
-    id: "2",
-    mood: "Ontem",
-    text: "Troquei alguns detalhes visuais e a navegação lateral ficou muito mais fluida.",
-    likes: 21,
-    comments: 4,
-  },
-  {
-    id: "3",
-    mood: "3 dias",
-    text: "Rascunhando novas ideias para comunidades e curadoria de conteúdo.",
-    likes: 14,
-    comments: 3,
-  },
-];
-
 export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState<TabKey>("posts");
   const [isEditing, setIsEditing] = useState(false);
@@ -155,6 +133,7 @@ export default function ProfilePage() {
   const [saveMessage, setSaveMessage] = useState("");
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [isUploadingHeader, setIsUploadingHeader] = useState(false);
+  const { posts, loading: postsLoading } = usePosts();
 
   useEffect(() => {
     async function loadProfile() {
@@ -634,27 +613,23 @@ export default function ProfilePage() {
               <div className="px-5 md:px-7 py-2">
                 {activeTab === "posts" ? (
                   <ul className="divide-y divide-border-base">
-                    {POST_ITEMS.map((post) => (
-                      <li key={post.id} className="py-4 flex items-start gap-3">
-                        <Avatar src={profile.avatarUrl || null} name={profile.name} sizes="lg" />
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 text-sm">
-                            <span className="font-bold text-foreground">
-                              {profile.name || "Usuário"}
-                            </span>
-                            <span className="text-subtitle">
-                              @{profile.username || "usuario"}
-                            </span>
-                            <span className="text-subtitle">· {post.mood}</span>
-                          </div>
-                          <p className="mt-1 text-foreground">{post.text}</p>
-                          <div className="mt-2 flex gap-5 text-sm text-subtitle">
-                            <span>{post.comments} respostas</span>
-                            <span>{post.likes} curtidas</span>
-                          </div>
-                        </div>
+                    {postsLoading ? (
+                      <li className="py-8 text-center text-foreground-muted">
+                        Carregando posts...
                       </li>
-                    ))}
+                    ) : posts.filter((p) => p.user_id === profile.id).length === 0 ? (
+                      <li className="py-8 text-center text-foreground-muted">
+                        Sem novos posts por aqui.
+                      </li>
+                    ) : (
+                      posts
+                        .filter((p) => p.user_id === profile.id)
+                        .map((post) => (
+                          <li key={post.id} className="py-4">
+                            <PostCard post={post} />
+                          </li>
+                        ))
+                    )}
                   </ul>
                 ) : (
                   <div className="py-8 text-center text-subtitle text-sm">
