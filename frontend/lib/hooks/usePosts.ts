@@ -19,14 +19,15 @@ export type Post = {
   profiles: PostAuthor | null;
 };
 
-const supabase = createClient();
-
 export function usePosts() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchPosts = useCallback(async () => {
     setLoading(true);
+    setError(null);
+    const supabase = createClient();
     const { data, error } = await supabase
       .from("posts")
       .select(
@@ -37,7 +38,17 @@ export function usePosts() {
       .limit(50);
 
     if (!error && data) {
-      setPosts(data as Post[]);
+      setPosts(data.map((item: any) => ({
+        id: item.id,
+        user_id: item.user_id,
+        content: item.content,
+        image_url: item.image_url,
+        created_at: item.created_at,
+        likes_count: item.likes_count,
+        profiles: item.profiles && Array.isArray(item.profiles) ? item.profiles[0] : item.profiles,
+      })) as Post[]);
+    } else if (error) {
+      setError(error.message);
     }
     setLoading(false);
   }, []);
@@ -53,5 +64,5 @@ export function usePosts() {
     [],
   );
 
-  return { posts, loading, refetch: fetchPosts, addPost };
+  return { posts, loading, error, refetch: fetchPosts, addPost };
 }

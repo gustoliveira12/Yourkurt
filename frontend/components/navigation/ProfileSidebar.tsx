@@ -17,7 +17,7 @@ export interface NavlinksItem {
 }
 
 interface NavProps extends AvatarProps {
-  prop: NavlinksItem[];
+  prop?: NavlinksItem[] | any[];
   size: number;
   alt: string;
   name: string;

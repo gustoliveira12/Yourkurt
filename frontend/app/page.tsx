@@ -104,56 +104,25 @@ export default function Home() {
             <div className="flex md:gap-6 justify-start items-center max-w-dvw lg:max-w-176 overflow-hidden px-2">
               {/* TODO: TROCAR O OUTLINE DOS STORIES, PORQUE ESTA HARDCODED */}
               <Story
+                key={`story-${profile?.id}`}
                 hasStory
                 name={profile?.name ?? "Usuário"}
                 src={profile?.avatarUrl ?? null}
               />
-              <Story hasStory name="Renata" src="/imagem_foda.webp" />
               <Story
+                key="story-fake-1"
                 hasStory
-                name="Whindersson Nunes"
-                src="https://i.pinimg.com/736x/1e/ef/f8/1eeff8134eac63b5f367d464b2da70e9.jpg"
+                name="Renata"
+                src="/imagem_foda.webp"
               />
-              <Story
-                hasStory
-                name="Whindersson Nunes"
-                src="https://i.pinimg.com/736x/1e/ef/f8/1eeff8134eac63b5f367d464b2da70e9.jpg"
-              />
-              <Story
-                hasStory
-                name="Whindersson Nunes"
-                src="https://i.pinimg.com/736x/1e/ef/f8/1eeff8134eac63b5f367d464b2da70e9.jpg"
-              />
-              <Story
-                hasStory
-                name="Whindersson Nunes"
-                src="https://i.pinimg.com/736x/1e/ef/f8/1eeff8134eac63b5f367d464b2da70e9.jpg"
-              />
-              <Story
-                hasStory
-                name="Whindersson Nunes"
-                src="https://i.pinimg.com/736x/1e/ef/f8/1eeff8134eac63b5f367d464b2da70e9.jpg"
-              />
-              <Story
-                hasStory
-                name="Whindersson Nunes"
-                src="https://i.pinimg.com/736x/1e/ef/f8/1eeff8134eac63b5f367d464b2da70e9.jpg"
-              />
-              <Story
-                hasStory
-                name="Whindersson Nunes"
-                src="https://i.pinimg.com/736x/1e/ef/f8/1eeff8134eac63b5f367d464b2da70e9.jpg"
-              />
-              <Story
-                hasStory
-                name="Whindersson Nunes"
-                src="https://i.pinimg.com/736x/1e/ef/f8/1eeff8134eac63b5f367d464b2da70e9.jpg"
-              />
-              <Story
-                hasStory
-                name="Whindersson Nunes"
-                src="https://i.pinimg.com/736x/1e/ef/f8/1eeff8134eac63b5f367d464b2da70e9.jpg"
-              />
+              {["Whindersson Nunes", "Marina Silva", "Lucas Santos", "Carla Costa", "André Souza", "Juliana Lima"].map((name, index) => (
+                <Story
+                  key={`story-fake-${index}`}
+                  hasStory
+                  name={name}
+                  src="https://i.pinimg.com/736x/1e/ef/f8/1eeff8134eac63b5f367d464b2da70e9.jpg"
+                />
+              ))}
             </div>
           </div>
           <div className="flex flex-col w-full gap-4 max-w-xl">

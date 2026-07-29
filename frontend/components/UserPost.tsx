@@ -12,6 +12,7 @@ import Image from "next/image";
 import clsx from "clsx";
 import { useState } from "react";
 import { useLikes } from "@/lib/hooks/useLikes";
+import { useInteractions } from "@/lib/hooks/useInteractions";
 import type { Post } from "@/lib/hooks/usePosts";
 
 function timeAgo(dateStr: string): string {
@@ -26,6 +27,7 @@ export default function PostCard({ post }: { post: Post }) {
   const [reposted, setReposted] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
   const { liked, likesCount, toggleLike } = useLikes(post.id, post.likes_count);
+  const { interactions, loading: loadingInteractions } = useInteractions(post.id);
 
   const author = post.profiles;
 
@@ -87,7 +89,7 @@ export default function PostCard({ post }: { post: Post }) {
               )}
             >
               <MessageSquare />
-              <span>0</span>
+              <span>{loadingInteractions ? "..." : interactions.commentsCount}</span>
             </button>
             <button
               onClick={() => setReposted(!reposted)}
@@ -99,7 +101,7 @@ export default function PostCard({ post }: { post: Post }) {
               )}
             >
               <Repeat2 />
-              <span>0</span>
+              <span>{loadingInteractions ? "..." : interactions.repostsCount}</span>
             </button>
           </div>
           <button
