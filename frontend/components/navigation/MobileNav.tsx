@@ -2,7 +2,6 @@
 import {
   ChatIcon,
   HouseIcon,
-  PlusIcon,
   UserIcon,
   UsersFourIcon,
   UsersIcon,
@@ -30,62 +29,62 @@ export default function MobileNav() {
       </Link>
       <Link
         className="hover:bg-background-raised flex items-center rounded-lg"
-        href="/NewPost"
+        href="/perfil"
       >
-        <PlusIcon
+        <UserIcon
           color={
-            pathname === "/NewPost"
+            pathname === "/perfil"
               ? "var(--background-brand)"
               : "var(--subtitle)"
           }
           className="shrink-0"
           size={28}
-          weight={pathname === "/NewPost" ? "fill" : "bold"}
+          weight={pathname === "/perfil" ? "fill" : "bold"}
         />
       </Link>
       <Link
         className="hover:bg-background-raised flex items-center rounded-lg"
-        href="/"
+        href="/friends"
       >
         <UsersIcon
           color={
-            pathname === "/Amigos"
+            pathname === "/friends"
               ? "var(--background-brand)"
               : "var(--subtitle)"
           }
           className="shrink-0"
           size={28}
-          weight={pathname === "/Amigos" ? "fill" : "bold"}
+          weight={pathname === "/friends" ? "fill" : "bold"}
         />
       </Link>
       <Link
         className="hover:bg-background-raised flex items-center rounded-lg"
-        href="/"
+        href="/communities"
       >
         <UsersFourIcon
           color={
-            pathname === "/Comunidades"
+            pathname === "/communities"
               ? "var(--background-brand)"
               : "var(--subtitle)"
           }
           className="shrink-0"
           size={28}
-          weight={pathname === "/Comunidades" ? "fill" : "bold"}
+          weight={pathname === "/communities" ? "fill" : "bold"}
         />
       </Link>
       <Link
         className="hover:bg-background-raised flex items-center rounded-lg"
-        href="/"
+        href="/messages"
       >
         <ChatIcon
           color={
-            pathname === "/Mensagens"
+            pathname === "/messages"
               ? "var(--background-brand)"
               : "var(--subtitle)"
           }
           className="shrink-0"
           size={28}
-          weight={pathname === "/Mensagens" ? "fill" : "bold"}
+          weight={pathname === "/messages" ? "fill" : "bold"}
         />
       </Link>
     </nav>

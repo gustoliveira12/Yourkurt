@@ -58,38 +58,6 @@ export default function Home() {
   const { profile } = useCurrentProfile();
   const { posts, loading, addPost } = usePosts();
 
-  const NavLinks = [
-    {
-      text: "Feed",
-      redirect: "/",
-      icon: HouseIcon,
-    },
-    {
-      text: "Perfil",
-      redirect: "/",
-      icon: UserIcon,
-    },
-    {
-      text: "Amigos",
-      redirect: "/",
-      icon: UsersIcon,
-    },
-    {
-      text: "Comunidade",
-      redirect: "/",
-      icon: UsersFourIcon,
-    },
-    {
-      text: "Mensagens",
-      redirect: "/",
-      icon: ChatIcon,
-    },
-    {
-      text: "Configurações",
-      redirect: "/",
-      icon: GearSixIcon,
-    },
-  ];
   const Comunnities = [
     {
       text: "GamersBr",
@@ -125,7 +93,7 @@ export default function Home() {
         <ProfileSidebar
           alt="string"
           size={1}
-          prop={NavLinks}
+          prop={NAV_ITEMS}
           name={profile?.name ?? "Carregando..."}
           at={profile?.username ?? "usuario"}
           src={profile?.avatarUrl ?? null}
