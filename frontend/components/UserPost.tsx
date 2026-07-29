@@ -10,7 +10,7 @@ import {
 import { Avatar } from "./Avatar";
 import Image from "next/image";
 import clsx from "clsx";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLikes } from "@/lib/hooks/useLikes";
 import { useInteractions } from "@/lib/hooks/useInteractions";
 import type { Post } from "@/lib/hooks/usePosts";
@@ -30,6 +30,28 @@ export default function PostCard({ post }: { post: Post }) {
   const { interactions, loading: loadingInteractions } = useInteractions(post.id);
 
   const author = post.profiles;
+
+  // Load reposted and bookmarked state from localStorage on mount
+  useEffect(() => {
+    const storedReposted = localStorage.getItem(`reposted-${post.id}`) === "true";
+    const storedBookmarked = localStorage.getItem(`bookmarked-${post.id}`) === "true";
+    setReposted(storedReposted);
+    setBookmarked(storedBookmarked);
+  }, [post.id]);
+
+  // Save reposted state to localStorage
+  const handleRepost = () => {
+    const newRepostedState = !reposted;
+    setReposted(newRepostedState);
+    localStorage.setItem(`reposted-${post.id}`, newRepostedState.toString());
+  };
+
+  // Save bookmarked state to localStorage
+  const handleBookmark = () => {
+    const newBookmarkedState = !bookmarked;
+    setBookmarked(newBookmarkedState);
+    localStorage.setItem(`bookmarked-${post.id}`, newBookmarkedState.toString());
+  };
 
   return (
     <div className="flex flex-col md:py-4 md:w-full md:rounded-lg gap-2 w-dvw">
@@ -92,7 +114,7 @@ export default function PostCard({ post }: { post: Post }) {
               <span>{loadingInteractions ? "..." : interactions.commentsCount}</span>
             </button>
             <button
-              onClick={() => setReposted(!reposted)}
+              onClick={handleRepost}
               className={clsx(
                 "flex gap-2 items-center cursor-pointer",
                 reposted
@@ -105,7 +127,7 @@ export default function PostCard({ post }: { post: Post }) {
             </button>
           </div>
           <button
-            onClick={() => setBookmarked(!bookmarked)}
+            onClick={handleBookmark}
             className="cursor-pointer py-2 px-4 text-foreground rounded-sm hover:bg-background-brand/15 hover:text-foreground-brand transition-all duration-150"
           >
             <Bookmark

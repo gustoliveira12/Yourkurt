@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { type Icon, ArrowRightIcon, UserIcon } from "@phosphor-icons/react";
 import { createClient } from "@/lib/supabase/client";
+import { useFriends } from "@/lib/hooks/useFriends";
 
 export interface NavlinksItem {
   text: string;
@@ -55,6 +56,7 @@ export default function LeftNavbar({
     postsCount: 0,
   });
   const [loadingStats, setLoadingStats] = useState(true);
+  const { friends, loading: loadingFriends } = useFriends(6);
 
   // Fetch user statistics
   useEffect(() => {
@@ -178,17 +180,26 @@ export default function LeftNavbar({
           </button>
         </div>
         <div className="flex flex-wrap gap-4">
-          <div className="flex flex-col justify-center items-center gap-2 text-xs text-zinc-400 truncate max-w-16 ">
-            <div className="flex flex-col rounded-full size-16  items-center justify-center ">
-              <Avatar src="" />
-            </div>
-            <span
-              title=" HingleMcGringleBerry"
-              className="w-full min-w-0 truncate"
-            >
-              HingleMcGringleBerry
-            </span>
-          </div>
+          {loadingFriends ? (
+            <p className="text-xs text-zinc-400">Carregando...</p>
+          ) : friends.length === 0 ? (
+            <p className="text-xs text-zinc-400">Nenhum amigo ainda</p>
+          ) : (
+            friends.map((friend) => (
+              <Link
+                key={friend.id}
+                href={`/perfil/${friend.username}`}
+                className="flex flex-col justify-center items-center gap-2 text-xs text-zinc-400 truncate max-w-16 hover:opacity-80 transition-opacity"
+              >
+                <div className="flex flex-col rounded-full size-16 items-center justify-center">
+                  <Avatar src={friend.avatar_url} />
+                </div>
+                <span title={friend.name} className="w-full min-w-0 truncate">
+                  {friend.name}
+                </span>
+              </Link>
+            ))
+          )}
         </div>
       </div>
     </div>
