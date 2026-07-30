@@ -15,6 +15,10 @@ BEGIN
 END;
 $$;
 
+DROP TRIGGER IF EXISTS reactions_likes_count_sync ON public.reactions;
+DROP TRIGGER IF EXISTS reactions_likes_count_sync_insert ON public.reactions;
+DROP TRIGGER IF EXISTS reactions_likes_count_sync_delete ON public.reactions;
+
 CREATE TRIGGER reactions_likes_count_sync_insert
 AFTER INSERT ON public.reactions
 FOR EACH ROW
