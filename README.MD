@@ -9,7 +9,7 @@ Esprokurt é uma rede social interna inspirada no Orkut, focada em perfis, posts
 - Feed de posts com limite de 500 caracteres.
 - Curtidas, contagem de interações e exibição de dados do autor.
 - Navegação mobile integrada ao layout principal.
-- Alternância entre tema claro e escuro, com persistência local de preferências visuais [1].
+- Alternância entre tema claro e escuro, com persistência local de preferências visuais.
 
 ## Stack Tecnológica
 
@@ -27,7 +27,7 @@ O projeto utiliza a seguinte stack:
 | Gerenciador de pacotes | pnpm                                      |
 | Hospedagem             | Vercel                                    |
 
-Supabase é utilizado como Backend as a Service, fornecendo autenticação, banco de dados PostgreSQL, armazenamento de arquivos e consultas [1].
+Supabase é utilizado como Backend as a Service, fornecendo autenticação, banco de dados PostgreSQL, armazenamento de arquivos e consultas.
 
 ## Estrutura do Repositório
 
@@ -44,7 +44,7 @@ Esprokurt/
 
 - `frontend/`: código da aplicação web (App Router, componentes, hooks).
 - `backend/`: diretório reservado para um backend próprio futuro.
-- `supabase/`: scripts de migrations, configuração de buckets, triggers e policies [1].
+- `supabase/`: scripts de migrations, configuração de buckets, triggers e policies.
 
 ## Como rodar localmente
 
@@ -76,7 +76,7 @@ Esprokurt/
    NEXT_PUBLIC_SUPABASE_ANON_KEY=<chave-anon-do-supabase>
    ```
 
-   A aplicação depende dessas variáveis para se conectar ao backend de dados [1].
+   A aplicação depende dessas variáveis para se conectar ao backend de dados.
 
 4. Subir o ambiente de desenvolvimento:
 
@@ -106,7 +106,7 @@ O status atual das principais áreas é:
 | Mensagens                              | Não iniciado  |
 | Backend próprio                        | Não iniciado  |
 
-Essas informações são detalhadas na Documentação Técnica do projeto [1].
+Essas informações são detalhadas na Documentação Técnica do projeto .
 
 ## Roadmap (Próximos Passos)
 
@@ -114,4 +114,4 @@ Essas informações são detalhadas na Documentação Técnica do projeto [1].
 - Implementar o backend próprio e definir suas responsabilidades.
 - Aplicar migrations pendentes no ambiente Supabase.
 - Refinar detalhes visuais (stories, menu, interações de hover).
-- Finalizar a funcionalidade completa de comunidades [1].
+- Finalizar a funcionalidade completa de comunidades.
