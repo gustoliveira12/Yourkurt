@@ -33,6 +33,7 @@ export function useLikes(postId: string, initialLikesCount: number) {
         .select("id")
         .eq("post_id", postId)
         .eq("user_id", user.id)
+        .eq("type", "like")
         .maybeSingle();
 
       setLiked(!!data);
@@ -54,7 +55,8 @@ export function useLikes(postId: string, initialLikesCount: number) {
         .from("reactions")
         .delete()
         .eq("post_id", postId)
-        .eq("user_id", userId);
+        .eq("user_id", userId)
+        .eq("type", "like");
 
       // Revert on error
       if (error) {

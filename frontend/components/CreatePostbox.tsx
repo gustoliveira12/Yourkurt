@@ -69,7 +69,7 @@ export default function CreatePostbox({
         </div>
         <textarea
           placeholder="O que está passando pela sua órbita?"
-          className="bg-background w-full rouded-xl transition-all duration-100 border border-border-base rounded-sm px-4 py-2 placeholder:text-foreground-muted text-foreground resize-none min-h-[80px] disabled:opacity-50"
+          className="bg-background w-full rounded-xl transition-all duration-100 border border-border-base rounded-sm px-4 py-2 placeholder:text-foreground-muted text-foreground resize-none min-h-[80px] disabled:opacity-50"
           value={content}
           onChange={(e) => setContent(e.target.value)}
           onKeyDown={handleKeyDown}
@@ -97,7 +97,7 @@ export default function CreatePostbox({
               className="dark:text-emerald-500 text-emerald-600"
               size={16}
             />
-            <span className="hidden md:flex">Musica</span>
+            <span className="hidden md:flex">Música</span>
           </button>
           <button
             disabled={submitting}

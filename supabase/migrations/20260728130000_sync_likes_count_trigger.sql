@@ -3,18 +3,26 @@ CREATE OR REPLACE FUNCTION public.sync_post_likes_count()
 RETURNS trigger
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = public, pg_temp
 AS $$
 BEGIN
-  IF TG_OP = 'INSERT' AND NEW.type = 'like' THEN
+  IF TG_OP = 'INSERT' THEN
     UPDATE posts SET likes_count = likes_count + 1 WHERE id = NEW.post_id;
-  ELSIF TG_OP = 'DELETE' AND OLD.type = 'like' THEN
+  ELSIF TG_OP = 'DELETE' THEN
     UPDATE posts SET likes_count = GREATEST(likes_count - 1, 0) WHERE id = OLD.post_id;
   END IF;
   RETURN NULL;
 END;
 $$;
 
-CREATE TRIGGER reactions_likes_count_sync
-AFTER INSERT OR DELETE ON public.reactions
-FOR EACH ROW EXECUTE FUNCTION public.sync_post_likes_count();
+CREATE TRIGGER reactions_likes_count_sync_insert
+AFTER INSERT ON public.reactions
+FOR EACH ROW
+WHEN (NEW.type = 'like')
+EXECUTE FUNCTION public.sync_post_likes_count();
+
+CREATE TRIGGER reactions_likes_count_sync_delete
+AFTER DELETE ON public.reactions
+FOR EACH ROW
+WHEN (OLD.type = 'like')
+EXECUTE FUNCTION public.sync_post_likes_count();

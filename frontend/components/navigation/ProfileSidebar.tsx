@@ -10,15 +10,15 @@ import { createClient } from "@/lib/supabase/client";
 import { useFriends } from "@/lib/hooks/useFriends";
 
 export interface NavlinksItem {
-  text: string;
-  redirect: UrlObject | string;
+  text?: string;
+  redirect?: UrlObject | string;
   icon: Icon;
   label?: string;
   to?: string;
 }
 
 interface NavProps extends AvatarProps {
-  prop?: NavlinksItem[] | any[];
+  prop?: NavlinksItem[];
   size: number;
   alt: string;
   name: string;
@@ -175,7 +175,7 @@ export default function LeftNavbar({
             Seus amigos
           </h2>
           <button className="flex items-center justify-center  text-foreground-brand font-medium text-sm hover:bg-foreground-brand/15 px-2 py-1 rounded-sm transition-all duration-150 gap-1 cursor-pointer ">
-            300
+            {loadingStats ? "..." : stats.friendsCount}
             <ArrowRightIcon size={12} />
           </button>
         </div>

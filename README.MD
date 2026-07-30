@@ -1,6 +1,6 @@
 # Esprokurt
 
-Esprokurt é uma rede social interna inspirada no Orkut, focada em perfis, posts e interações entre usuários de um mesmo ambiente organizacional. O projeto está em desenvolvimento ativo e já oferece autenticação, perfil, feed de posts, curtidas e navegação mobile [1].
+Esprokurt é uma rede social interna inspirada no Orkut, focada em perfis, posts e interações entre usuários de um mesmo ambiente organizacional. O projeto está em desenvolvimento ativo e já oferece autenticação, perfil, feed de posts, curtidas e navegação mobile.
 
 ## Funcionalidades Principais
 
@@ -106,7 +106,7 @@ O status atual das principais áreas é:
 | Mensagens                              | Não iniciado  |
 | Backend próprio                        | Não iniciado  |
 
-Essas informações são detalhadas na Documentação Técnica do projeto .
+Essas informações são detalhadas na Documentação Técnica do projeto.
 
 ## Roadmap (Próximos Passos)
 

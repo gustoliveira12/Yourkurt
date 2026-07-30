@@ -22,13 +22,13 @@ export function useInteractions(postId: string) {
     // Count comments
     const { count: commentsCount } = await supabase
       .from("comments")
-      .select("id", { count: "exact" })
+      .select("id", { count: "exact", head: true })
       .eq("post_id", postId);
 
     // Count reposts (reactions with type='repost')
     const { count: repostsCount } = await supabase
       .from("reactions")
-      .select("id", { count: "exact" })
+      .select("id", { count: "exact", head: true })
       .eq("post_id", postId)
       .eq("type", "repost");
 

@@ -58,6 +58,16 @@ export default function Home() {
   const { profile } = useCurrentProfile();
   const { posts, loading, addPost } = usePosts();
 
+  const feedStoryNames = Array.from(
+    new Set(
+      posts
+        .map((post) => post.profiles?.name)
+        .filter((name): name is string => Boolean(name)),
+    ),
+  )
+    .filter((name) => name !== profile?.name)
+    .slice(0, 6);
+
   const Comunnities = [
     {
       text: "GamersBr",
@@ -102,25 +112,18 @@ export default function Home() {
         <div className="flex flex-col md:gap-12 items-center md:min-w-152 md:px-4">
           <div className="flex flex-col w-full ">
             <div className="flex md:gap-6 justify-start items-center max-w-dvw lg:max-w-176 overflow-hidden px-2">
-              {/* TODO: TROCAR O OUTLINE DOS STORIES, PORQUE ESTA HARDCODED */}
               <Story
                 key={`story-${profile?.id}`}
                 hasStory
                 name={profile?.name ?? "Usuário"}
                 src={profile?.avatarUrl ?? null}
               />
-              <Story
-                key="story-fake-1"
-                hasStory
-                name="Renata"
-                src="/imagem_foda.webp"
-              />
-              {["Whindersson Nunes", "Marina Silva", "Lucas Santos", "Carla Costa", "André Souza", "Juliana Lima"].map((name, index) => (
+              {feedStoryNames.map((name, index) => (
                 <Story
-                  key={`story-fake-${index}`}
+                  key={`story-feed-${index}`}
                   hasStory
                   name={name}
-                  src="https://i.pinimg.com/736x/1e/ef/f8/1eeff8134eac63b5f367d464b2da70e9.jpg"
+                  src={null}
                 />
               ))}
             </div>

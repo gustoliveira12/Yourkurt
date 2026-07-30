@@ -1,6 +1,6 @@
 "use client";
 import {
-  ChatIcon,
+  GearSixIcon,
   HouseIcon,
   UserIcon,
   UsersFourIcon,
@@ -44,47 +44,47 @@ export default function MobileNav() {
       </Link>
       <Link
         className="hover:bg-background-raised flex items-center rounded-lg"
-        href="/friends"
+        href="/"
+        aria-disabled="true"
+        onClick={(event) => event.preventDefault()}
       >
         <UsersIcon
           color={
-            pathname === "/friends"
-              ? "var(--background-brand)"
-              : "var(--subtitle)"
+            "var(--subtitle)"
           }
-          className="shrink-0"
+          className="shrink-0 opacity-50"
           size={28}
-          weight={pathname === "/friends" ? "fill" : "bold"}
+          weight="bold"
         />
       </Link>
       <Link
         className="hover:bg-background-raised flex items-center rounded-lg"
-        href="/communities"
+        href="/"
+        aria-disabled="true"
+        onClick={(event) => event.preventDefault()}
       >
         <UsersFourIcon
           color={
-            pathname === "/communities"
-              ? "var(--background-brand)"
-              : "var(--subtitle)"
+            "var(--subtitle)"
           }
-          className="shrink-0"
+          className="shrink-0 opacity-50"
           size={28}
-          weight={pathname === "/communities" ? "fill" : "bold"}
+          weight="bold"
         />
       </Link>
       <Link
         className="hover:bg-background-raised flex items-center rounded-lg"
-        href="/messages"
+        href="/settings"
       >
-        <ChatIcon
+        <GearSixIcon
           color={
-            pathname === "/messages"
+            pathname === "/settings"
               ? "var(--background-brand)"
               : "var(--subtitle)"
           }
           className="shrink-0"
           size={28}
-          weight={pathname === "/messages" ? "fill" : "bold"}
+          weight={pathname === "/settings" ? "fill" : "bold"}
         />
       </Link>
     </nav>
