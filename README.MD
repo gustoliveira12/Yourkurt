@@ -17,13 +17,13 @@ O projeto utiliza a seguinte stack:
 
 | Camada                 | Tecnologia                                |
 |------------------------|-------------------------------------------|
-| Framework              | Next.js 16.2.4 (App Router)              |
+| Framework              | Next.js 16.2.4 (App Router)               |
 | Interface              | React 19.2.4                              |
 | Linguagem              | TypeScript                                |
 | Estilização            | Tailwind CSS 4                            |
 | Componentes de UI      | Radix UI                                  |
 | Ícones                 | Lucide React e Phosphor Icons             |
-| Backend as a Service   | Supabase (Supabase JS e Supabase SSR)    |
+| Backend as a Service   | Supabase (Supabase JS e Supabase SSR)     |
 | Gerenciador de pacotes | pnpm                                      |
 | Hospedagem             | Vercel                                    |
 
