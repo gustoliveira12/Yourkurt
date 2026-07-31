@@ -8,6 +8,7 @@ import ProfileSidebar from "@/components/navigation/ProfileSidebar";
 import RightNavbar from "@/components/PostComposer";
 import PostCard from "@/components/UserPost";
 import { usePosts } from "@/lib/hooks/usePosts";
+import { useUserReplies } from "@/lib/hooks/useUserReplies";
 import { createClient } from "@/lib/supabase/client";
 import {
   CameraIcon,
@@ -142,6 +143,11 @@ export default function ProfilePage() {
     deletePost,
     deletingPostId,
   } = usePosts();
+  const {
+    replies,
+    loading: repliesLoading,
+    error: repliesError,
+  } = useUserReplies(profile.id);
 
   useEffect(() => {
     async function loadProfile() {
@@ -395,6 +401,14 @@ export default function ProfilePage() {
         ? "Nenhuma resposta ainda."
         : "Nenhuma mídia publicada ainda.";
 
+  function getReplyPostImages(imageUrl: string | null, imageUrls: string[] | null) {
+    return Array.isArray(imageUrls) && imageUrls.length > 0
+      ? imageUrls
+      : imageUrl
+        ? [imageUrl]
+        : [];
+  }
+
   return (
     <div className="w-dvw min-h-dvh overflow-hidden relative flex h-screen items-center justify-center bg-background font-sans gap-4">
       <PageAside items={NAV_ITEMS} />
@@ -642,11 +656,121 @@ export default function ProfilePage() {
                               canDelete={post.user_id === profile.id}
                               deleting={deletingPostId === post.id}
                               onDelete={deletePost}
+                              detailHref={`/post/${post.id}`}
                             />
                           </li>
                         ))
                     )}
                   </ul>
+                ) : activeTab === "replies" ? (
+                  <div className="flex flex-col gap-4 py-3">
+                    {repliesLoading ? (
+                      <div className="py-8 text-center text-foreground-muted">
+                        Carregando respostas...
+                      </div>
+                    ) : repliesError ? (
+                      <div className="py-8 text-center text-red-600">{repliesError}</div>
+                    ) : replies.length === 0 ? (
+                      <div className="py-8 text-center text-foreground-muted">
+                        Nenhuma resposta ainda.
+                      </div>
+                    ) : (
+                      replies.map((reply) => {
+                        const replyImages = getReplyPostImages(
+                          reply.posts?.image_url ?? null,
+                          reply.posts?.image_urls ?? null,
+                        );
+
+                        return (
+                          <article
+                            key={reply.id}
+                            className="rounded-2xl border border-border-base bg-background p-4"
+                          >
+                            <div className="flex items-start justify-between gap-4">
+                              <div className="min-w-0 flex-1">
+                                <p className="text-xs font-bold uppercase tracking-wider text-subtitle">
+                                  Resposta em
+                                </p>
+                                <Link
+                                  href={`/post/${reply.post_id}`}
+                                  className="mt-1 block text-sm font-semibold text-foreground-brand hover:underline"
+                                >
+                                  Ver publicação original
+                                </Link>
+                              </div>
+                              <span className="text-xs text-subtitle">
+                                {new Date(reply.created_at).toLocaleDateString("pt-BR")}
+                              </span>
+                            </div>
+
+                            {reply.posts && (
+                              <div className="mt-4 rounded-xl border border-border-base bg-background-raised p-3">
+                                <div className="flex items-center gap-3">
+                                  <div className="size-10 overflow-hidden rounded-full">
+                                    <Avatar
+                                      src={reply.posts.profiles && !Array.isArray(reply.posts.profiles)
+                                        ? reply.posts.profiles.avatar_url
+                                        : null}
+                                      name={
+                                        reply.posts.profiles && !Array.isArray(reply.posts.profiles)
+                                          ? reply.posts.profiles.name
+                                          : "Usuário"
+                                      }
+                                      sizes="sm"
+                                    />
+                                  </div>
+                                  <div className="min-w-0 flex-1">
+                                    <p className="truncate text-sm font-bold text-foreground">
+                                      {reply.posts.profiles && !Array.isArray(reply.posts.profiles)
+                                        ? reply.posts.profiles.name
+                                        : "Usuário"}
+                                    </p>
+                                    <p className="truncate text-xs text-subtitle">
+                                      {reply.posts.profiles && !Array.isArray(reply.posts.profiles)
+                                        ? `@${reply.posts.profiles.username}`
+                                        : "@usuario"}
+                                    </p>
+                                  </div>
+                                </div>
+
+                                <p className="mt-3 line-clamp-3 whitespace-pre-wrap text-sm text-foreground">
+                                  {reply.posts.content}
+                                </p>
+
+                                {replyImages.length > 0 && (
+                                  <div className="mt-3 grid grid-cols-2 gap-2">
+                                    {replyImages.slice(0, 4).map((imageUrl, index) => (
+                                      <div
+                                        key={`${reply.id}-image-${index}`}
+                                        className="relative h-24 overflow-hidden rounded-lg"
+                                      >
+                                        <Image
+                                          src={imageUrl}
+                                          alt={`Imagem da publicação respondida ${index + 1}`}
+                                          fill
+                                          sizes="160px"
+                                          className="object-cover"
+                                        />
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            )}
+
+                            <div className="mt-4 rounded-xl border border-border-base bg-background-raised p-3">
+                              <p className="text-xs font-bold uppercase tracking-wider text-subtitle">
+                                Seu comentário
+                              </p>
+                              <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-foreground">
+                                {reply.content}
+                              </p>
+                            </div>
+                          </article>
+                        );
+                      })
+                    )}
+                  </div>
                 ) : (
                   <div className="py-8 text-center text-subtitle text-sm">
                     {selectedTabEmptyState}

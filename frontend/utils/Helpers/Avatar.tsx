@@ -5,7 +5,7 @@ export function getInitials(name?: string): string {
   return parts[0].charAt(0) + parts[parts.length - 1].charAt(0).toUpperCase();
 }
 
-export type AvatarSize = "lg" | "xl" | "2xl" | "3xl";
+export type AvatarSize = "sm" | "lg" | "xl" | "2xl" | "3xl";
 export const SIZE_MAP: Record<
   AvatarSize,
   {
@@ -16,6 +16,13 @@ export const SIZE_MAP: Record<
     statusPos: string;
   }
 > = {
+  sm: {
+    px: 40,
+    text: "text-sm",
+    ring: "ring-[2px]",
+    statusSize: "w-3 h-3",
+    statusPos: "bottom-0 right-0",
+  },
   lg: {
     px: 56,
     text: "text-base",

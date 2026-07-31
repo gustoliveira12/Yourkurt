@@ -145,6 +145,7 @@ export default function Home() {
                 canDelete={post.user_id === profile?.id}
                 deleting={deletingPostId === post.id}
                 onDelete={deletePost}
+                detailHref={`/post/${post.id}`}
               />
             ))}
           </div>

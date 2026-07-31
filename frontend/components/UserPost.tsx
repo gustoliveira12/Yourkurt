@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { Avatar } from "./Avatar";
 import Image from "next/image";
+import Link from "next/link";
 import clsx from "clsx";
 import { useState } from "react";
 import { useLikes } from "@/lib/hooks/useLikes";
@@ -30,6 +31,7 @@ type PostCardProps = {
   canDelete?: boolean;
   deleting?: boolean;
   onDelete?: (postId: string) => Promise<boolean>;
+  detailHref?: string;
 };
 
 export default function PostCard({
@@ -37,6 +39,7 @@ export default function PostCard({
   canDelete = false,
   deleting = false,
   onDelete,
+  detailHref,
 }: PostCardProps) {
   const [reposted, setReposted] = useState(() => {
     if (typeof window === "undefined") return false;
@@ -91,20 +94,37 @@ export default function PostCard({
     <div className="flex flex-col md:py-4 md:w-full md:rounded-lg gap-2 w-dvw">
       <div className="flex flex-col gap-4 px-3">
         <div className="flex justify-between items-center">
-          <div className="flex gap-4 ">
-            <div>
-              <Avatar src={author?.avatar_url ?? null} />
-            </div>
-            <div className="flex flex-col">
-              <h3 className="text-lg font-bold text-foreground cursor-pointer">
-                {author?.name ?? "Usuário"}
-              </h3>
-              <div className="flex gap-4 text-subtitle">
-                <span>@{author?.username ?? "usuario"}</span>
-                <span>{timeAgo(post.created_at)}</span>
+          {detailHref ? (
+            <Link href={detailHref} className="flex gap-4 group min-w-0 flex-1">
+              <div>
+                <Avatar src={author?.avatar_url ?? null} />
+              </div>
+              <div className="flex flex-col min-w-0">
+                <h3 className="text-lg font-bold text-foreground cursor-pointer group-hover:underline truncate">
+                  {author?.name ?? "Usuário"}
+                </h3>
+                <div className="flex gap-4 text-subtitle flex-wrap">
+                  <span>@{author?.username ?? "usuario"}</span>
+                  <span>{timeAgo(post.created_at)}</span>
+                </div>
+              </div>
+            </Link>
+          ) : (
+            <div className="flex gap-4 ">
+              <div>
+                <Avatar src={author?.avatar_url ?? null} />
+              </div>
+              <div className="flex flex-col">
+                <h3 className="text-lg font-bold text-foreground cursor-pointer">
+                  {author?.name ?? "Usuário"}
+                </h3>
+                <div className="flex gap-4 text-subtitle">
+                  <span>@{author?.username ?? "usuario"}</span>
+                  <span>{timeAgo(post.created_at)}</span>
+                </div>
               </div>
             </div>
-          </div>
+          )}
           <div className="relative">
             <button
               type="button"
@@ -131,36 +151,72 @@ export default function PostCard({
             )}
           </div>
         </div>
-        <div>
-          <span className="font-medium whitespace-pre-wrap">{post.content}</span>
-        </div>
+        {detailHref ? (
+          <Link href={detailHref} className="block">
+            <span className="font-medium whitespace-pre-wrap hover:underline">
+              {post.content}
+            </span>
+          </Link>
+        ) : (
+          <div>
+            <span className="font-medium whitespace-pre-wrap">{post.content}</span>
+          </div>
+        )}
       </div>
       {postImages.length === 1 && (
-        <div className="w-full relative max-w-full max-h-96 aspect-video md:rounded-xl overflow-hidden flex justify-center items-center">
-          <Image
-            className="object-contain"
-            fill
-            sizes="(max-width: 768px) 100vw, 768px"
-            alt="Imagem da publicação"
-            src={postImages[0]}
-          />
-        </div>
+        detailHref ? (
+          <Link href={detailHref} className="w-full relative max-w-full max-h-96 aspect-video md:rounded-xl overflow-hidden flex justify-center items-center">
+            <Image
+              className="object-contain"
+              fill
+              sizes="(max-width: 768px) 100vw, 768px"
+              alt="Imagem da publicação"
+              src={postImages[0]}
+            />
+          </Link>
+        ) : (
+          <div className="w-full relative max-w-full max-h-96 aspect-video md:rounded-xl overflow-hidden flex justify-center items-center">
+            <Image
+              className="object-contain"
+              fill
+              sizes="(max-width: 768px) 100vw, 768px"
+              alt="Imagem da publicação"
+              src={postImages[0]}
+            />
+          </div>
+        )
       )}
       {postImages.length > 1 && (
         <div className="grid grid-cols-2 gap-2 px-3">
           {postImages.map((url, index) => (
-            <div
-              key={`${post.id}-image-${index}`}
-              className="relative h-40 overflow-hidden rounded-lg border border-border-base bg-background"
-            >
-              <Image
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 50vw, 320px"
-                alt={`Imagem ${index + 1} da publicacao`}
-                src={url}
-              />
-            </div>
+            detailHref ? (
+              <Link
+                key={`${post.id}-image-${index}`}
+                href={detailHref}
+                className="relative h-40 overflow-hidden rounded-lg border border-border-base bg-background"
+              >
+                <Image
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 50vw, 320px"
+                  alt={`Imagem ${index + 1} da publicacao`}
+                  src={url}
+                />
+              </Link>
+            ) : (
+              <div
+                key={`${post.id}-image-${index}`}
+                className="relative h-40 overflow-hidden rounded-lg border border-border-base bg-background"
+              >
+                <Image
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 50vw, 320px"
+                  alt={`Imagem ${index + 1} da publicacao`}
+                  src={url}
+                />
+              </div>
+            )
           ))}
         </div>
       )}
@@ -179,14 +235,26 @@ export default function PostCard({
               <Heart />
               <span>{likesCount}</span>
             </button>
-            <button
-              className={clsx(
-                "flex gap-2 items-center hover:text-zinc-600 text-foreground cursor-pointer",
-              )}
-            >
-              <MessageSquare />
-              <span>{loadingInteractions ? "..." : interactions.commentsCount}</span>
-            </button>
+            {detailHref ? (
+              <Link
+                href={detailHref}
+                className={clsx(
+                  "flex gap-2 items-center hover:text-zinc-600 text-foreground cursor-pointer",
+                )}
+              >
+                <MessageSquare />
+                <span>{loadingInteractions ? "..." : interactions.commentsCount}</span>
+              </Link>
+            ) : (
+              <button
+                className={clsx(
+                  "flex gap-2 items-center hover:text-zinc-600 text-foreground cursor-pointer",
+                )}
+              >
+                <MessageSquare />
+                <span>{loadingInteractions ? "..." : interactions.commentsCount}</span>
+              </button>
+            )}
             <button
               onClick={handleRepost}
               className={clsx(
