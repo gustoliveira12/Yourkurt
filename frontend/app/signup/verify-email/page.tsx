@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 function getBaseOrigin() {
@@ -19,7 +19,7 @@ function getRateLimitMessage(rawMessage: string) {
   return rawMessage;
 }
 
-export default function VerifyEmailPage() {
+function VerifyEmailContent() {
   const supabase = useMemo(() => createClient(), []);
   const searchParams = useSearchParams();
   const email = searchParams.get("email")?.trim() ?? "";
@@ -139,5 +139,23 @@ export default function VerifyEmailPage() {
         </section>
       </div>
     </main>
+  );
+}
+
+export default function VerifyEmailPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="min-h-dvh w-full bg-background p-4 md:p-6">
+          <div className="mx-auto flex min-h-[80dvh] w-full max-w-2xl items-center justify-center">
+            <section className="w-full rounded-3xl border border-border-base bg-background-raised p-6 md:p-10">
+              <p className="text-subtitle">Carregando...</p>
+            </section>
+          </div>
+        </main>
+      }
+    >
+      <VerifyEmailContent />
+    </Suspense>
   );
 }
