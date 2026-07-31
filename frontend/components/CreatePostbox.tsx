@@ -47,7 +47,7 @@ export default function CreatePostbox({
 
     const remaining = Math.max(0, MAX_IMAGES - selectedImages.length);
     if (remaining === 0) {
-      setError(`Voce pode enviar no maximo ${MAX_IMAGES} imagens por post.`);
+      setError(`Você pode enviar no máximo ${MAX_IMAGES} imagens por post.`);
       return;
     }
 

@@ -13,7 +13,7 @@ function getBaseOrigin() {
 function getRateLimitMessage(rawMessage: string) {
   const lowered = rawMessage.toLowerCase();
   if (lowered.includes("rate limit") || lowered.includes("too many requests")) {
-    return "Voce atingiu o limite de envios por agora. Aguarde alguns minutos e tente novamente.";
+    return "Você atingiu o limite de envios por agora. Aguarde alguns minutos e tente novamente.";
   }
 
   return rawMessage;
