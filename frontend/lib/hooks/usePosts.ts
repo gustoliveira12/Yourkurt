@@ -25,10 +25,16 @@ type RawPost = {
   user_id: string;
   content: string;
   image_url: string | null;
-  image_urls: string[] | null;
+  image_urls?: string[] | null;
   created_at: string;
   likes_count: number;
-  profiles: PostAuthor | PostAuthor[] | null;
+};
+
+type RawProfile = {
+  id: string;
+  name: string;
+  username: string;
+  avatar_url: string | null;
 };
 
 export function usePosts() {
@@ -46,8 +52,8 @@ export function usePosts() {
         .from("posts")
         .select(
           includeMultipleImages
-            ? "id, user_id, content, image_url, image_urls, created_at, likes_count, profiles(name, username, avatar_url)"
-            : "id, user_id, content, image_url, created_at, likes_count, profiles(name, username, avatar_url)",
+            ? "id, user_id, content, image_url, image_urls, created_at, likes_count"
+            : "id, user_id, content, image_url, created_at, likes_count",
         )
         .eq("is_public", true)
         .order("created_at", { ascending: false })
@@ -62,7 +68,32 @@ export function usePosts() {
     const { data, error } = queryResult;
 
     if (!error && data) {
-      const mappedPosts = (data as Array<RawPost & { image_urls?: string[] | null }>).map((item) => ({
+      const rawPosts = data as RawPost[];
+      const uniqueUserIds = Array.from(new Set(rawPosts.map((item) => item.user_id)));
+
+      let profilesById = new Map<string, PostAuthor>();
+
+      if (uniqueUserIds.length > 0) {
+        const { data: profilesData } = await supabase
+          .from("profiles")
+          .select("id, name, username, avatar_url")
+          .in("id", uniqueUserIds);
+
+        if (profilesData) {
+          profilesById = new Map(
+            (profilesData as RawProfile[]).map((profile) => [
+              profile.id,
+              {
+                name: profile.name,
+                username: profile.username,
+                avatar_url: profile.avatar_url,
+              },
+            ]),
+          );
+        }
+      }
+
+      const mappedPosts = rawPosts.map((item) => ({
         id: item.id,
         user_id: item.user_id,
         content: item.content,
@@ -75,7 +106,7 @@ export function usePosts() {
               : [],
         created_at: item.created_at,
         likes_count: item.likes_count,
-        profiles: item.profiles && Array.isArray(item.profiles) ? item.profiles[0] : item.profiles,
+              profiles: profilesById.get(item.user_id) ?? null,
       }));
 
       setPosts(mappedPosts);
