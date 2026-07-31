@@ -64,10 +64,16 @@ export default function SignupPage() {
     setMessage("");
 
     try {
+      const origin = typeof window !== "undefined" ? window.location.origin : "";
+      const emailRedirectTo = origin
+        ? `${origin}/auth/confirm?next=/`
+        : undefined;
+
       const { error } = await supabase.auth.signUp({
         email: email.trim(),
         password,
         options: {
+          emailRedirectTo,
           data: {
             name: name.trim(),
             username: cleanUsername,
@@ -81,8 +87,8 @@ export default function SignupPage() {
 
       if (error) throw new Error(error.message);
 
-      setMessage("Conta criada com sucesso. Você já pode fazer login.");
-      router.replace("/login");
+      const encodedEmail = encodeURIComponent(email.trim());
+      router.replace(`/signup/verify-email?email=${encodedEmail}`);
     } catch (err) {
       setMessage(err instanceof Error ? err.message : "Erro ao criar conta.");
     } finally {

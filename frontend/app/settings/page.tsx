@@ -6,17 +6,21 @@ import PageAside from "@/components/navigation/NavBar";
 import ProfileSidebar from "@/components/navigation/ProfileSidebar";
 import ThemeToggle from "@/components/theme/ThemeToggle";
 import { useCurrentProfile } from "@/lib/hooks/useCurrentProfile";
+import { createClient } from "@/lib/supabase/client";
 import {
   BellIcon,
   ChatIcon,
   GearSixIcon,
   HouseIcon,
   LockKeyIcon,
+  SignOutIcon,
   ShieldCheckIcon,
   UserIcon,
   UsersFourIcon,
   UsersIcon,
 } from "@phosphor-icons/react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 const NAV_ITEMS = [
   {
@@ -117,7 +121,30 @@ function SettingsCard({
 }
 
 export default function SettingsPage() {
+  const router = useRouter();
   const { profile } = useCurrentProfile();
+  const [isSigningOut, setIsSigningOut] = useState(false);
+  const [logoutError, setLogoutError] = useState("");
+
+  async function handleSignOut() {
+    setIsSigningOut(true);
+    setLogoutError("");
+
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.auth.signOut();
+      if (error) throw new Error(error.message);
+
+      router.replace("/login");
+      router.refresh();
+    } catch (error) {
+      setLogoutError(
+        error instanceof Error ? error.message : "Erro ao sair da conta.",
+      );
+    } finally {
+      setIsSigningOut(false);
+    }
+  }
 
   return (
     <div className="w-dvw min-h-dvh overflow-hidden relative flex h-screen items-center justify-center bg-background font-sans gap-4">
@@ -180,6 +207,41 @@ export default function SettingsPage() {
                 actionText="Configurar"
                 icon={<BellIcon size={18} weight="fill" />}
               />
+            </div>
+
+            <div className="flex flex-col gap-3">
+              <h2 className="text-sm font-bold uppercase tracking-wider text-subtitle">
+                Sessao
+              </h2>
+
+              <div className="rounded-xl border border-border-base bg-background-raised p-4 flex items-start justify-between gap-4">
+                <div className="flex items-start gap-3">
+                  <span className="mt-0.5 rounded-lg bg-background p-2 text-foreground-brand">
+                    <SignOutIcon size={18} weight="fill" />
+                  </span>
+                  <div className="flex flex-col">
+                    <h3 className="text-base font-semibold text-foreground">Sair da conta</h3>
+                    <p className="text-sm text-subtitle">
+                      Encerre sua sessao neste dispositivo com seguranca.
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleSignOut}
+                  disabled={isSigningOut}
+                  className="rounded-lg border border-red-300 bg-red-50 px-3 py-2 text-sm font-semibold text-red-700 hover:bg-red-100 disabled:opacity-70"
+                >
+                  {isSigningOut ? "Saindo..." : "Sair"}
+                </button>
+              </div>
+
+              {logoutError && (
+                <p className="rounded-lg border border-border-base bg-background px-3 py-2 text-sm text-foreground">
+                  {logoutError}
+                </p>
+              )}
             </div>
           </div>
         </section>

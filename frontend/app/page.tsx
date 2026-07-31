@@ -56,7 +56,7 @@ const NAV_ITEMS = [
 
 export default function Home() {
   const { profile } = useCurrentProfile();
-  const { posts, loading, addPost } = usePosts();
+  const { posts, loading, error, addPost, deletePost, deletingPostId } = usePosts();
 
   const feedStoryNames = Array.from(
     new Set(
@@ -132,11 +132,20 @@ export default function Home() {
             {loading && (
               <p className="text-center text-foreground-muted py-8">Carregando posts...</p>
             )}
+            {error && (
+              <p className="text-center text-red-600 py-2 text-sm">{error}</p>
+            )}
             {!loading && posts.length === 0 && (
               <p className="text-center text-foreground-muted py-8">Nenhum post ainda. Seja o primeiro!</p>
             )}
             {posts.map((post) => (
-              <PostCard key={post.id} post={post} />
+              <PostCard
+                key={post.id}
+                post={post}
+                canDelete={post.user_id === profile?.id}
+                deleting={deletingPostId === post.id}
+                onDelete={deletePost}
+              />
             ))}
           </div>
         </div>

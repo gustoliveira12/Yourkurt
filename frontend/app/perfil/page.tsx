@@ -5,6 +5,7 @@ import MobileHeader from "@/components/navigation/MobileHeader";
 import MobileNav from "@/components/navigation/MobileNav";
 import PageAside from "@/components/navigation/NavBar";
 import ProfileSidebar from "@/components/navigation/ProfileSidebar";
+import RightNavbar from "@/components/PostComposer";
 import PostCard from "@/components/UserPost";
 import { usePosts } from "@/lib/hooks/usePosts";
 import { createClient } from "@/lib/supabase/client";
@@ -133,7 +134,14 @@ export default function ProfilePage() {
   const [saveMessage, setSaveMessage] = useState("");
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [isUploadingHeader, setIsUploadingHeader] = useState(false);
-  const { posts, loading: postsLoading } = usePosts();
+  const {
+    posts,
+    loading: postsLoading,
+    error: postsError,
+    addPost,
+    deletePost,
+    deletingPostId,
+  } = usePosts();
 
   useEffect(() => {
     async function loadProfile() {
@@ -611,6 +619,9 @@ export default function ProfilePage() {
               </div>
 
               <div className="px-5 md:px-7 py-2">
+                {postsError && (
+                  <p className="py-2 text-sm text-red-600">{postsError}</p>
+                )}
                 {activeTab === "posts" ? (
                   <ul className="divide-y divide-border-base">
                     {postsLoading ? (
@@ -626,7 +637,12 @@ export default function ProfilePage() {
                         .filter((p) => p.user_id === profile.id)
                         .map((post) => (
                           <li key={post.id} className="py-4">
-                            <PostCard post={post} />
+                            <PostCard
+                              post={post}
+                              canDelete={post.user_id === profile.id}
+                              deleting={deletingPostId === post.id}
+                              onDelete={deletePost}
+                            />
                           </li>
                         ))
                     )}
@@ -640,6 +656,8 @@ export default function ProfilePage() {
             </div>
           </div>
         </section>
+
+        <RightNavbar prop={[]} onPostCreated={addPost} />
       </main>
 
       <MobileNav />
