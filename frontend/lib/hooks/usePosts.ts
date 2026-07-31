@@ -47,28 +47,15 @@ export function usePosts() {
     setLoading(true);
     setError(null);
     const supabase = createClient();
-    const buildPostsQuery = (includeMultipleImages: boolean) =>
-      supabase
-        .from("posts")
-        .select(
-          includeMultipleImages
-            ? "id, user_id, content, image_url, image_urls, created_at, likes_count"
-            : "id, user_id, content, image_url, created_at, likes_count",
-        )
-        .eq("is_public", true)
-        .order("created_at", { ascending: false })
-        .limit(50);
-
-    let queryResult = await buildPostsQuery(true);
-
-    if (queryResult.error?.message.toLowerCase().includes("image_urls")) {
-      queryResult = await buildPostsQuery(false);
-    }
-
-    const { data, error } = queryResult;
+    const { data, error } = await supabase
+      .from("posts")
+      .select("*")
+      .eq("is_public", true)
+      .order("created_at", { ascending: false })
+      .limit(50);
 
     if (!error && data) {
-      const rawPosts = data as RawPost[];
+      const rawPosts = data as unknown as RawPost[];
       const uniqueUserIds = Array.from(new Set(rawPosts.map((item) => item.user_id)));
 
       let profilesById = new Map<string, PostAuthor>();
@@ -76,12 +63,12 @@ export function usePosts() {
       if (uniqueUserIds.length > 0) {
         const { data: profilesData } = await supabase
           .from("profiles")
-          .select("id, name, username, avatar_url")
+          .select("*")
           .in("id", uniqueUserIds);
 
         if (profilesData) {
           profilesById = new Map(
-            (profilesData as RawProfile[]).map((profile) => [
+            (profilesData as unknown as RawProfile[]).map((profile) => [
               profile.id,
               {
                 name: profile.name,
