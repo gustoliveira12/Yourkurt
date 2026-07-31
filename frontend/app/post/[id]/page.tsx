@@ -62,6 +62,28 @@ function normalizeImages(post: Post | null) {
       : [];
 }
 
+type RawPostDetail = {
+  id: string;
+  user_id: string;
+  content: string;
+  image_url: string | null;
+  image_urls?: string[] | null;
+  created_at: string;
+  likes_count: number;
+  profiles:
+    | {
+        name: string;
+        username: string;
+        avatar_url: string | null;
+      }
+    | Array<{
+        name: string;
+        username: string;
+        avatar_url: string | null;
+      }>
+    | null;
+};
+
 function mapCommentToItem(comment: CommentItem): CommentItem {
   return comment;
 }
@@ -117,23 +139,25 @@ export default function PostDetailPage() {
         return;
       }
 
+      const rawPost = data as RawPostDetail;
+
       setPost({
-        id: data.id,
-        user_id: data.user_id,
-        content: data.content,
-        image_url: data.image_url,
+        id: rawPost.id,
+        user_id: rawPost.user_id,
+        content: rawPost.content,
+        image_url: rawPost.image_url,
         image_urls:
-          Array.isArray((data as Post).image_urls) && (data as Post).image_urls.length > 0
-            ? (data as Post).image_urls
-            : data.image_url
-              ? [data.image_url]
+          Array.isArray(rawPost.image_urls) && rawPost.image_urls.length > 0
+            ? rawPost.image_urls
+            : rawPost.image_url
+              ? [rawPost.image_url]
               : [],
-        created_at: data.created_at,
-        likes_count: data.likes_count,
+        created_at: rawPost.created_at,
+        likes_count: rawPost.likes_count,
         profiles:
-          data.profiles && Array.isArray(data.profiles)
-            ? data.profiles[0]
-            : data.profiles,
+          rawPost.profiles && Array.isArray(rawPost.profiles)
+            ? rawPost.profiles[0]
+            : rawPost.profiles,
       });
       setLoadingPost(false);
     }
