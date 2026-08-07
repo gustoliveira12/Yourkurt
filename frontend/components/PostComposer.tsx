@@ -1,6 +1,5 @@
 "use client";
 import { LucideIcon } from "lucide-react";
-import Link from "next/link";
 import type { UrlObject } from "url";
 import CreatePostbox from "./CreatePostbox";
 import { useCurrentProfile } from "@/lib/hooks/useCurrentProfile";
@@ -19,6 +18,7 @@ type NavlinkProps = {
 };
 
 export default function RightNavbar({ prop, onPostCreated }: NavlinkProps) {
+  void prop;
   const { profile } = useCurrentProfile();
 
   const handlePostCreated = (post: Post) => {
@@ -30,16 +30,22 @@ export default function RightNavbar({ prop, onPostCreated }: NavlinkProps) {
   return (
     <div className="flex flex-col gap-8 max-w-136">
       {profile && (
-        <CreatePostbox
-          avatarUrl={profile.avatarUrl}
-          userId={profile.id}
-          profile={{
-            name: profile.name,
-            username: profile.username,
-            avatar_url: profile.avatarUrl,
-          }}
-          onPostCreated={handlePostCreated}
-        />
+        profile.isAdmin ? (
+          <CreatePostbox
+            avatarUrl={profile.avatarUrl}
+            userId={profile.id}
+            profile={{
+              name: profile.name,
+              username: profile.username,
+              avatar_url: profile.avatarUrl,
+            }}
+            onPostCreated={handlePostCreated}
+          />
+        ) : (
+          <div className="hidden sm:flex w-full max-w-lg rounded-lg border border-border-base bg-background-raised px-4 py-3 text-sm text-subtitle">
+            Apenas administradores podem publicar no momento.
+          </div>
+        )
       )}
     </div>
   );

@@ -12,6 +12,7 @@ export type PostAuthor = {
 export type Post = {
   id: string;
   user_id: string;
+  author_team_page_id: string | null;
   content: string;
   image_url: string | null;
   image_urls: string[];
@@ -23,6 +24,7 @@ export type Post = {
 type RawPost = {
   id: string;
   user_id: string;
+  author_team_page_id?: string | null;
   content: string;
   image_url: string | null;
   image_urls?: string[] | null;
@@ -34,6 +36,13 @@ type RawProfile = {
   id: string;
   name: string;
   username: string;
+  avatar_url: string | null;
+};
+
+type RawTeamPage = {
+  id: string;
+  name: string;
+  slug: string;
   avatar_url: string | null;
 };
 
@@ -57,8 +66,16 @@ export function usePosts() {
     if (!error && data) {
       const rawPosts = data as unknown as RawPost[];
       const uniqueUserIds = Array.from(new Set(rawPosts.map((item) => item.user_id)));
+      const uniqueTeamPageIds = Array.from(
+        new Set(
+          rawPosts
+            .map((item) => item.author_team_page_id)
+            .filter((id): id is string => Boolean(id)),
+        ),
+      );
 
       let profilesById = new Map<string, PostAuthor>();
+      let teamPagesById = new Map<string, PostAuthor>();
 
       if (uniqueUserIds.length > 0) {
         const { data: profilesData } = await supabase
@@ -80,9 +97,30 @@ export function usePosts() {
         }
       }
 
+      if (uniqueTeamPageIds.length > 0) {
+        const { data: teamPagesData } = await supabase
+          .from("team_pages")
+          .select("id, name, slug, avatar_url")
+          .in("id", uniqueTeamPageIds);
+
+        if (teamPagesData) {
+          teamPagesById = new Map(
+            (teamPagesData as unknown as RawTeamPage[]).map((teamPage) => [
+              teamPage.id,
+              {
+                name: teamPage.name,
+                username: teamPage.slug,
+                avatar_url: teamPage.avatar_url,
+              },
+            ]),
+          );
+        }
+      }
+
       const mappedPosts = rawPosts.map((item) => ({
         id: item.id,
         user_id: item.user_id,
+        author_team_page_id: item.author_team_page_id ?? null,
         content: item.content,
         image_url: item.image_url,
         image_urls:
@@ -93,7 +131,10 @@ export function usePosts() {
               : [],
         created_at: item.created_at,
         likes_count: item.likes_count,
-              profiles: profilesById.get(item.user_id) ?? null,
+        profiles:
+          (item.author_team_page_id
+            ? teamPagesById.get(item.author_team_page_id)
+            : null) ?? profilesById.get(item.user_id) ?? null,
       }));
 
       setPosts(mappedPosts);

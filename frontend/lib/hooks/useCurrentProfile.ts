@@ -9,6 +9,8 @@ export type CurrentProfile = {
   username: string;
   avatarUrl: string | null;
   headerUrl: string | null;
+  isAdmin: boolean;
+  isSuperAdmin: boolean;
 };
 
 const supabase = createClient();
@@ -44,12 +46,25 @@ export function useCurrentProfile() {
         user.email?.split("@")[0]?.toLowerCase() ??
         "usuario";
 
+      const { data: permissionsData } = await supabase.rpc(
+        "get_current_user_permissions",
+      );
+
+      const isAdmin = Array.isArray(permissionsData)
+        ? Boolean(permissionsData[0]?.is_admin)
+        : false;
+      const isSuperAdmin = Array.isArray(permissionsData)
+        ? Boolean(permissionsData[0]?.is_super_admin)
+        : false;
+
       setProfile({
         id: user.id,
         name: data?.name ?? fallbackName,
         username: data?.username ?? fallbackUsername,
         avatarUrl: data?.avatar_url ?? null,
         headerUrl: data?.header_url ?? null,
+        isAdmin,
+        isSuperAdmin,
       });
 
       setLoading(false);

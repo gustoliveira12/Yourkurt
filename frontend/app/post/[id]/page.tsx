@@ -65,6 +65,7 @@ function normalizeImages(post: Post | null) {
 type RawPostDetail = {
   id: string;
   user_id: string;
+  author_team_page_id?: string | null;
   content: string;
   image_url: string | null;
   image_urls?: string[] | null;
@@ -120,7 +121,7 @@ export default function PostDetailPage() {
       const { data, error } = await supabase
         .from("posts")
         .select(
-          "id, user_id, content, image_url, image_urls, created_at, likes_count, profiles(name, username, avatar_url)",
+          "id, user_id, author_team_page_id, content, image_url, image_urls, created_at, likes_count, profiles(name, username, avatar_url)",
         )
         .eq("id", postId)
         .maybeSingle();
@@ -140,10 +141,31 @@ export default function PostDetailPage() {
       }
 
       const rawPost = data as RawPostDetail;
+      let postAuthor =
+        rawPost.profiles && Array.isArray(rawPost.profiles)
+          ? rawPost.profiles[0]
+          : rawPost.profiles;
+
+      if (rawPost.author_team_page_id) {
+        const { data: teamPageData } = await supabase
+          .from("team_pages")
+          .select("id, name, slug, avatar_url")
+          .eq("id", rawPost.author_team_page_id)
+          .maybeSingle();
+
+        if (teamPageData) {
+          postAuthor = {
+            name: teamPageData.name,
+            username: teamPageData.slug,
+            avatar_url: teamPageData.avatar_url,
+          };
+        }
+      }
 
       setPost({
         id: rawPost.id,
         user_id: rawPost.user_id,
+        author_team_page_id: rawPost.author_team_page_id ?? null,
         content: rawPost.content,
         image_url: rawPost.image_url,
         image_urls:
@@ -154,10 +176,7 @@ export default function PostDetailPage() {
               : [],
         created_at: rawPost.created_at,
         likes_count: rawPost.likes_count,
-        profiles:
-          rawPost.profiles && Array.isArray(rawPost.profiles)
-            ? rawPost.profiles[0]
-            : rawPost.profiles,
+        profiles: postAuthor,
       });
       setLoadingPost(false);
     }
