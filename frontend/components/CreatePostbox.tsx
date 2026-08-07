@@ -13,6 +13,33 @@ type CreatePostboxProps = {
   onPostCreated: (post: Post) => void;
 };
 
+type PostingIdentity = {
+  id: string;
+  type: "profile" | "team";
+  name: string;
+  username: string;
+  avatar_url: string | null;
+};
+
+type RawMembership = {
+  team_page_id: string;
+  can_post: boolean;
+  team_pages:
+    | {
+        id: string;
+        name: string;
+        slug: string;
+        avatar_url: string | null;
+      }
+    | {
+        id: string;
+        name: string;
+        slug: string;
+        avatar_url: string | null;
+      }[]
+    | null;
+};
+
 export default function CreatePostbox({
   avatarUrl,
   userId,
@@ -20,8 +47,22 @@ export default function CreatePostbox({
   onPostCreated,
 }: CreatePostboxProps) {
   const MAX_IMAGES = 4;
+  const profileIdentity = useMemo<PostingIdentity | null>(() => {
+    if (!profile) return null;
+
+    return {
+      id: userId,
+      type: "profile",
+      name: profile.name,
+      username: profile.username || "usuario",
+      avatar_url: profile.avatar_url,
+    };
+  }, [profile, userId]);
+
   const [content, setContent] = useState("");
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
+  const [teamIdentities, setTeamIdentities] = useState<PostingIdentity[]>([]);
+  const [selectedIdentityId, setSelectedIdentityId] = useState<string>("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -38,6 +79,61 @@ export default function CreatePostbox({
       });
     };
   }, [imagePreviews]);
+
+  useEffect(() => {
+    async function loadPostingIdentities() {
+      if (!userId) return;
+
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from("team_memberships")
+        .select("team_page_id, can_post, team_pages(id, name, slug, avatar_url)")
+        .eq("user_id", userId)
+        .eq("can_post", true);
+
+      if (error || !data) {
+        setTeamIdentities([]);
+        return;
+      }
+
+      const mapped: PostingIdentity[] = [];
+
+      (data as unknown as RawMembership[]).forEach((membership) => {
+        const rawTeam = Array.isArray(membership.team_pages)
+          ? membership.team_pages[0]
+          : membership.team_pages;
+
+        if (!rawTeam) return;
+
+        mapped.push({
+          id: rawTeam.id,
+          type: "team",
+          name: rawTeam.name,
+          username: rawTeam.slug,
+          avatar_url: rawTeam.avatar_url,
+        });
+      });
+
+      setTeamIdentities(mapped);
+    }
+
+    void loadPostingIdentities();
+  }, [userId]);
+
+  const postingIdentities = useMemo(() => {
+    const identities: PostingIdentity[] = [];
+    if (profileIdentity) identities.push(profileIdentity);
+    identities.push(...teamIdentities);
+    return identities;
+  }, [profileIdentity, teamIdentities]);
+
+  const selectedIdentity = useMemo(
+    () =>
+      postingIdentities.find((identity) => identity.id === selectedIdentityId) ??
+      postingIdentities[0] ??
+      null,
+    [postingIdentities, selectedIdentityId],
+  );
 
   function handleImageSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? []);
@@ -94,7 +190,7 @@ export default function CreatePostbox({
 
   async function handleSubmit() {
     const trimmed = content.trim();
-    if ((!trimmed && selectedImages.length === 0) || submitting) return;
+    if ((!trimmed && selectedImages.length === 0) || submitting || !selectedIdentity) return;
 
     setSubmitting(true);
     setError(null);
@@ -114,6 +210,7 @@ export default function CreatePostbox({
 
     const payload = {
       user_id: userId,
+      author_team_page_id: selectedIdentity.type === "team" ? selectedIdentity.id : null,
       content: trimmed || "[midia]",
       is_public: true,
       image_url: imageUrls[0] ?? null,
@@ -122,8 +219,8 @@ export default function CreatePostbox({
 
     const buildPostSelect = (supportsMultipleImages: boolean) =>
       supportsMultipleImages
-        ? "id, user_id, content, image_url, image_urls, created_at, likes_count"
-        : "id, user_id, content, image_url, created_at, likes_count";
+        ? "id, user_id, author_team_page_id, content, image_url, image_urls, created_at, likes_count"
+        : "id, user_id, author_team_page_id, content, image_url, created_at, likes_count";
 
     let data: Post | null = null;
     let submitError: { message: string } | null = null;
@@ -142,6 +239,8 @@ export default function CreatePostbox({
         .from("posts")
         .insert({
           user_id: userId,
+          author_team_page_id:
+            selectedIdentity.type === "team" ? selectedIdentity.id : null,
           content: trimmed || "[midia]",
           is_public: true,
           image_url: imageUrls[0] ?? null,
@@ -158,12 +257,17 @@ export default function CreatePostbox({
     } else if (data) {
       onPostCreated({
         ...data,
+        author_team_page_id: data.author_team_page_id ?? null,
         image_urls: Array.isArray(data.image_urls)
           ? data.image_urls
           : data.image_url
             ? [data.image_url]
             : [],
-        profiles: profile,
+        profiles: {
+          name: selectedIdentity.name,
+          username: selectedIdentity.username,
+          avatar_url: selectedIdentity.avatar_url,
+        },
       } as Post);
       setContent("");
       setSelectedImages([]);
@@ -187,17 +291,36 @@ export default function CreatePostbox({
       )}
       <div className="flex gap-4">
         <div className="rounded-full flex items-start justify-center w-fit h-fit mt-1">
-          <Avatar src={avatarUrl} />
+          <Avatar src={selectedIdentity?.avatar_url ?? avatarUrl} />
         </div>
-        <textarea
-          placeholder="O que está passando pela sua órbita?"
-          className="bg-background w-full rounded-xl transition-all duration-100 border border-border-base rounded-sm px-4 py-2 placeholder:text-foreground-muted text-foreground resize-none min-h-[80px] disabled:opacity-50"
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          onKeyDown={handleKeyDown}
-          maxLength={500}
-          disabled={submitting}
-        />
+        <div className="w-full flex flex-col gap-2">
+          {postingIdentities.length > 1 && (
+            <label className="flex items-center gap-2 text-xs text-subtitle">
+              <span>Publicar como</span>
+              <select
+                className="rounded-md border border-border-base bg-background px-2 py-1 text-sm text-foreground"
+                value={selectedIdentity?.id ?? ""}
+                onChange={(e) => setSelectedIdentityId(e.target.value)}
+                disabled={submitting}
+              >
+                {postingIdentities.map((identity) => (
+                  <option key={identity.id} value={identity.id}>
+                    {identity.type === "team" ? `Equipe: ${identity.name}` : `Perfil: ${identity.name}`}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
+          <textarea
+            placeholder="O que está passando pela sua órbita?"
+            className="bg-background w-full rounded-xl transition-all duration-100 border border-border-base rounded-sm px-4 py-2 placeholder:text-foreground-muted text-foreground resize-none min-h-[80px] disabled:opacity-50"
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            onKeyDown={handleKeyDown}
+            maxLength={500}
+            disabled={submitting}
+          />
+        </div>
       </div>
 
       {imagePreviews.length > 0 && (
