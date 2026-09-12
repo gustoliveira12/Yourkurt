@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Esprokurt",
+  title: "Yourkurt",
   description: "Compartilhe e Conecte-se",
 };
 

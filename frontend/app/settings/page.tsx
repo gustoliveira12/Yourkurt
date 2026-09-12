@@ -31,6 +31,18 @@ type TeamPageItem = {
   slug: string;
 };
 
+type TeamPageMember = {
+  id: string;
+  user_id: string;
+  role: string;
+  can_post: boolean;
+  name: string | null;
+  username: string | null;
+  avatar_url: string | null;
+};
+
+type TeamPageMembersMap = Record<string, TeamPageMember[]>;
+
 const NAV_ITEMS = [
   {
     label: "Feed",
@@ -132,6 +144,7 @@ function SettingsCard({
 export default function SettingsPage() {
   const router = useRouter();
   const { profile } = useCurrentProfile();
+  const [hasMounted, setHasMounted] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [logoutError, setLogoutError] = useState("");
   const [teamName, setTeamName] = useState("");
@@ -140,11 +153,17 @@ export default function SettingsPage() {
   const [teamMessage, setTeamMessage] = useState("");
   const [isCreatingTeam, setIsCreatingTeam] = useState(false);
   const [teamPages, setTeamPages] = useState<TeamPageItem[]>([]);
+  const [teamMembersByPage, setTeamMembersByPage] = useState<TeamPageMembersMap>({});
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
 
   useEffect(() => {
     async function loadTeamPages() {
       if (!profile?.id || !profile.isAdmin) {
         setTeamPages([]);
+        setTeamMembersByPage({});
         return;
       }
 
@@ -157,6 +176,7 @@ export default function SettingsPage() {
 
       if (!data) {
         setTeamPages([]);
+        setTeamMembersByPage({});
         return;
       }
 
@@ -181,6 +201,75 @@ export default function SettingsPage() {
 
     void loadTeamPages();
   }, [profile?.id, profile?.isAdmin]);
+
+  useEffect(() => {
+    async function loadTeamMembers() {
+      if (!profile?.id || !profile.isAdmin || teamPages.length === 0) {
+        setTeamMembersByPage({});
+        return;
+      }
+
+      const supabase = createClient();
+      const teamPageIds = teamPages.map((page) => page.id);
+
+      const { data, error } = await supabase
+        .from("team_memberships")
+        .select("id, team_page_id, user_id, role, can_post")
+        .in("team_page_id", teamPageIds);
+
+      if (error || !data) {
+        setTeamMembersByPage({});
+        return;
+      }
+
+      const userIds = [...new Set(data.map((row) => row.user_id))];
+
+      const profilesById = new Map<string, { name: string | null; username: string | null; avatar_url: string | null }>();
+
+      if (userIds.length > 0) {
+        const { data: profilesData } = await supabase
+          .from("profiles")
+          .select("id, name, username, avatar_url")
+          .in("id", userIds);
+
+        (profilesData ?? []).forEach((row) => {
+          profilesById.set(row.id, {
+            name: row.name,
+            username: row.username,
+            avatar_url: row.avatar_url,
+          });
+        });
+      }
+
+      const nextMembersByPage: TeamPageMembersMap = {};
+
+      data.forEach((row) => {
+        const profileInfo = profilesById.get(row.user_id);
+
+        const item: TeamPageMember = {
+          id: row.id,
+          user_id: row.user_id,
+          role: row.role,
+          can_post: Boolean(row.can_post),
+          name: profileInfo?.name ?? null,
+          username: profileInfo?.username ?? null,
+          avatar_url: profileInfo?.avatar_url ?? null,
+        };
+
+        if (!nextMembersByPage[row.team_page_id]) {
+          nextMembersByPage[row.team_page_id] = [];
+        }
+
+        nextMembersByPage[row.team_page_id].push(item);
+      });
+
+      setTeamMembersByPage(nextMembersByPage);
+    }
+
+    void loadTeamMembers();
+  }, [profile?.id, profile?.isAdmin, teamPages]);
+
+  const canManageTeamPages = hasMounted && Boolean(profile?.isAdmin);
 
   function normalizeSlug(value: string) {
     return value
@@ -243,6 +332,54 @@ export default function SettingsPage() {
       setTeamMessage(error instanceof Error ? error.message : "Erro ao criar equipe.");
     } finally {
       setIsCreatingTeam(false);
+    }
+  }
+
+  async function handleTeamMemberPermissionChange(
+    teamPageId: string,
+    member: TeamPageMember,
+    nextValues: { can_post?: boolean; role?: string },
+  ) {
+    const nextCanPost = nextValues.can_post ?? member.can_post;
+    const nextRole = nextValues.role ?? member.role;
+
+    try {
+      const supabase = createClient();
+      const { data, error } = await supabase.rpc("set_team_member_permissions", {
+        p_team_page_id: teamPageId,
+        p_user_id: member.user_id,
+        p_can_post: nextCanPost,
+        p_role: nextRole,
+      });
+
+      if (error) {
+        throw new Error(error.message || "Nao foi possivel atualizar permissões do membro.");
+      }
+
+      const updated = data as { id: string; user_id: string; role: string; can_post: boolean } | null;
+
+      if (!updated) {
+        throw new Error("Resposta vazia da atualização de permissões.");
+      }
+
+      setTeamMembersByPage((prev) => ({
+        ...prev,
+        [teamPageId]: (prev[teamPageId] ?? []).map((item) =>
+          item.id === member.id
+            ? {
+                ...item,
+                role: updated.role,
+                can_post: Boolean(updated.can_post),
+              }
+            : item,
+        ),
+      }));
+
+      setTeamMessage("Permissões do membro atualizadas com sucesso.");
+    } catch (error) {
+      setTeamMessage(
+        error instanceof Error ? error.message : "Erro ao atualizar permissões do membro.",
+      );
     }
   }
 
@@ -369,7 +506,7 @@ export default function SettingsPage() {
                   </div>
                 </div>
 
-                {!profile?.isAdmin && (
+                {!canManageTeamPages && (
                   <p className="rounded-lg border border-border-base bg-background px-3 py-2 text-sm text-subtitle">
                     Sua conta e de usuario comum. Apenas administradores podem criar equipes e publicar.
                   </p>
@@ -380,14 +517,14 @@ export default function SettingsPage() {
                     value={teamName}
                     onChange={(e) => setTeamName(e.target.value)}
                     placeholder="Nome da equipe"
-                    disabled={!profile?.isAdmin}
+                    disabled={!canManageTeamPages}
                     className="rounded-lg border border-border-base bg-background px-3 py-2 text-sm text-foreground"
                   />
                   <input
                     value={teamSlug}
                     onChange={(e) => setTeamSlug(e.target.value)}
                     placeholder="Slug (ex.: time-marketing)"
-                    disabled={!profile?.isAdmin}
+                    disabled={!canManageTeamPages}
                     className="rounded-lg border border-border-base bg-background px-3 py-2 text-sm text-foreground"
                   />
                 </div>
@@ -396,7 +533,7 @@ export default function SettingsPage() {
                   value={teamAvatarUrl}
                   onChange={(e) => setTeamAvatarUrl(e.target.value)}
                   placeholder="URL do avatar da pagina (opcional)"
-                  disabled={!profile?.isAdmin}
+                  disabled={!canManageTeamPages}
                   className="rounded-lg border border-border-base bg-background px-3 py-2 text-sm text-foreground"
                 />
 
@@ -404,7 +541,7 @@ export default function SettingsPage() {
                   <button
                     type="button"
                     onClick={handleCreateTeamPage}
-                    disabled={isCreatingTeam || !profile?.isAdmin}
+                    disabled={isCreatingTeam || !canManageTeamPages}
                     className="rounded-lg border border-border-base px-3 py-2 text-sm font-semibold text-foreground hover:bg-background disabled:opacity-70"
                   >
                     {isCreatingTeam ? "Criando..." : "Criar equipe"}
@@ -430,6 +567,90 @@ export default function SettingsPage() {
                   <p className="rounded-lg border border-border-base bg-background px-3 py-2 text-sm text-foreground">
                     {teamMessage}
                   </p>
+                )}
+
+                {teamPages.length > 0 && (
+                  <div className="flex flex-col gap-3 pt-2">
+                    <h3 className="text-sm font-bold uppercase tracking-wider text-subtitle">
+                      Permissões da equipe
+                    </h3>
+
+                    {teamPages.map((page) => {
+                      const pageMembers = teamMembersByPage[page.id] ?? [];
+
+                      return (
+                        <div
+                          key={page.id}
+                          className="rounded-xl border border-border-base bg-background px-3 py-3"
+                        >
+                          <div className="mb-3 flex items-center justify-between gap-3">
+                            <div>
+                              <p className="text-sm font-semibold text-foreground">{page.name}</p>
+                              <p className="text-xs text-subtitle">@{page.slug}</p>
+                            </div>
+                            <span className="text-[11px] uppercase tracking-wider text-subtitle">
+                              {pageMembers.length} membro(s)
+                            </span>
+                          </div>
+
+                          {pageMembers.length === 0 ? (
+                            <p className="text-sm text-subtitle">
+                              Nenhum membro vinculado ainda.
+                            </p>
+                          ) : (
+                            <div className="space-y-2">
+                              {pageMembers.map((member) => (
+                                <div
+                                  key={member.id}
+                                  className="flex flex-col gap-2 rounded-lg border border-border-base bg-background-raised p-3 md:flex-row md:items-center md:justify-between"
+                                >
+                                  <div className="min-w-0">
+                                    <p className="truncate text-sm font-semibold text-foreground">
+                                      {member.name ?? "Usuário sem nome"}
+                                    </p>
+                                    <p className="text-xs text-subtitle">
+                                      {member.username ? `@${member.username}` : "Perfil sem username"}
+                                    </p>
+                                  </div>
+
+                                  <div className="flex flex-col gap-2 md:flex-row md:items-center">
+                                    <select
+                                      value={member.role}
+                                      onChange={(event) =>
+                                        void handleTeamMemberPermissionChange(page.id, member, {
+                                          role: event.target.value,
+                                        })
+                                      }
+                                      className="rounded-lg border border-border-base bg-background px-2 py-1.5 text-xs text-foreground"
+                                    >
+                                      <option value="owner">Owner</option>
+                                      <option value="admin">Admin</option>
+                                      <option value="editor">Editor</option>
+                                      <option value="member">Member</option>
+                                    </select>
+
+                                    <label className="flex items-center gap-2 text-xs text-subtitle">
+                                      <input
+                                        type="checkbox"
+                                        checked={member.can_post}
+                                        onChange={(event) =>
+                                          void handleTeamMemberPermissionChange(page.id, member, {
+                                            can_post: event.target.checked,
+                                          })
+                                        }
+                                        className="h-4 w-4 rounded border-border-base"
+                                      />
+                                      Pode postar
+                                    </label>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
                 )}
               </div>
             </div>

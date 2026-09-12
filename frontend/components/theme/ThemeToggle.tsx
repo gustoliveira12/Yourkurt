@@ -27,7 +27,7 @@ function applyTheme(theme: Theme) {
   const root = document.documentElement;
   root.dataset.theme = theme;
   root.classList.toggle("dark", theme === "dark");
-  localStorage.setItem("esprokurt-theme", theme);
+  localStorage.setItem("yourkurt-theme", theme);
 }
 
 export default function ThemeToggle() {
