@@ -1,6 +1,20 @@
 alter table if exists public.profiles
   add column if not exists is_super_admin boolean not null default false;
 
+create or replace function public.is_current_user_admin()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select coalesce((
+    select profiles.is_admin or profiles.is_super_admin
+    from public.profiles
+    where profiles.id = auth.uid()
+  ), false);
+$$;
+
 create table if not exists public.admin_audit_logs (
   id uuid default gen_random_uuid() primary key,
   actor_id uuid not null references public.profiles(id) on delete restrict,
@@ -47,8 +61,33 @@ grant execute on function public.get_current_user_permissions() to authenticated
 
 alter table public.admin_audit_logs enable row level security;
 
-revoke all on public.admin_audit_logs from anon;
-revoke all on public.admin_audit_logs from authenticated;
+revoke insert, update, delete on public.admin_audit_logs from anon;
+revoke insert, update, delete on public.admin_audit_logs from authenticated;
+grant select on public.admin_audit_logs to authenticated;
+
+create or replace function public.prevent_profile_privilege_flag_updates()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if (old.is_admin is distinct from new.is_admin)
+     or (old.is_super_admin is distinct from new.is_super_admin) then
+    if auth.uid() is null or not public.is_current_user_super_admin() then
+      raise exception 'Only super admins can change privilege flags';
+    end if;
+  end if;
+
+  return new;
+end;
+$$;
+
+drop trigger if exists profiles_privilege_guard on public.profiles;
+create trigger profiles_privilege_guard
+before update on public.profiles
+for each row
+execute function public.prevent_profile_privilege_flag_updates();
 
 drop policy if exists "admin_audit_logs_select_super_admin" on public.admin_audit_logs;
 create policy "admin_audit_logs_select_super_admin"
@@ -114,6 +153,10 @@ begin
 
   if actor_id = p_target_user_id and p_is_super_admin = false then
     raise exception 'Super admin cannot remove own super admin permission';
+  end if;
+
+  if p_is_super_admin = true and p_is_admin = false then
+    raise exception 'Super admin status requires admin status';
   end if;
 
   select jsonb_build_object(
