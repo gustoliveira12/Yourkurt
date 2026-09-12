@@ -4,7 +4,7 @@ export default function ThemeScript() {
   const script = `
 (() => {
   try {
-    const saved = localStorage.getItem("esprokurt-theme");
+    const saved = localStorage.getItem("yourkurt-theme");
     const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
     const theme = saved === "light" || saved === "dark" ? saved : (prefersDark ? "dark" : "light");
     const root = document.documentElement;
@@ -16,7 +16,7 @@ export default function ThemeScript() {
 })();`;
 
   return (
-    <Script id="esprokurt-theme-script" strategy="beforeInteractive">
+    <Script id="yourkurt-theme-script" strategy="beforeInteractive">
       {script}
     </Script>
   );

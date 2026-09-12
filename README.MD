@@ -1,6 +1,6 @@
-# Esprokurt
+# Yourkurt
 
-Esprokurt é uma rede social interna inspirada no Orkut, focada em perfis, posts e interações entre usuários de um mesmo ambiente organizacional. O projeto está em desenvolvimento ativo e já oferece autenticação, perfil, feed de posts, curtidas e navegação mobile.
+Yourkurt é uma rede social interna inspirada no Orkut, focada em perfis, posts e interações entre usuários de um mesmo ambiente organizacional. O projeto está em desenvolvimento ativo e já oferece autenticação, perfil, feed de posts, curtidas e navegação mobile.
 
 ## Funcionalidades Principais
 
@@ -34,7 +34,7 @@ Supabase é utilizado como Backend as a Service, fornecendo autenticação, banc
 A estrutura de alto nível do monorepo é:
 
 ```text
-Esprokurt/
+Yourkurt/
 ├── frontend/   Aplicação Next.js
 ├── backend/    Reservado para backend próprio
 ├── supabase/   Migrations e configuração do Supabase
@@ -60,7 +60,7 @@ Esprokurt/
 
    ```bash
    git clone <url-do-repositorio>
-   cd Esprokurt
+   cd Yourkurt
    ```
 
 2. Instalar dependências:
