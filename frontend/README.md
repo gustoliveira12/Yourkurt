@@ -1,4 +1,4 @@
-# Esprokurt Frontend
+# Yourkurt Frontend
 
 A modern social media platform built with [Next.js](https://nextjs.org), featuring posts, interactions, and user profiles.
 

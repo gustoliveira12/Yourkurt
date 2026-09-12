@@ -18,7 +18,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
 
   async function handleLogin(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+    e.preventDefault(); http://localhost:3000
     setLoading(true);
 
     try {
@@ -49,7 +49,7 @@ export default function LoginPage() {
       </div>
 
       <div className="flex flex-col h-full justify-between px-12 py-8 rounded-[20px] absolute top-0 left-0 w-1/2">
-        <span className="text-foreground-brand text-xl tracking-widest uppercase">Esprokurt</span>
+        <span className="text-foreground-brand text-xl tracking-widest uppercase">Yourkurt</span>
         <div className="flex flex-col gap-3 text-foreground">
           <span className="w-1.5 text-6xl tracking-wider text-white font-semibold dark:text-foreground">
             Conecte. Compartilhe. Inspire.
