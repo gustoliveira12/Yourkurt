@@ -38,13 +38,16 @@ create policy "team_pages_update_owner_or_manager"
     )
   )
   with check (
-    created_by = auth.uid()
-    or exists (
-      select 1
-      from public.team_memberships membership
-      where membership.team_page_id = id
-        and membership.user_id = auth.uid()
-        and membership.role in ('owner', 'admin')
+    created_by = old.created_by
+    and (
+      created_by = auth.uid()
+      or exists (
+        select 1
+        from public.team_memberships membership
+        where membership.team_page_id = id
+          and membership.user_id = auth.uid()
+          and membership.role in ('owner', 'admin')
+      )
     )
   );
 
@@ -64,7 +67,16 @@ create policy "team_memberships_update_manager"
   for update
   to authenticated
   using (public.is_current_user_team_manager(team_page_id))
-  with check (public.is_current_user_team_manager(team_page_id));
+  with check (
+    public.is_current_user_team_manager(team_page_id)
+    and team_page_id = old.team_page_id
+    and user_id = old.user_id
+    and (
+      role = old.role
+      or role in ('owner', 'admin', 'editor', 'member')
+    )
+    and can_post is not null
+  );
 
 drop policy if exists "team_memberships_delete_manager" on public.team_memberships;
 create policy "team_memberships_delete_manager"

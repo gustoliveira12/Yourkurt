@@ -170,9 +170,8 @@ export default function SettingsPage() {
       const supabase = createClient();
       const { data } = await supabase
         .from("team_memberships")
-        .select("team_pages(id, name, slug), can_post")
-        .eq("user_id", profile.id)
-        .eq("can_post", true);
+        .select("team_pages(id, name, slug), role, can_post")
+        .eq("user_id", profile.id);
 
       if (!data) {
         setTeamPages([]);
@@ -188,6 +187,10 @@ export default function SettingsPage() {
           : row.team_pages;
 
         if (!rawTeam) return;
+
+        if (row.role !== "owner" && row.role !== "admin") {
+          return;
+        }
 
         mapped.push({
           id: rawTeam.id,
