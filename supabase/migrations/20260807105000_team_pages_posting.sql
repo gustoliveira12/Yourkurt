@@ -36,6 +36,8 @@ as $$
   ), false);
 $$;
 
+drop function if exists public.get_current_user_permissions();
+
 create or replace function public.get_current_user_permissions()
 returns table (is_admin boolean)
 language sql
