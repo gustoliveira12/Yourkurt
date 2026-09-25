@@ -93,7 +93,7 @@ const PageAside = ({ items }: PageAsideProps) => {
       >
         <div className="flex items-center justify-center h-14 px-2.5 shrink-0 overflow-hidden">
           <h1 className="text-2xl font-black gradient-to-l text-transparent bg-clip-text">
-            E
+            Y
           </h1>
         </div>
         <nav className="flex flex-col justify-center flex-1 p-2">
