@@ -45,7 +45,7 @@ export function useComments(postId: string) {
 
     const { data, error: fetchError } = await supabase
       .from("comments")
-      .select(
+      .select<string, RawComment>(
         "id, post_id, user_id, content, created_at, profiles(name, username, avatar_url)",
       )
       .eq("post_id", postId)
@@ -58,7 +58,7 @@ export function useComments(postId: string) {
       return;
     }
 
-    const mappedComments = (data as RawComment[] | null ?? []).map((item) => ({
+    const mappedComments = (data ?? []).map((item) => ({
       id: item.id,
       post_id: item.post_id,
       user_id: item.user_id,

@@ -58,7 +58,7 @@ export function useUserReplies(userId: string) {
     const supabase = createClient();
     const { data, error: fetchError } = await supabase
       .from("comments")
-      .select(
+      .select<string, RawReply>(
         "id, post_id, user_id, content, created_at, posts(id, content, image_url, image_urls, profiles(name, username, avatar_url))",
       )
       .eq("user_id", userId)
@@ -72,7 +72,7 @@ export function useUserReplies(userId: string) {
       return;
     }
 
-    const mappedReplies = (data as RawReply[] | null ?? []).map((item) => ({
+    const mappedReplies = (data ?? []).map((item) => ({
       id: item.id,
       post_id: item.post_id,
       user_id: item.user_id,
