@@ -91,7 +91,7 @@ export default function PostCard({
   };
 
   return (
-    <div className="flex flex-col md:py-4 md:w-full md:rounded-lg gap-2 w-dvw">
+    <div className="flex flex-col md:py-4 md:w-full md:rounded-card md:bg-surface md:shadow-card gap-2 w-dvw">
       <div className="flex flex-col gap-4 px-3">
         <div className="flex justify-between items-center">
           {detailHref ? (
@@ -137,7 +137,7 @@ export default function PostCard({
             </button>
 
             {menuOpen && canDelete && (
-              <div className="absolute right-0 top-11 z-20 min-w-40 rounded-lg border border-border-base bg-background-raised p-1 shadow-lg">
+              <div className="absolute right-0 top-11 z-20 min-w-40 rounded-control border border-border-base bg-surface-raised p-1 shadow-card">
                 <button
                   type="button"
                   onClick={() => void handleDelete()}
@@ -165,7 +165,7 @@ export default function PostCard({
       </div>
       {postImages.length === 1 && (
         detailHref ? (
-          <Link href={detailHref} className="w-full relative max-w-full max-h-96 aspect-video md:rounded-xl overflow-hidden flex justify-center items-center">
+          <Link href={detailHref} className="w-full relative max-w-full max-h-96 aspect-video md:rounded-2xl overflow-hidden flex justify-center items-center">
             <Image
               className="object-contain"
               fill
@@ -175,7 +175,7 @@ export default function PostCard({
             />
           </Link>
         ) : (
-          <div className="w-full relative max-w-full max-h-96 aspect-video md:rounded-xl overflow-hidden flex justify-center items-center">
+          <div className="w-full relative max-w-full max-h-96 aspect-video md:rounded-2xl overflow-hidden flex justify-center items-center">
             <Image
               className="object-contain"
               fill

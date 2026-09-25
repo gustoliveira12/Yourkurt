@@ -121,7 +121,7 @@ function SettingsCard({
   actionText: string;
 }) {
   return (
-    <div className="rounded-xl border border-border-base bg-background-raised p-4 flex items-start justify-between gap-4">
+    <div className="rounded-card border border-border-base bg-surface p-4 flex items-start justify-between gap-4">
       <div className="flex items-start gap-3">
         <span className="mt-0.5 rounded-lg bg-background p-2 text-foreground-brand">
           {icon}
@@ -423,7 +423,7 @@ export default function SettingsPage() {
         />
 
         <section className="w-full max-w-4xl px-3 md:px-4 pb-24 sm:pb-10">
-          <div className="rounded-2xl bg-background-raised border border-border-base p-6 md:p-8 flex flex-col gap-8">
+          <div className="rounded-card bg-surface shadow-card border border-border-base p-6 md:p-8 flex flex-col gap-8">
             <div className="flex items-start justify-between gap-3">
               <div>
                 <h1 className="text-2xl md:text-3xl font-black text-foreground tracking-tight">

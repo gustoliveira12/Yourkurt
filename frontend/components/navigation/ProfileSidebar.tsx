@@ -98,8 +98,8 @@ export default function LeftNavbar({
   }, []);
 
   return (
-    <div className="hidden md:flex flex-col gap-8 max-w-80">
-      <div className="flex flex-col rounded-xl bg-background-raised overflow-hidden h-fit ">
+    <div className="hidden md:flex flex-col gap-6 max-w-80">
+      <div className="flex flex-col rounded-card bg-surface shadow-card overflow-hidden h-fit">
         <Link href="/perfil" className="w-full h-16 relative block" aria-label="Abrir perfil">
           {headerUrl ? (
             <Image
@@ -113,7 +113,7 @@ export default function LeftNavbar({
           ) : (
             <div className="gradient-to-l absolute inset-0" />
           )}
-          <div className="overflow-hidden size-16 rounded-full border-4 border-background-raised flex items-center justify-center mb-3 bg-purple-500 absolute -bottom-10 left-4">
+          <div className="overflow-hidden size-16 rounded-full border-4 border-surface flex items-center justify-center mb-3 bg-background-brand absolute -bottom-10 left-4">
             {!src || error ? (
               <UserIcon className="text-foreground-inverted" size={34} weight="fill" />
             ) : (
@@ -143,7 +143,7 @@ export default function LeftNavbar({
               @{at}
             </Link>
           </div>
-          <div className="border-t border-zinc-800 flex justify-between p-2 gap-2">
+          <div className="border-t border-border-base flex justify-between p-2 gap-2">
             <div className="flex flex-col items-center justify-center">
               <h3 className="text-lg font-bold">
                 {loadingStats ? "..." : stats.friendsCount}
@@ -169,7 +169,7 @@ export default function LeftNavbar({
           </div>
         </div>
       </div>
-      <div className="flex flex-col rounded-xl bg-background-raised overflow-hidden h-fit  px-6 py-4 gap-2">
+      <div className="flex flex-col rounded-card bg-surface shadow-card overflow-hidden h-fit px-6 py-4 gap-2">
         <div className="flex justify-between">
           <h2 className=" flex items-center uppercase font-bold tracking-wide text-sm text-foreground ">
             Seus amigos
@@ -181,15 +181,15 @@ export default function LeftNavbar({
         </div>
         <div className="flex flex-wrap gap-4">
           {loadingFriends ? (
-            <p className="text-xs text-zinc-400">Carregando...</p>
+            <p className="text-xs text-subtitle">Carregando...</p>
           ) : friends.length === 0 ? (
-            <p className="text-xs text-zinc-400">Nenhum amigo ainda</p>
+            <p className="text-xs text-subtitle">Nenhum amigo ainda</p>
           ) : (
             friends.map((friend) => (
               <Link
                 key={friend.id}
                 href={`/perfil/${friend.username}`}
-                className="flex flex-col justify-center items-center gap-2 text-xs text-zinc-400 truncate max-w-16 hover:opacity-80 transition-opacity"
+                className="flex flex-col justify-center items-center gap-2 text-xs text-subtitle truncate max-w-16 hover:opacity-80 transition-opacity"
               >
                 <div className="flex flex-col rounded-full size-16 items-center justify-center">
                   <Avatar src={friend.avatar_url} />

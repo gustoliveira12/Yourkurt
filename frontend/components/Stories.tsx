@@ -13,7 +13,7 @@ export default function Story({ src, name, hasStory }: StoryProps) {
       <Avatar isRead isStory sizes="xl" src={src} name={name} />
       <span
         title={name}
-        className="text-center text-zinc-400 truncate min-w-full w-0 block"
+        className="text-center text-subtitle truncate min-w-full w-0 block"
       >
         {name}
       </span>

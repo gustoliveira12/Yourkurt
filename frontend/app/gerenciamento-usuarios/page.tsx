@@ -211,7 +211,7 @@ export default function SuperAdminPage() {
           />
 
           <section className="w-full max-w-3xl px-3 md:px-4 pb-24 sm:pb-10">
-            <div className="rounded-2xl border border-border-base bg-background-raised p-6">
+            <div className="rounded-card border border-border-base bg-surface shadow-card p-6">
               <h1 className="text-2xl font-black text-foreground">Acesso restrito</h1>
               <p className="mt-2 text-subtitle">
                 Este painel é exclusivo para administradores autorizados.
@@ -248,7 +248,7 @@ export default function SuperAdminPage() {
         />
 
         <section className="w-full max-w-5xl px-3 md:px-4 pb-24 sm:pb-10">
-          <div className="rounded-2xl border border-border-base bg-background-raised p-6 md:p-8">
+          <div className="rounded-card border border-border-base bg-surface shadow-card p-6 md:p-8">
             <div className="flex items-center justify-between gap-3">
               <div>
                 <h1 className="text-2xl md:text-3xl font-black text-foreground tracking-tight">Gerenciamento de Usuários</h1>

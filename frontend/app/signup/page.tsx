@@ -99,7 +99,7 @@ export default function SignupPage() {
   return (
     <main className="min-h-dvh w-full bg-background p-4 md:p-6">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 lg:grid lg:grid-cols-[1.1fr_0.9fr]">
-        <section className="rounded-3xl border border-border-base bg-background-raised p-6 md:p-10">
+        <section className="rounded-card border border-border-base bg-surface shadow-card p-6 md:p-10">
           <div className="mb-8 flex items-start justify-between gap-4">
             <div>
               <span className="inline-flex rounded-full bg-background px-3 py-1 text-xs font-bold uppercase tracking-widest text-foreground-brand">
@@ -205,7 +205,7 @@ export default function SignupPage() {
                     type="checkbox"
                     checked={isPrivateProfile}
                     onChange={(e) => setIsPrivateProfile(e.target.checked)}
-                    className="mt-1"
+                    className="mt-1 size-4 accent-background-brand cursor-pointer"
                   />
                   <span className="flex flex-col">
                     <span className="flex items-center gap-2 text-sm font-semibold text-foreground">
@@ -223,7 +223,7 @@ export default function SignupPage() {
                     type="checkbox"
                     checked={receiveProductUpdates}
                     onChange={(e) => setReceiveProductUpdates(e.target.checked)}
-                    className="mt-1"
+                    className="mt-1 size-4 accent-background-brand cursor-pointer"
                   />
                   <span className="flex flex-col">
                     <span className="flex items-center gap-2 text-sm font-semibold text-foreground">
@@ -291,7 +291,7 @@ export default function SignupPage() {
           </form>
         </section>
 
-        <aside className="rounded-3xl border border-border-base bg-background-raised p-6 md:p-8 lg:sticky lg:top-6 lg:h-fit">
+        <aside className="rounded-card border border-border-base bg-surface shadow-card p-6 md:p-8 lg:sticky lg:top-6 lg:h-fit">
           <h2 className="text-lg font-black tracking-tight text-foreground">Prévia do perfil</h2>
           <p className="mt-1 text-sm text-subtitle">
             Veja como as suas escolhas iniciais aparecem para outras pessoas.
