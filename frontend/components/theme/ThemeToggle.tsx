@@ -1,21 +1,19 @@
 "use client";
 
 import { MoonIcon, SunIcon } from "@phosphor-icons/react";
-import { useEffect, useState } from "react";
-import { applyTheme, getThemeFromDom, type Theme } from "@/lib/theme";
+import { useState } from "react";
+import { applyTheme, useThemeFromDom, type Theme } from "@/lib/theme";
 
 export default function ThemeToggle() {
-  const [theme, setTheme] = useState<Theme>("light");
-
-  useEffect(() => {
-    setTheme(getThemeFromDom());
-  }, []);
+  const domTheme = useThemeFromDom();
+  const [overrideTheme, setOverrideTheme] = useState<Theme | null>(null);
+  const theme = overrideTheme ?? domTheme;
 
   const isDark = theme === "dark";
 
   function handleToggle() {
     const nextTheme: Theme = isDark ? "light" : "dark";
-    setTheme(nextTheme);
+    setOverrideTheme(nextTheme);
     applyTheme(nextTheme);
   }
 
