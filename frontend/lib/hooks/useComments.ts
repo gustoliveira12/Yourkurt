@@ -73,13 +73,7 @@ export function useComments(postId: string) {
   }, [postId]);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      void fetchComments();
-    }, 0);
-
-    return () => {
-      clearTimeout(timer);
-    };
+    void fetchComments();
   }, [fetchComments]);
 
   const addComment = useCallback((comment: CommentItem) => {

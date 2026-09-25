@@ -146,13 +146,7 @@ export function usePosts() {
   }, []);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      void fetchPosts();
-    }, 0);
-
-    return () => {
-      clearTimeout(timer);
-    };
+    void fetchPosts();
   }, [fetchPosts]);
 
   const addPost = useCallback(

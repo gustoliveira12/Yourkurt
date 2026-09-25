@@ -86,11 +86,7 @@ export function useUserReplies(userId: string) {
   }, [userId]);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      void fetchReplies();
-    }, 0);
-
-    return () => clearTimeout(timer);
+    void fetchReplies();
   }, [fetchReplies]);
 
   return { replies, loading, error, refetch: fetchReplies };
