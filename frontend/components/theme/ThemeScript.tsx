@@ -1,5 +1,3 @@
-import Script from "next/script";
-
 export default function ThemeScript() {
   const script = `
 (() => {
@@ -15,9 +13,5 @@ export default function ThemeScript() {
   }
 })();`;
 
-  return (
-    <Script id="yourkurt-theme-script" strategy="beforeInteractive">
-      {script}
-    </Script>
-  );
+  return <script id="yourkurt-theme-script">{script}</script>;
 }
