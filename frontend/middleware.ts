@@ -11,6 +11,8 @@ const AUTH_ROUTES = new Set([
   "/auth/confirm",
 ]);
 
+const SUPER_ADMIN_ROUTES = new Set(["/gerenciamento-usuarios", "/super-admin"]);
+
 function withPreservedHeaders(baseResponse: NextResponse, redirectResponse: NextResponse) {
   baseResponse.headers.forEach((value, key) => {
     if (key.toLowerCase() !== "location") {
@@ -68,6 +70,20 @@ export async function middleware(request: NextRequest) {
     const url = request.nextUrl.clone();
     url.pathname = "/";
     return withPreservedHeaders(response, NextResponse.redirect(url));
+  }
+
+  if (user && SUPER_ADMIN_ROUTES.has(request.nextUrl.pathname)) {
+    const { data: permissions } = await supabase.rpc(
+      "get_current_user_permissions",
+    );
+    const isSuperAdmin =
+      Array.isArray(permissions) && Boolean(permissions[0]?.is_super_admin);
+
+    if (!isSuperAdmin) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/";
+      return withPreservedHeaders(response, NextResponse.redirect(url));
+    }
   }
 
   return response;

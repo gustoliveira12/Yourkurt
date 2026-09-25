@@ -3,6 +3,8 @@
 import { createClient } from "@/lib/supabase/client";
 import { useCallback, useEffect, useState } from "react";
 
+const supabase = createClient();
+
 export type PostAuthor = {
   name: string;
   username: string;
@@ -55,7 +57,6 @@ export function usePosts() {
   const fetchPosts = useCallback(async () => {
     setLoading(true);
     setError(null);
-    const supabase = createClient();
     const { data, error } = await supabase
       .from("posts")
       .select("*")
@@ -167,7 +168,6 @@ export function usePosts() {
     setDeletingPostId(postId);
     setError(null);
 
-    const supabase = createClient();
     const { error: deleteError } = await supabase
       .from("posts")
       .delete()
