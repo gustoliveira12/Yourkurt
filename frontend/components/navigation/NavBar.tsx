@@ -104,13 +104,8 @@ const PageAside = ({ items }: PageAsideProps) => {
                 <li key={to}>
                   <Link
                     href={to}
-                    className={clsx(
-                      "hover:bg-background-raised flex items-center w-full py-4 px-2.5 gap-3 font-bold uppercase rounded-lg text-subtitle",
-                      isActive ? "" : "",
-                    )}
+                    className="hover:bg-background-raised flex items-center w-full py-4 px-2.5 gap-3 font-bold uppercase rounded-lg text-subtitle"
                   >
-                    {" "}
-                    {/* TODO: MUDAR COR DE TEXTO PARA USAR VARIAVEIS */}
                     <Icon
                       color={isActive ? "var(--foreground)" : "var(--subtitle)"}
                       className="shrink-0"
