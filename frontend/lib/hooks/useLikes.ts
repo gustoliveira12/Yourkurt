@@ -3,12 +3,14 @@
 import { createClient } from "@/lib/supabase/client";
 import { useEffect, useState } from "react";
 
+const supabase = createClient();
+
 export function useLikes(postId: string, initialLikesCount: number) {
-  const supabase = createClient();
   const [liked, setLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(initialLikesCount);
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState<string | null>(null);
+  const [isToggling, setIsToggling] = useState(false);
 
   // Get current user and check if they liked this post
   useEffect(() => {
@@ -44,7 +46,9 @@ export function useLikes(postId: string, initialLikesCount: number) {
   }, [postId]);
 
   async function toggleLike() {
-    if (!userId) return;
+    if (!userId || isToggling) return;
+
+    setIsToggling(true);
 
     if (liked) {
       // Optimistic update first
@@ -82,7 +86,9 @@ export function useLikes(postId: string, initialLikesCount: number) {
       }
       // DB trigger (sync_post_likes_count) handles likes_count update automatically
     }
+
+    setIsToggling(false);
   }
 
-  return { liked, likesCount, loading, toggleLike };
+  return { liked, likesCount, loading, toggleLike, isToggling };
 }

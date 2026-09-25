@@ -3,6 +3,8 @@
 import { createClient } from "@/lib/supabase/client";
 import { useCallback, useEffect, useState } from "react";
 
+const supabase = createClient();
+
 export type Interactions = {
   commentsCount: number;
   repostsCount: number;
@@ -17,7 +19,6 @@ export function useInteractions(postId: string) {
 
   const fetchInteractions = useCallback(async () => {
     setLoading(true);
-    const supabase = createClient();
 
     // Count comments
     const { count: commentsCount } = await supabase
