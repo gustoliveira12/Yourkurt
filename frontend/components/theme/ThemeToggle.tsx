@@ -2,33 +2,7 @@
 
 import { MoonIcon, SunIcon } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
-
-type Theme = "light" | "dark";
-
-function getThemeFromDom(): Theme {
-  if (typeof document === "undefined") return "light";
-  const root = document.documentElement;
-  const explicitTheme = root.dataset.theme;
-
-  if (explicitTheme === "light" || explicitTheme === "dark") {
-    return explicitTheme;
-  }
-
-  if (root.classList.contains("dark")) {
-    return "dark";
-  }
-
-  return window.matchMedia("(prefers-color-scheme: dark)").matches
-    ? "dark"
-    : "light";
-}
-
-function applyTheme(theme: Theme) {
-  const root = document.documentElement;
-  root.dataset.theme = theme;
-  root.classList.toggle("dark", theme === "dark");
-  localStorage.setItem("yourkurt-theme", theme);
-}
+import { applyTheme, getThemeFromDom, type Theme } from "@/lib/theme";
 
 export default function ThemeToggle() {
   const [theme, setTheme] = useState<Theme>("light");
