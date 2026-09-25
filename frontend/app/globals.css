@@ -2,39 +2,53 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/*
+  Yourkurt design tokens — Orkut nostalgia + Instagram cards + Twitter timeline,
+  built on the brand palette extracted from the logo. No pure #fff / #000 anywhere.
+*/
 :root {
-  --neutral-1100: #010001;
-  --neutral-1000: #121212;
-  --neutral-900: #1c1c1c;
-  --neutral-700: #535252;
-  --neutral-600: #7c8084;
-  --neutral-500: #8f999c;
-  --neutral-400: #a5b0b3;
-  --neutral-300: #c3cccf;
-  --neutral-200: #dee6e8;
-  --neutral-100: #f0f4f5;
+  /* Light theme */
+  --neutral-1100: #2b1d12;
+  --neutral-1000: #402c1b;
+  --neutral-900: #6b5645;
+  --neutral-700: #8a7362;
+  --neutral-600: #a08d7a;
+  --neutral-500: #c9b79e;
+  --neutral-400: #e3d2bc;
+  --neutral-300: #ecdfc9;
+  --neutral-200: #f2e6d3;
+  --neutral-100: #f7f1e8;
 
-  --brand-500: #d97a3a;
-  --brand-400: #ffa45b;
-  --brand-300: #ffb67b;
+  --brand-700: #825a32;
+  --brand-500: #c16a2e;
+  --brand-400: #e08a47;
+  --brand-300: #edad7a;
 
   --background: var(--neutral-100);
+  --surface: #fff8ef;
+  --surface-raised: var(--neutral-200);
   --tag-brand: var(--brand-500);
   --background-raised: var(--neutral-200);
   --background-brand: var(--brand-500);
 
-  --border-base: var(--neutral-500);
+  --border-base: var(--neutral-400);
 
-  --foreground: var(--neutral-1000);
-  --subtitle: var(--neutral-600);
+  --foreground: #2b1d12;
+  --subtitle: #6b5645;
   --foreground-brand: var(--brand-500);
   --foreground-inverted: var(--neutral-100);
-  --foreground-muted: var(--neutral-500);
+  --foreground-muted: var(--neutral-600);
+
+  --card-radius: 1.25rem;
+  --control-radius: 0.75rem;
+  --card-shadow: 0 1px 2px rgba(43, 29, 18, 0.06), 0 8px 24px rgba(43, 29, 18, 0.08);
 }
 
 /* TAILWIND VARIAVEIS 🔽 */
 @theme inline {
   --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
   --color-background-raised: var(--background-raised);
   --color-background-brand: var(--background-brand);
   --color-tag-brand: var(--tag-brand);
@@ -56,17 +70,21 @@
   --color-neutral-100: var(--neutral-100);
 
   --color-foreground-brand: var(--foreground-brand);
+
+  --radius-card: var(--card-radius);
+  --radius-control: var(--control-radius);
+  --shadow-card: var(--card-shadow);
 }
 @theme {
   --shadow-overflow-dark:
-    0 0 1px 0 rgba(1, 4, 4, 0.5), 0 0 12px 0 rgba(1, 4, 4, 0.56);
+    0 0 1px 0 rgba(10, 6, 3, 0.5), 0 0 12px 0 rgba(10, 6, 3, 0.56);
   --shadow-overflow-light:
-    0 0 1px 0 rgb(30 31 33 /12%), 0 0 8px 0 rgb(30 31 33 /16%);
+    0 0 1px 0 rgb(43 29 18 /12%), 0 0 8px 0 rgb(43 29 18 /16%);
 }
 
 @layer components {
   .gradient-to-l {
-    @apply bg-linear-to-l from-[#eec88b] via-[#e09056] to-[#da6fd2] dark:from-[#d6a85f] dark:via-[#be6729] dark:to-[#a740a0];
+    @apply bg-linear-to-l from-[#e6be96] via-[#c16a2e] to-[#825a32] dark:from-[#b08654] dark:via-[#e08a47] dark:to-[#825a32];
   }
 }
 
@@ -78,53 +96,64 @@
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: var(--neutral-1000);
-    --background-raised: var(--neutral-1100);
+    --background: #1e140c;
+    --surface: #2a1d12;
+    --surface-raised: #33230f;
+    --background-raised: #2a1d12;
     --background-brand: var(--brand-400);
     --tag-brand: var(--brand-300);
 
-    --border-base: var(--neutral-700);
+    --border-base: #3d2c1c;
 
-    --foreground: var(--neutral-100);
+    --foreground: #f0e6d8;
     --foreground-brand: var(--brand-400);
-    --foreground-inverted: var(--neutral-1000);
-    --foreground-muted: var(--neutral-700);
-    --subtitle: var(--neutral-500);
+    --foreground-inverted: #1e140c;
+    --foreground-muted: #b08654;
+    --subtitle: #c9b79e;
   }
 }
 
 :root[data-theme="light"] {
   --background: var(--neutral-100);
+  --surface: #fff8ef;
+  --surface-raised: var(--neutral-200);
   --background-raised: var(--neutral-200);
   --background-brand: var(--brand-500);
   --tag-brand: var(--brand-500);
 
-  --border-base: var(--neutral-500);
+  --border-base: var(--neutral-400);
 
-  --foreground: var(--neutral-1000);
+  --foreground: #2b1d12;
   --foreground-brand: var(--brand-500);
   --foreground-inverted: var(--neutral-100);
-  --foreground-muted: var(--neutral-500);
-  --subtitle: var(--neutral-600);
+  --foreground-muted: var(--neutral-600);
+  --subtitle: #6b5645;
 }
 
 :root[data-theme="dark"] {
-  --background: var(--neutral-1000);
-  --background-raised: var(--neutral-1100);
+  --background: #1e140c;
+  --surface: #2a1d12;
+  --surface-raised: #33230f;
+  --background-raised: #2a1d12;
   --background-brand: var(--brand-400);
   --tag-brand: var(--brand-300);
 
-  --border-base: var(--neutral-700);
+  --border-base: #3d2c1c;
 
-  --foreground: var(--neutral-100);
+  --foreground: #f0e6d8;
   --foreground-brand: var(--brand-400);
-  --foreground-inverted: var(--neutral-1000);
-  --foreground-muted: var(--neutral-700);
-  --subtitle: var(--neutral-500);
+  --foreground-inverted: #1e140c;
+  --foreground-muted: #b08654;
+  --subtitle: #c9b79e;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+::selection {
+  background: var(--background-brand);
+  color: var(--foreground-inverted);
 }
