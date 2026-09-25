@@ -101,6 +101,7 @@ export default function PostDetailPage() {
   const [postError, setPostError] = useState<string | null>(null);
   const [commentContent, setCommentContent] = useState("");
   const [submittingComment, setSubmittingComment] = useState(false);
+  const [commentSubmitError, setCommentSubmitError] = useState<string | null>(null);
   const [viewerIndex, setViewerIndex] = useState<number | null>(null);
   const [viewerZoomed, setViewerZoomed] = useState(false);
 
@@ -189,6 +190,7 @@ export default function PostDetailPage() {
     if (!trimmed || !post || !profile || submittingComment) return;
 
     setSubmittingComment(true);
+    setCommentSubmitError(null);
     const supabase = createClient();
 
     const { data, error } = await supabase
@@ -202,6 +204,7 @@ export default function PostDetailPage() {
       .single();
 
     if (error) {
+      setCommentSubmitError(error.message || "Erro ao publicar comentário.");
       setSubmittingComment(false);
       return;
     }
@@ -242,7 +245,7 @@ export default function PostDetailPage() {
         ) : null}
 
         <section className="w-full max-w-3xl px-3 md:px-4 pb-24 sm:pb-10">
-          <div className="rounded-2xl border border-border-base bg-background-raised overflow-hidden">
+          <div className="rounded-card border border-border-base bg-surface shadow-card overflow-hidden">
             <div className="flex items-center gap-3 border-b border-border-base px-4 py-3">
               <Link href="/" className="inline-flex items-center gap-2 rounded-full px-3 py-2 text-sm font-semibold text-foreground hover:bg-background">
                 <ArrowLeftIcon size={16} weight="bold" />
@@ -369,6 +372,9 @@ export default function PostDetailPage() {
                       Responder
                     </button>
                   </div>
+                  {commentSubmitError && (
+                    <p className="mt-2 text-sm text-red-600">{commentSubmitError}</p>
+                  )}
                 </div>
               </div>
             </section>

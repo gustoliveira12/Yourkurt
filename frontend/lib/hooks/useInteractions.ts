@@ -16,22 +16,32 @@ export function useInteractions(postId: string) {
     repostsCount: 0,
   });
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchInteractions = useCallback(async () => {
     setLoading(true);
+    setError(null);
 
     // Count comments
-    const { count: commentsCount } = await supabase
+    const { count: commentsCount, error: commentsError } = await supabase
       .from("comments")
       .select("id", { count: "exact", head: true })
       .eq("post_id", postId);
 
     // Count reposts (reactions with type='repost')
-    const { count: repostsCount } = await supabase
+    const { count: repostsCount, error: repostsError } = await supabase
       .from("reactions")
       .select("id", { count: "exact", head: true })
       .eq("post_id", postId)
       .eq("type", "repost");
+
+    if (commentsError || repostsError) {
+      setError(
+        commentsError?.message ??
+          repostsError?.message ??
+          "Erro ao carregar interações.",
+      );
+    }
 
     setInteractions({
       commentsCount: commentsCount ?? 0,
@@ -44,5 +54,5 @@ export function useInteractions(postId: string) {
     void fetchInteractions();
   }, [fetchInteractions]);
 
-  return { interactions, loading };
+  return { interactions, loading, error };
 }
