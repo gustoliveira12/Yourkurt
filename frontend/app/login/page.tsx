@@ -42,8 +42,8 @@ export default function LoginPage() {
   return (
     <>
       <div className="bg-[url('/imagem_login.avif')] w-full h-dvh bg-cover p-4 font-sans">
-        <div className={clsx("bg-white dark:bg-black rounded-4xl h-full justify-between flex gap-3 p-3 [mix-blend-mode:screen] dark:[mix-blend-mode:multiply]")}>
-          <div className="bg-black dark:bg-white flex flex-col w-full h-full justify-between px-12 py-8 rounded-[20px]" />
+        <div className={clsx("bg-surface rounded-4xl h-full justify-between flex gap-3 p-3 [mix-blend-mode:screen] dark:[mix-blend-mode:multiply]")}>
+          <div className="bg-neutral-1100 flex flex-col w-full h-full justify-between px-12 py-8 rounded-[20px]" />
           <div className="justify-between px-12 py-8 flex flex-col w-full h-full rounded-[20px] items-center" />
         </div>
       </div>
@@ -74,7 +74,7 @@ export default function LoginPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-2 bg-background-raised rounded-sm text-foreground placeholder:text-foreground-muted"
+                className="w-full px-4 py-2 bg-background-raised rounded-control border border-border-base text-foreground placeholder:text-foreground-muted focus:border-foreground-brand transition-colors"
                 placeholder="email@example.com"
                 required
               />
@@ -86,19 +86,19 @@ export default function LoginPage() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-2 bg-background-raised rounded-sm text-foreground placeholder:text-foreground-muted"
+                className="w-full px-4 py-2 bg-background-raised rounded-control border border-border-base text-foreground placeholder:text-foreground-muted focus:border-foreground-brand transition-colors"
                 placeholder="Digite sua senha"
                 required
               />
             </label>
 
-            <div className="w-full flex justify-between">
-              <div className="flex gap-1 items-center">
+            <div className="w-full flex justify-between text-sm text-subtitle">
+              <div className="flex gap-2 items-center">
                 <Checkbox.Root
                   id="c1"
                   checked={checked}
                   onCheckedChange={setChecked}
-                  className="size-4 rounded-sm border border-border-base flex items-center justify-center data-[state=checked]:bg-background-brand"
+                  className="size-4 rounded-[4px] border border-border-base flex items-center justify-center data-[state=checked]:bg-background-brand data-[state=checked]:border-background-brand transition-colors"
                 >
                   <Checkbox.Indicator>
                     <CheckIcon weight="bold" className="text-foreground-inverted" />
@@ -106,20 +106,22 @@ export default function LoginPage() {
                 </Checkbox.Root>
                 <label htmlFor="c1">Lembrar-se</label>
               </div>
-              <span>Esqueci minha senha</span>
+              <button type="button" className="hover:text-foreground-brand hover:underline">
+                Esqueci minha senha
+              </button>
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="items-center justify-center flex w-full p-2 gradient-to-l rounded-lg font-bold"
+              className="items-center justify-center flex w-full p-2 gradient-to-l rounded-control font-bold text-foreground-inverted hover:brightness-95 transition-all disabled:opacity-60"
             >
               {loading ? "Entrando..." : "Entrar"}
             </button>
 
             <button
               type="button"
-              className="items-center justify-center flex w-full p-2 border border-background-brand rounded-lg font-medium gap-1"
+              className="items-center justify-center flex w-full p-2 border border-background-brand rounded-control font-medium gap-1 text-foreground hover:bg-background-brand/10 transition-colors"
             >
               <GoogleLogoIcon weight="bold" />
               Entrar com o Google

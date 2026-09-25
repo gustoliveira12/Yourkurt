@@ -96,10 +96,10 @@ export default function Home() {
   ];
 
   return (
-    <div className="w-dvw min-h-dvh overflow-hidden relative flex h-screen items-center justify-center bg-background font-sans gap-4">
+    <div className="w-dvw min-h-dvh overflow-hidden relative flex h-screen items-center justify-center bg-background font-sans gap-2">
       <PageAside items={NAV_ITEMS} />
       <MobileHeader />
-      <main className="overflow-auto h-dvh flex-1 w-full flex items-start justify-center pt-20 gap-4 sm:pt-12">
+      <main className="overflow-auto h-dvh flex-1 w-full flex items-start justify-center pt-20 gap-6 sm:pt-12">
         <ProfileSidebar
           alt="string"
           size={1}
@@ -109,9 +109,9 @@ export default function Home() {
           src={profile?.avatarUrl ?? null}
           headerUrl={profile?.headerUrl}
         />
-        <div className="flex flex-col md:gap-12 items-center md:min-w-152 md:px-4">
+        <div className="flex flex-col md:gap-12 items-center md:min-w-168 md:px-3">
           <div className="flex flex-col w-full ">
-            <div className="flex md:gap-6 justify-start items-center max-w-dvw lg:max-w-176 overflow-hidden px-2">
+            <div className="flex md:gap-6 gap-2 justify-start items-center max-w-dvw lg:max-w-192 overflow-hidden px-2 py-3 md:rounded-card md:bg-surface md:shadow-card">
               <Story
                 key={`story-${profile?.id}`}
                 hasStory
@@ -128,7 +128,7 @@ export default function Home() {
               ))}
             </div>
           </div>
-          <div className="flex flex-col w-full gap-4 max-w-xl">
+          <div className="flex flex-col w-full gap-4 max-w-2xl">
             {loading && (
               <p className="text-center text-foreground-muted py-8">Carregando posts...</p>
             )}

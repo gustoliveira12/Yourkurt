@@ -42,7 +42,7 @@ export default function RightNavbar({ prop, onPostCreated }: NavlinkProps) {
             onPostCreated={handlePostCreated}
           />
         ) : (
-          <div className="hidden sm:flex w-full max-w-lg rounded-lg border border-border-base bg-background-raised px-4 py-3 text-sm text-subtitle">
+          <div className="hidden sm:flex w-full max-w-lg rounded-card border border-border-base bg-surface px-4 py-3 text-sm text-subtitle">
             Apenas administradores podem publicar no momento.
           </div>
         )
