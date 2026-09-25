@@ -1,26 +1,24 @@
 "use client";
 
 import { MoonIcon, SunIcon } from "@phosphor-icons/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import clsx from "clsx";
-import { applyTheme, getThemeFromDom, type Theme } from "@/lib/theme";
+import { applyTheme, useThemeFromDom, type Theme } from "@/lib/theme";
 
 type ThemeToggleCompactProps = {
   isOpen?: boolean;
 };
 
 export default function ThemeToggleCompact({ isOpen }: ThemeToggleCompactProps) {
-  const [theme, setTheme] = useState<Theme>("light");
-
-  useEffect(() => {
-    setTheme(getThemeFromDom());
-  }, []);
+  const domTheme = useThemeFromDom();
+  const [overrideTheme, setOverrideTheme] = useState<Theme | null>(null);
+  const theme = overrideTheme ?? domTheme;
 
   const isDark = theme === "dark";
 
   function handleToggle() {
     const nextTheme: Theme = isDark ? "light" : "dark";
-    setTheme(nextTheme);
+    setOverrideTheme(nextTheme);
     applyTheme(nextTheme);
   }
 
