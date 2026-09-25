@@ -2,6 +2,7 @@
 
 import { Avatar } from "../Avatar";
 import { useCurrentProfile } from "@/lib/hooks/useCurrentProfile";
+import ThemeToggleCompact from "@/components/theme/ThemeToggleCompact";
 
 export default function MobileHeader() {
   const { profile } = useCurrentProfile();
@@ -11,7 +12,10 @@ export default function MobileHeader() {
       <h1 className="text-2xl font-black gradient-to-l text-transparent bg-clip-text">
         Yourkurt
       </h1>
-      <Avatar sizes="lg" src={profile?.avatarUrl ?? null} name={profile?.name} />
+      <div className="flex items-center gap-2">
+        <ThemeToggleCompact />
+        <Avatar sizes="lg" src={profile?.avatarUrl ?? null} name={profile?.name} />
+      </div>
     </header>
   );
 }

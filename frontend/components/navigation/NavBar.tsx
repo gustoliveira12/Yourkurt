@@ -8,6 +8,7 @@ import {
 import clsx from "clsx";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import ThemeToggleCompact from "@/components/theme/ThemeToggleCompact";
 
 type AsideState = {
   isExpanded: boolean;
@@ -128,10 +129,11 @@ const PageAside = ({ items }: PageAsideProps) => {
           </ul>
         </nav>
 
-        <div className="flex flex-col items-center justify-center w-14 dark:text-gray-400 pb-4 gap-1">
+        <div className="flex flex-col items-center justify-center w-14 pb-4 gap-1">
+          <ThemeToggleCompact isOpen={isOpen} />
           <button
             title="Manter minimizado"
-            className={clsx("p-2 hover:bg-background-raised rounded-lg", {
+            className={clsx("p-2 hover:bg-background-raised rounded-lg text-subtitle", {
               "text-foreground bg-background-raised": state.isKeepMinimized,
             })}
             onClick={() => dispatch({ type: "KEEP_MINIMIZED" })}
@@ -140,7 +142,7 @@ const PageAside = ({ items }: PageAsideProps) => {
           </button>
           <button
             title="Fixar aberta"
-            className={clsx("p-2 hover:bg-background-raised rounded-lg", {
+            className={clsx("p-2 hover:bg-background-raised rounded-lg text-subtitle", {
               "text-foreground bg-background-raised": state.isPinned,
             })}
             onClick={() => dispatch({ type: "KEEP_PINNED" })}
