@@ -10,6 +10,18 @@ export type Friend = {
   avatar_url: string | null;
 };
 
+type RawFriendship = {
+  requester_id: string;
+  addressee_id: string;
+  requester: Friend | Friend[] | null;
+  addressee: Friend | Friend[] | null;
+};
+
+function normalizeFriend(value: Friend | Friend[] | null): Friend | null {
+  if (!value) return null;
+  return Array.isArray(value) ? (value[0] ?? null) : value;
+}
+
 export function useFriends(limit: number = 6) {
   const [friends, setFriends] = useState<Friend[]>([]);
   const [loading, setLoading] = useState(true);
@@ -30,7 +42,7 @@ export function useFriends(limit: number = 6) {
     // Fetch accepted friendships where current user is either requester or addressee
     const { data } = await supabase
       .from("friendships")
-      .select(
+      .select<string, RawFriendship>(
         "requester_id, addressee_id, requester:requester_id(id, name, username, avatar_url), addressee:addressee_id(id, name, username, avatar_url)",
       )
       .eq("status", "accepted")
@@ -39,15 +51,15 @@ export function useFriends(limit: number = 6) {
 
     if (data) {
       const friendsList: Friend[] = data
-        .map((friendship: any) => {
+        .map((friendship) => {
           // Return the friend that is NOT the current user
-          if (friendship.requester_id === user.id) {
-            return friendship.addressee;
-          } else {
-            return friendship.requester;
-          }
+          const friend =
+            friendship.requester_id === user.id
+              ? friendship.addressee
+              : friendship.requester;
+          return normalizeFriend(friend);
         })
-        .filter(Boolean);
+        .filter((friend): friend is Friend => friend !== null);
 
       setFriends(friendsList);
     }

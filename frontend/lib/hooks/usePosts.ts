@@ -59,13 +59,13 @@ export function usePosts() {
     setError(null);
     const { data, error } = await supabase
       .from("posts")
-      .select("*")
+      .select<string, RawPost>("*")
       .eq("is_public", true)
       .order("created_at", { ascending: false })
       .limit(50);
 
     if (!error && data) {
-      const rawPosts = data as unknown as RawPost[];
+      const rawPosts = data;
       const uniqueUserIds = Array.from(new Set(rawPosts.map((item) => item.user_id)));
       const uniqueTeamPageIds = Array.from(
         new Set(
@@ -81,12 +81,12 @@ export function usePosts() {
       if (uniqueUserIds.length > 0) {
         const { data: profilesData } = await supabase
           .from("profiles")
-          .select("*")
+          .select<string, RawProfile>("*")
           .in("id", uniqueUserIds);
 
         if (profilesData) {
           profilesById = new Map(
-            (profilesData as unknown as RawProfile[]).map((profile) => [
+            profilesData.map((profile) => [
               profile.id,
               {
                 name: profile.name,
@@ -101,12 +101,12 @@ export function usePosts() {
       if (uniqueTeamPageIds.length > 0) {
         const { data: teamPagesData } = await supabase
           .from("team_pages")
-          .select("id, name, slug, avatar_url")
+          .select<string, RawTeamPage>("id, name, slug, avatar_url")
           .in("id", uniqueTeamPageIds);
 
         if (teamPagesData) {
           teamPagesById = new Map(
-            (teamPagesData as unknown as RawTeamPage[]).map((teamPage) => [
+            teamPagesData.map((teamPage) => [
               teamPage.id,
               {
                 name: teamPage.name,
