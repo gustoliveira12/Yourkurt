@@ -229,9 +229,9 @@ export default function ProfilePage() {
         ? `https://${cleanWebsite}`
         : cleanWebsite;
 
-    const { error } = await supabase.from("profiles").upsert(
-      {
-        id: profile.id,
+    const { error } = await supabase
+      .from("profiles")
+      .update({
         name: profile.name.trim(),
         username: cleanUsername,
         bio: profile.bio.trim() || null,
@@ -239,12 +239,12 @@ export default function ProfilePage() {
         website: normalizedWebsite || null,
         birthday: profile.birthday || null,
         header_url: profile.headerUrl || null,
-      },
-      { onConflict: "id" },
-    );
+      })
+      .eq("id", profile.id);
 
     if (error) {
-      setSaveMessage("Erro ao salvar perfil. Tente novamente.");
+      console.error("Erro ao salvar perfil:", error);
+      setSaveMessage("Não foi possível salvar as alterações. Tente novamente em instantes.");
       return;
     }
 
@@ -293,17 +293,17 @@ export default function ProfilePage() {
       data: { publicUrl },
     } = supabase.storage.from("avatars").getPublicUrl(filePath);
 
-    const { error: persistError } = await supabase.from("profiles").upsert(
-      {
-        id: profile.id,
+    const { error: persistError } = await supabase
+      .from("profiles")
+      .update({
         name: profile.name.trim() || "Usuário",
         avatar_url: publicUrl,
-      },
-      { onConflict: "id" },
-    );
+      })
+      .eq("id", profile.id);
 
     if (persistError) {
-      setSaveMessage("Foto enviada, mas não foi possível salvar no perfil.");
+      console.error("Erro ao salvar avatar no perfil:", persistError);
+      setSaveMessage("Não foi possível salvar as alterações. Tente novamente em instantes.");
       setIsUploadingAvatar(false);
       return;
     }
@@ -361,17 +361,17 @@ export default function ProfilePage() {
       data: { publicUrl },
     } = supabase.storage.from("headers").getPublicUrl(filePath);
 
-    const { error: persistError } = await supabase.from("profiles").upsert(
-      {
-        id: profile.id,
+    const { error: persistError } = await supabase
+      .from("profiles")
+      .update({
         name: profile.name.trim() || "Usuário",
         header_url: publicUrl,
-      },
-      { onConflict: "id" },
-    );
+      })
+      .eq("id", profile.id);
 
     if (persistError) {
-      setSaveMessage("Capa enviada, mas não foi possível salvar no perfil.");
+      console.error("Erro ao salvar capa no perfil:", persistError);
+      setSaveMessage("Não foi possível salvar as alterações. Tente novamente em instantes.");
       setIsUploadingHeader(false);
       return;
     }
@@ -426,7 +426,7 @@ export default function ProfilePage() {
         />
 
         <section className="w-full max-w-4xl px-3 md:px-4 pb-24 sm:pb-10">
-          <div className="rounded-2xl overflow-hidden border border-border-base bg-background-raised">
+          <div className="rounded-card overflow-hidden border border-border-base bg-surface shadow-card">
             <div className="relative h-38 md:h-56 gradient-to-l overflow-hidden">
               {profile.headerUrl && (
                 <Image
