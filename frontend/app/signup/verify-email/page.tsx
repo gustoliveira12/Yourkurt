@@ -91,7 +91,7 @@ function VerifyEmailContent() {
   return (
     <main className="min-h-dvh w-full bg-background p-4 md:p-6">
       <div className="mx-auto flex min-h-[80dvh] w-full max-w-2xl items-center justify-center">
-        <section className="w-full rounded-3xl border border-border-base bg-background-raised p-6 md:p-10">
+        <section className="w-full rounded-card border border-border-base bg-surface shadow-card p-6 md:p-10">
           <span className="inline-flex rounded-full bg-background px-3 py-1 text-xs font-bold uppercase tracking-widest text-foreground-brand">
             Verificação
           </span>
@@ -148,7 +148,7 @@ export default function VerifyEmailPage() {
       fallback={
         <main className="min-h-dvh w-full bg-background p-4 md:p-6">
           <div className="mx-auto flex min-h-[80dvh] w-full max-w-2xl items-center justify-center">
-            <section className="w-full rounded-3xl border border-border-base bg-background-raised p-6 md:p-10">
+            <section className="w-full rounded-card border border-border-base bg-surface shadow-card p-6 md:p-10">
               <p className="text-subtitle">Carregando...</p>
             </section>
           </div>

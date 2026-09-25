@@ -283,7 +283,7 @@ export default function CreatePostbox({
   }
 
   return (
-    <div className=" flex-col w-full px-6 py-4 rounded-lg bg-background-raised gap-4 max-w-lg hidden sm:flex">
+    <div className=" flex-col w-full px-6 py-4 rounded-card bg-surface shadow-card gap-4 max-w-lg hidden sm:flex">
       {error && (
         <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-sm text-red-600 dark:text-red-400 text-sm">
           {error}
@@ -313,7 +313,7 @@ export default function CreatePostbox({
           )}
           <textarea
             placeholder="O que está passando pela sua órbita?"
-            className="bg-background w-full rounded-xl transition-all duration-100 border border-border-base rounded-sm px-4 py-2 placeholder:text-foreground-muted text-foreground resize-none min-h-[80px] disabled:opacity-50"
+            className="bg-background-raised w-full rounded-control transition-all duration-100 border border-border-base px-4 py-2 placeholder:text-foreground-muted text-foreground resize-none min-h-[80px] disabled:opacity-50"
             value={content}
             onChange={(e) => setContent(e.target.value)}
             onKeyDown={handleKeyDown}
