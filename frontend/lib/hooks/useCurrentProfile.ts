@@ -18,14 +18,21 @@ const supabase = createClient();
 export function useCurrentProfile() {
   const [profile, setProfile] = useState<CurrentProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function loadProfile() {
       setLoading(true);
+      setError(null);
 
       const {
         data: { user },
+        error: userError,
       } = await supabase.auth.getUser();
+
+      if (userError) {
+        setError(userError.message);
+      }
 
       if (!user) {
         setProfile(null);
@@ -33,11 +40,15 @@ export function useCurrentProfile() {
         return;
       }
 
-      const { data } = await supabase
+      const { data, error: profileError } = await supabase
         .from("profiles")
         .select("id, name, username, avatar_url, header_url")
         .eq("id", user.id)
         .maybeSingle();
+
+      if (profileError) {
+        setError(profileError.message);
+      }
 
       const fallbackName =
         user.user_metadata?.name ?? user.email?.split("@")[0] ?? "Usuário";
@@ -46,9 +57,13 @@ export function useCurrentProfile() {
         user.email?.split("@")[0]?.toLowerCase() ??
         "usuario";
 
-      const { data: permissionsData } = await supabase.rpc(
+      const { data: permissionsData, error: permissionsError } = await supabase.rpc(
         "get_current_user_permissions",
       );
+
+      if (permissionsError) {
+        setError(permissionsError.message);
+      }
 
       const isAdmin = Array.isArray(permissionsData)
         ? Boolean(permissionsData[0]?.is_admin)
@@ -73,5 +88,5 @@ export function useCurrentProfile() {
     void loadProfile();
   }, []);
 
-  return { profile, loading };
+  return { profile, loading, error };
 }
