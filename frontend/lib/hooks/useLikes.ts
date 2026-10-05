@@ -12,7 +12,6 @@ export function useLikes(postId: string, initialLikesCount: number) {
   const [userId, setUserId] = useState<string | null>(null);
   const [isToggling, setIsToggling] = useState(false);
 
-  // Get current user and check if they liked this post
   useEffect(() => {
     async function loadLikeStatus() {
       setLoading(true);
@@ -29,7 +28,6 @@ export function useLikes(postId: string, initialLikesCount: number) {
 
       setUserId(user.id);
 
-      // Check if user has liked this post
       const { data } = await supabase
         .from("reactions")
         .select("id")
@@ -51,7 +49,6 @@ export function useLikes(postId: string, initialLikesCount: number) {
     setIsToggling(true);
 
     if (liked) {
-      // Optimistic update first
       setLiked(false);
       setLikesCount((prev) => Math.max(0, prev - 1));
 
@@ -62,14 +59,11 @@ export function useLikes(postId: string, initialLikesCount: number) {
         .eq("user_id", userId)
         .eq("type", "like");
 
-      // Revert on error
       if (error) {
         setLiked(true);
         setLikesCount((prev) => prev + 1);
       }
-      // DB trigger (sync_post_likes_count) handles likes_count update automatically
     } else {
-      // Optimistic update first
       setLiked(true);
       setLikesCount((prev) => prev + 1);
 
@@ -78,13 +72,10 @@ export function useLikes(postId: string, initialLikesCount: number) {
         user_id: userId,
         type: "like",
       });
-
-      // Revert on error
       if (error) {
         setLiked(false);
         setLikesCount((prev) => Math.max(0, prev - 1));
       }
-      // DB trigger (sync_post_likes_count) handles likes_count update automatically
     }
 
     setIsToggling(false);
