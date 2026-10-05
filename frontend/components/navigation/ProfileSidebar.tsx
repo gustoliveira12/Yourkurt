@@ -58,7 +58,6 @@ export default function LeftNavbar({
   const [loadingStats, setLoadingStats] = useState(true);
   const { friends, loading: loadingFriends } = useFriends(6);
 
-  // Fetch user statistics
   useEffect(() => {
     async function loadStats() {
       setLoadingStats(true);
@@ -73,13 +72,11 @@ export default function LeftNavbar({
         return;
       }
 
-      // Count user's posts
       const { count: postsCount } = await supabase
         .from("posts")
         .select("id", { count: "exact" })
         .eq("user_id", user.id);
 
-      // Count user's friends (both directions in friendships table)
       const { count: friendsCount } = await supabase
         .from("friendships")
         .select("id", { count: "exact" })
@@ -100,7 +97,11 @@ export default function LeftNavbar({
   return (
     <div className="hidden md:flex flex-col gap-6 max-w-80">
       <div className="flex flex-col rounded-card bg-surface shadow-card overflow-hidden h-fit">
-        <Link href="/perfil" className="w-full h-16 relative block" aria-label="Abrir perfil">
+        <Link
+          href="/perfil"
+          className="w-full h-16 relative block"
+          aria-label="Abrir perfil"
+        >
           {headerUrl ? (
             <Image
               fill
@@ -115,7 +116,11 @@ export default function LeftNavbar({
           )}
           <div className="overflow-hidden size-16 rounded-full border-4 border-surface flex items-center justify-center mb-3 bg-background-brand absolute -bottom-10 left-4">
             {!src || error ? (
-              <UserIcon className="text-foreground-inverted" size={34} weight="fill" />
+              <UserIcon
+                className="text-foreground-inverted"
+                size={34}
+                weight="fill"
+              />
             ) : (
               <Image
                 className=""
@@ -132,14 +137,20 @@ export default function LeftNavbar({
         <div className="flex flex-col px-6 py-4 gap-4 relative pt-10">
           <div className="flex flex-col w-full">
             <div className="flex w-full justify-between">
-              <Link href="/perfil" className="text-xl text-foreground font-bold hover:underline">
+              <Link
+                href="/perfil"
+                className="text-xl text-foreground font-bold hover:underline"
+              >
                 {name}
               </Link>
               <button className="text-sm text-foreground-brand cursor-pointer">
                 trocar
               </button>
             </div>
-            <Link href="/perfil" className="text-subtitle hover:underline w-fit">
+            <Link
+              href="/perfil"
+              className="text-subtitle hover:underline w-fit"
+            >
               @{at}
             </Link>
           </div>

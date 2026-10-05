@@ -11,7 +11,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-
+import { BellIcon, Lightbulb, Lock, LockIcon, Palette } from "lucide-react";
+//TODO: TIRAR ALERT DO NAVEGADOR, E MOSTRAR MENSAGEM DE ERRO NA TELA
 const supabase = createClient();
 
 export default function SignupPage() {
@@ -23,9 +24,9 @@ export default function SignupPage() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isPrivateProfile, setIsPrivateProfile] = useState(false);
-  const [themePreference, setThemePreference] = useState<"system" | "light" | "dark">(
-    "system",
-  );
+  const [themePreference, setThemePreference] = useState<
+    "system" | "light" | "dark"
+  >("system");
   const [receiveProductUpdates, setReceiveProductUpdates] = useState(true);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
@@ -41,7 +42,9 @@ export default function SignupPage() {
     }
 
     if (!/^([a-z0-9_.]{3,20})$/.test(cleanUsername)) {
-      setMessage("Seu usuário deve ter 3 a 20 caracteres (letras, números, _ ou .).");
+      setMessage(
+        "Seu usuário deve ter 3 a 20 caracteres (letras, números, _ ou .).",
+      );
       return;
     }
 
@@ -64,7 +67,8 @@ export default function SignupPage() {
     setMessage("");
 
     try {
-      const origin = typeof window !== "undefined" ? window.location.origin : "";
+      const origin =
+        typeof window !== "undefined" ? window.location.origin : "";
       const emailRedirectTo = origin
         ? `${origin}/auth/confirm?next=/`
         : undefined;
@@ -109,8 +113,8 @@ export default function SignupPage() {
                 Crie sua conta
               </h1>
               <p className="mt-2 max-w-lg text-subtitle">
-                Monte seu perfil em poucos passos e escolha como você quer aparecer
-                na comunidade.
+                Monte seu perfil em poucos passos e escolha como você quer
+                aparecer na comunidade.
               </p>
             </div>
             <UserCirclePlusIcon
@@ -139,7 +143,9 @@ export default function SignupPage() {
                 type="text"
                 required
                 value={username}
-                onChange={(e) => setUsername(e.target.value.replace(/\s+/g, ""))}
+                onChange={(e) =>
+                  setUsername(e.target.value.replace(/\s+/g, ""))
+                }
                 className="rounded-xl border border-border-base bg-background px-3.5 py-2.5 text-foreground placeholder:text-foreground-muted"
                 placeholder="ex.: lucas.silva"
               />
@@ -199,17 +205,17 @@ export default function SignupPage() {
                 Configurações iniciais
               </h2>
 
-              <div className="mt-3 flex flex-col gap-3">
-                <label className="flex items-start gap-3 rounded-xl border border-border-base p-3">
+              <div className="flex flex-col gap-3 justify-center">
+                <label className="h-14 flex justify-start items-center gap-3 rounded-xl border border-border-base px-2">
                   <input
                     type="checkbox"
                     checked={isPrivateProfile}
                     onChange={(e) => setIsPrivateProfile(e.target.checked)}
-                    className="mt-1 size-4 accent-background-brand cursor-pointer"
+                    className="size-4 accent-background-brand cursor-pointer"
                   />
-                  <span className="flex flex-col">
-                    <span className="flex items-center gap-2 text-sm font-semibold text-foreground">
-                      <LockSimpleIcon size={16} weight="fill" />
+                  <span className="flex flex-col justify-center">
+                    <span className="flex items-center gap-2 text-md font-semibold text-foreground">
+                      <LockIcon size={16} />
                       Perfil privado
                     </span>
                     <span className="text-sm text-subtitle">
@@ -218,7 +224,7 @@ export default function SignupPage() {
                   </span>
                 </label>
 
-                <label className="flex items-start gap-3 rounded-xl border border-border-base p-3">
+                <label className="h-14 flex justify-start items-center gap-3 rounded-xl border border-border-base px-2">
                   <input
                     type="checkbox"
                     checked={receiveProductUpdates}
@@ -226,8 +232,8 @@ export default function SignupPage() {
                     className="mt-1 size-4 accent-background-brand cursor-pointer"
                   />
                   <span className="flex flex-col">
-                    <span className="flex items-center gap-2 text-sm font-semibold text-foreground">
-                      <BellSimpleRingingIcon size={16} weight="fill" />
+                    <span className="flex items-center gap-2 text-md font-semibold text-foreground">
+                      <BellIcon size={16} />
                       Receber novidades do produto
                     </span>
                     <span className="text-sm text-subtitle">
@@ -237,8 +243,8 @@ export default function SignupPage() {
                 </label>
 
                 <div className="rounded-xl border border-border-base p-3">
-                  <p className="mb-2 flex items-center gap-2 text-sm font-semibold text-foreground">
-                    <PaletteIcon size={16} weight="fill" />
+                  <p className="mb-2 flex items-center gap-2 text-md font-semibold text-foreground">
+                    <Palette size={18} />
                     Aparência preferida
                   </p>
                   <div className="grid grid-cols-3 gap-2">
@@ -253,7 +259,11 @@ export default function SignupPage() {
                             : "border-border-base bg-background text-foreground hover:bg-background-raised"
                         }`}
                       >
-                        {option === "system" ? "Sistema" : option === "light" ? "Claro" : "Escuro"}
+                        {option === "system"
+                          ? "Sistema"
+                          : option === "light"
+                            ? "Claro"
+                            : "Escuro"}
                       </button>
                     ))}
                   </div>
@@ -274,7 +284,10 @@ export default function SignupPage() {
                 </p>
                 <p className="text-sm text-subtitle">
                   Já tem conta?{" "}
-                  <Link href="/login" className="font-semibold text-foreground-brand underline">
+                  <Link
+                    href="/login"
+                    className="font-semibold text-foreground-brand underline"
+                  >
                     Fazer login
                   </Link>
                 </p>
@@ -292,7 +305,9 @@ export default function SignupPage() {
         </section>
 
         <aside className="rounded-card border border-border-base bg-surface shadow-card p-6 md:p-8 lg:sticky lg:top-6 lg:h-fit">
-          <h2 className="text-lg font-black tracking-tight text-foreground">Prévia do perfil</h2>
+          <h2 className="text-lg font-black tracking-tight text-foreground">
+            Prévia do perfil
+          </h2>
           <p className="mt-1 text-sm text-subtitle">
             Veja como as suas escolhas iniciais aparecem para outras pessoas.
           </p>
@@ -303,7 +318,9 @@ export default function SignupPage() {
                 {(name.trim()[0] ?? "E").toUpperCase()}
               </div>
               <div>
-                <p className="font-bold text-foreground">{name.trim() || "Seu nome"}</p>
+                <p className="font-bold text-foreground">
+                  {name.trim() || "Seu nome"}
+                </p>
                 <p className="text-sm text-subtitle">
                   @{username.trim().toLowerCase() || "seu.usuario"}
                 </p>
@@ -319,17 +336,24 @@ export default function SignupPage() {
                 {isPrivateProfile ? "Perfil privado" : "Perfil público"}
               </span>
               <span className="rounded-full bg-background-raised px-3 py-1 text-xs font-semibold text-foreground">
-                Tema: {themePreference === "system" ? "Sistema" : themePreference === "light" ? "Claro" : "Escuro"}
+                Tema:{" "}
+                {themePreference === "system"
+                  ? "Sistema"
+                  : themePreference === "light"
+                    ? "Claro"
+                    : "Escuro"}
               </span>
               <span className="rounded-full bg-background-raised px-3 py-1 text-xs font-semibold text-foreground">
-                {receiveProductUpdates ? "Novidades ativadas" : "Novidades desativadas"}
+                {receiveProductUpdates
+                  ? "Novidades ativadas"
+                  : "Novidades desativadas"}
               </span>
             </div>
           </div>
 
           <div className="mt-4 rounded-2xl border border-border-base bg-background p-4">
-            <p className="flex items-center gap-2 text-sm font-semibold text-foreground">
-              <GlobeHemisphereWestIcon size={16} weight="fill" />
+            <p className="flex items-center gap-2 text-md font-semibold text-foreground">
+              <Lightbulb size={18} />
               Dica rápida
             </p>
             <p className="mt-1 text-sm text-subtitle">

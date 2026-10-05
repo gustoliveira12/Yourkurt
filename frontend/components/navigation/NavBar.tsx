@@ -83,7 +83,7 @@ const PageAside = ({ items }: PageAsideProps) => {
   const pathname = usePathname();
 
   return (
-    <div className="top-0 left-0 fixed sm:flex h-dvh z-40 bg-surface shadow-overflow-light dark:shadow-overflow-dark hidden">
+    <div className="top-0 left-0 fixed sm:flex h-dvh z-40 bg-surface shadow-overflow-light hidden">
       <aside
         className={clsx(
           "transition-all duration-200 ease-in-out flex flex-col relative",
@@ -133,18 +133,24 @@ const PageAside = ({ items }: PageAsideProps) => {
           <ThemeToggleCompact isOpen={isOpen} />
           <button
             title="Manter minimizado"
-            className={clsx("p-2 hover:bg-background-raised rounded-lg text-subtitle", {
-              "text-foreground bg-background-raised": state.isKeepMinimized,
-            })}
+            className={clsx(
+              "p-2 hover:bg-background-raised rounded-lg text-subtitle",
+              {
+                "text-foreground bg-background-raised": state.isKeepMinimized,
+              },
+            )}
             onClick={() => dispatch({ type: "KEEP_MINIMIZED" })}
           >
             <AlignLeftIcon weight="fill" size={28} />
           </button>
           <button
             title="Fixar aberta"
-            className={clsx("p-2 hover:bg-background-raised rounded-lg text-subtitle", {
-              "text-foreground bg-background-raised": state.isPinned,
-            })}
+            className={clsx(
+              "p-2 hover:bg-background-raised rounded-lg text-subtitle",
+              {
+                "text-foreground bg-background-raised": state.isPinned,
+              },
+            )}
             onClick={() => dispatch({ type: "KEEP_PINNED" })}
           >
             <AlignTopSimpleIcon weight="fill" size={28} />

@@ -9,7 +9,9 @@ type ThemeToggleCompactProps = {
   isOpen?: boolean;
 };
 
-export default function ThemeToggleCompact({ isOpen }: ThemeToggleCompactProps) {
+export default function ThemeToggleCompact({
+  isOpen,
+}: ThemeToggleCompactProps) {
   const domTheme = useThemeFromDom();
   const [overrideTheme, setOverrideTheme] = useState<Theme | null>(null);
   const theme = overrideTheme ?? domTheme;
@@ -30,7 +32,7 @@ export default function ThemeToggleCompact({ isOpen }: ThemeToggleCompactProps) 
       onClick={handleToggle}
       className={clsx(
         "p-2 rounded-lg text-subtitle hover:bg-background-raised hover:text-foreground-brand transition-colors",
-        isOpen && "self-start",
+        isOpen,
       )}
     >
       {isDark ? (
