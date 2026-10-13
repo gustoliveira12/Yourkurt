@@ -5,13 +5,11 @@ import * as Checkbox from "@radix-ui/react-checkbox";
 import clsx from "clsx";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { createClient } from "@/lib/supabase/client";
-
-const supabase = createClient();
+import supabase from "../../lib/api";
 
 export default function LoginPage() {
   const router = useRouter();
+
   const [checked, setChecked] = useState<boolean | "indeterminate">(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -22,15 +20,23 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password: password.trim(),
-      });
+      const { data, error } = await supabase
+        .from("users")
+        .select("*")
+        .eq("email", email.trim())
+        .eq("password", password.trim())
+        .maybeSingle();
 
-      if (error) throw new Error(error.message);
-      if (!data.session || !data.user) throw new Error("Email ou senha inválidos");
+      if (error) {
+        throw new Error(error.message);
+      }
 
-      router.replace("/");
+      if (!data) {
+        throw new Error("Email ou senha inválidos");
+      }
+
+      localStorage.setItem("user", JSON.stringify(data));
+      router.push("/");
     } catch (err) {
       console.error(err);
       alert(err instanceof Error ? err.message : "Erro ao fazer login");
@@ -40,102 +46,133 @@ export default function LoginPage() {
   }
 
   return (
-    <>
-      <div className="bg-[url('/imagem_login.avif')] w-full h-dvh bg-cover p-4 font-sans">
-        <div className={clsx("bg-surface rounded-4xl h-full justify-between flex gap-3 p-3 [mix-blend-mode:screen] dark:[mix-blend-mode:multiply]")}>
-          <div className="bg-neutral-1100 flex flex-col w-full h-full justify-between px-12 py-8 rounded-[20px]" />
-          <div className="justify-between px-12 py-8 flex flex-col w-full h-full rounded-[20px] items-center" />
-        </div>
-      </div>
+    <main className="min-h-dvh w-full bg-[url('/imagem_login.avif')] bg-cover bg-center p-2 sm:p-4 font-sans">
+      <div className="grid min-h-[calc(100dvh-1rem)] grid-cols-1 overflow-hidden rounded-2xl border-2 border-white/80 bg-white shadow-2xl dark:border-neutral-700 dark:bg-neutral-950 sm:min-h-[calc(100dvh-2rem)] sm:rounded-3xl lg:grid-cols-2">
+        <section className="relative hidden min-h-[300px] flex-col justify-between overflow-hidden bg-black p-8 text-white sm:p-10 lg:flex lg:p-12">
+          <div className="absolute inset-0 bg-[url('/imagem_login.avif')] bg-cover bg-center opacity-80" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-black/30" />
 
-      <div className="flex flex-col h-full justify-between px-12 py-8 rounded-[20px] absolute top-0 left-0 w-1/2">
-        <span className="text-foreground-brand text-xl tracking-widest uppercase">Yourkurt</span>
-        <div className="flex flex-col gap-3 text-foreground">
-          <span className="w-1.5 text-6xl tracking-wider text-white font-semibold dark:text-foreground">
-            Conecte. Compartilhe. Inspire.
+          <span className="relative z-10 text-xl font-semibold tracking-widest text-orange-400 uppercase">
+            Yourkurt
           </span>
-          <span className="text-xl text-white">Entre e descubra pessoas, ideias e momentos incríveis</span>
-        </div>
-      </div>
 
-      <div className="justify-between px-12 py-8 flex flex-col h-full rounded-[20px] items-center right-0 top-0 absolute w-1/2">
-        <span className="text-2xl items-center justify-center">Compartilhe sua jornada</span>
+          <div className="relative z-10 flex flex-col gap-4">
+            <h1 className="max-w-xl text-4xl font-bold leading-tight tracking-wide xl:text-6xl">
+              Conecte.
+              <br />
+              Compartilhe.
+              <br />
+              Inspire.
+            </h1>
 
-        <div className="flex flex-col gap-20 w-full items-center justify-center">
-          <div className="gap-1 w-full flex flex-col items-center">
-            <h1 className="text-4xl font-bold tracking-widest">Bem-vindo</h1>
-            <h2 className="text-xl font-medium">Insira seu e-mail e senha para acessar sua conta</h2>
+            <p className="max-w-md text-base text-white/90 sm:text-lg">
+              Entre e descubra pessoas, ideias e momentos incríveis.
+            </p>
+          </div>
+        </section>
+
+        <section className="flex min-w-0 flex-col justify-between gap-8 p-5 text-neutral-900 dark:text-neutral-100 sm:p-8 md:p-10 lg:p-8 xl:p-12">
+          <div className="flex flex-col gap-2 lg:hidden">
+            <span className="text-lg font-bold tracking-widest text-orange-600 dark:text-orange-400 uppercase">
+              Yourkurt
+            </span>
+
+            <p className="text-sm text-neutral-600 dark:text-neutral-400">
+              Conecte. Compartilhe. Inspire.
+            </p>
           </div>
 
-          <form onSubmit={handleLogin} className="w-full flex flex-col gap-2.5 items-start justify-start max-w-2xl">
-            <label className="flex flex-col w-full font-medium text-lg tracking-wide">
-              E-mail
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-2 bg-background-raised rounded-control border border-border-base text-foreground placeholder:text-foreground-muted focus:border-foreground-brand transition-colors"
-                placeholder="email@example.com"
-                required
-              />
-            </label>
+          <div className="hidden text-center lg:block">
+            <p className="text-xl font-medium">Compartilhe sua jornada</p>
+          </div>
 
-            <label className="flex flex-col w-full font-medium text-lg tracking-wide">
-              Senha
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-2 bg-background-raised rounded-control border border-border-base text-foreground placeholder:text-foreground-muted focus:border-foreground-brand transition-colors"
-                placeholder="Digite sua senha"
-                required
-              />
-            </label>
+          <div className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center gap-8">
+            <div className="flex flex-col items-center gap-2 text-center">
+              <h2 className="text-3xl font-bold tracking-wide sm:text-4xl">
+                Bem-vindo
+              </h2>
 
-            <div className="w-full flex justify-between text-sm text-subtitle">
-              <div className="flex gap-2 items-center">
-                <Checkbox.Root
-                  id="c1"
-                  checked={checked}
-                  onCheckedChange={setChecked}
-                  className="size-4 rounded-[4px] border border-border-base flex items-center justify-center data-[state=checked]:bg-background-brand data-[state=checked]:border-background-brand transition-colors"
-                >
-                  <Checkbox.Indicator>
-                    <CheckIcon weight="bold" className="text-foreground-inverted" />
-                  </Checkbox.Indicator>
-                </Checkbox.Root>
-                <label htmlFor="c1">Lembrar-se</label>
-              </div>
-              <button type="button" className="hover:text-foreground-brand hover:underline">
-                Esqueci minha senha
-              </button>
+              <p className="text-sm text-neutral-600 dark:text-neutral-300 sm:text-base">
+                Insira seu e-mail e senha para acessar sua conta
+              </p>
             </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="items-center justify-center flex w-full p-2 gradient-to-l rounded-control font-bold text-foreground-inverted hover:brightness-95 transition-all disabled:opacity-60"
-            >
-              {loading ? "Entrando..." : "Entrar"}
-            </button>
+            <form onSubmit={handleLogin} className="flex w-full flex-col gap-5">
+              <label className="flex w-full flex-col gap-2 text-sm font-medium sm:text-base">
+                E-mail
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full min-w-0 rounded-lg border border-neutral-300 bg-white px-4 py-3 text-base text-neutral-900 placeholder:text-neutral-500 outline-none transition focus:border-orange-400 focus:ring-2 focus:ring-orange-400/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-400"
+                  placeholder="email@example.com"
+                  autoComplete="email"
+                  required
+                />
+              </label>
 
-            <button
-              type="button"
-              className="items-center justify-center flex w-full p-2 border border-background-brand rounded-control font-medium gap-1 text-foreground hover:bg-background-brand/10 transition-colors"
-            >
-              <GoogleLogoIcon weight="bold" />
-              Entrar com o Google
-            </button>
-          </form>
-        </div>
+              <label className="flex w-full flex-col gap-2 text-sm font-medium sm:text-base">
+                Senha
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full min-w-0 rounded-lg border border-neutral-300 bg-white px-4 py-3 text-base text-neutral-900 placeholder:text-neutral-500 outline-none transition focus:border-orange-400 focus:ring-2 focus:ring-orange-400/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-400"
+                  placeholder="Digite sua senha"
+                  autoComplete="current-password"
+                  required
+                />
+              </label>
 
-        <span>
-          Não tem uma conta?{" "}
-          <Link href="/signup" className="text-foreground-brand underline">
-            Registrar
-          </Link>
-        </span>
+              <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-neutral-600 dark:text-neutral-300">
+                <div className="flex items-center gap-2">
+                  <Checkbox.Root
+                    id="c1"
+                    checked={checked}
+                    onCheckedChange={setChecked}
+                    className="flex size-4 shrink-0 items-center justify-center rounded-sm border border-neutral-400 data-[state=checked]:border-orange-500 data-[state=checked]:bg-orange-500"
+                  >
+                    <Checkbox.Indicator>
+                      <CheckIcon weight="bold" className="text-white" />
+                    </Checkbox.Indicator>
+                  </Checkbox.Root>
+
+                  <label htmlFor="c1" className="cursor-pointer">
+                    Lembrar-se
+                  </label>
+                </div>
+
+                <span className="cursor-pointer text-orange-600 hover:underline dark:text-orange-400">
+                  Esqueci minha senha
+                </span>
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="flex w-full items-center justify-center rounded-lg bg-gr p-2 gradient-to-l px-4 py-3 font-bold text-white transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {loading ? "Entrando..." : "Entrar"}
+              </button>
+
+              <button
+                type="button"
+                className="flex w-full it ems-center justify-center gap-2 rounded-lg border border-orange-400 px-4 py-3 font-medium text-neutral-800 transition hover:bg-orange-400/10 dark:text-neutral-100"
+              >
+                <GoogleLogoIcon weight="bold" size={20} />
+                Entrar com o Google
+              </button>
+            </form>
+          </div>
+
+          <footer className="text-center text-sm text-neutral-600 dark:text-neutral-300">
+            Não tem uma conta?{" "}
+            <span className="cursor-pointer font-medium text-orange-600 underline dark:text-orange-400">
+              Registrar
+            </span>
+          </footer>
+        </section>
       </div>
-    </>
+    </main>
   );
 }
