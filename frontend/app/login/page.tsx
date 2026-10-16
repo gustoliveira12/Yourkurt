@@ -2,7 +2,7 @@
 
 import { CheckIcon, GoogleLogoIcon } from "@phosphor-icons/react";
 import * as Checkbox from "@radix-ui/react-checkbox";
-import clsx from "clsx";
+import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import supabase from "../../lib/api";
@@ -20,22 +20,15 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const { data, error } = await supabase
-        .from("users")
-        .select("*")
-        .eq("email", email.trim())
-        .eq("password", password.trim())
-        .maybeSingle();
+      const { error } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password,
+      });
 
       if (error) {
         throw new Error(error.message);
       }
 
-      if (!data) {
-        throw new Error("Email ou senha inválidos");
-      }
-
-      localStorage.setItem("user", JSON.stringify(data));
       router.push("/");
     } catch (err) {
       console.error(err);
@@ -167,9 +160,12 @@ export default function LoginPage() {
 
           <footer className="text-center text-sm text-neutral-600 dark:text-neutral-300">
             Não tem uma conta?{" "}
-            <span className="cursor-pointer font-medium text-orange-600 underline dark:text-orange-400">
+            <Link
+              href="/signup"
+              className="font-medium text-orange-600 underline dark:text-orange-400"
+            >
               Registrar
-            </span>
+            </Link>
           </footer>
         </section>
       </div>
