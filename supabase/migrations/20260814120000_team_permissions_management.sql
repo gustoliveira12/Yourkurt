@@ -1,3 +1,14 @@
+-- ============================================================
+-- Yourkurt - Gerenciamento de permissões de equipes
+--
+-- VERSÃO CORRIGIDA: a versão anterior usava old.* dentro de
+-- policies (inválido em RLS) e comparava membership.team_page_id
+-- com o id da própria membership. Aqui toda a lógica de
+-- "gerente" fica centralizada em is_current_user_team_manager().
+-- A proteção de identidade (user_id / team_page_id imutáveis)
+-- é feita por triggers, criados em migrations posteriores.
+-- ============================================================
+
 create or replace function public.is_current_user_team_manager(p_team_page_id uuid)
 returns boolean
 language sql
@@ -20,37 +31,21 @@ as $$
   );
 $$;
 
+revoke execute on function public.is_current_user_team_manager(uuid) from public, anon;
 grant execute on function public.is_current_user_team_manager(uuid) to authenticated;
 
+
+-- team_pages: quem pode editar a página
 drop policy if exists "team_pages_update_owner_or_manager" on public.team_pages;
 create policy "team_pages_update_owner_or_manager"
   on public.team_pages
   for update
   to authenticated
-  using (
-    created_by = auth.uid()
-    or exists (
-      select 1
-      from public.team_memberships membership
-      where membership.team_page_id = id
-        and membership.user_id = auth.uid()
-        and membership.role in ('owner', 'admin')
-    )
-  )
-  with check (
-    created_by = old.created_by
-    and (
-      created_by = auth.uid()
-      or exists (
-        select 1
-        from public.team_memberships membership
-        where membership.team_page_id = id
-          and membership.user_id = auth.uid()
-          and membership.role in ('owner', 'admin')
-      )
-    )
-  );
+  using (public.is_current_user_team_manager(id))
+  with check (public.is_current_user_team_manager(id));
 
+
+-- team_memberships: leitura (própria ou de quem gerencia a equipe)
 drop policy if exists "team_memberships_select_own_or_manager" on public.team_memberships;
 create policy "team_memberships_select_own_or_manager"
   on public.team_memberships
@@ -61,29 +56,27 @@ create policy "team_memberships_select_own_or_manager"
     or public.is_current_user_team_manager(team_page_id)
   );
 
+
+-- team_memberships: atualização por gerentes.
+-- user_id e team_page_id imutáveis: trigger prevent_team_membership_identity_change.
 drop policy if exists "team_memberships_update_manager" on public.team_memberships;
 create policy "team_memberships_update_manager"
   on public.team_memberships
   for update
   to authenticated
   using (public.is_current_user_team_manager(team_page_id))
-  with check (
-    public.is_current_user_team_manager(team_page_id)
-    and team_page_id = old.team_page_id
-    and user_id = old.user_id
-    and (
-      role = old.role
-      or role in ('owner', 'admin', 'editor', 'member')
-    )
-    and can_post is not null
-  );
+  with check (public.is_current_user_team_manager(team_page_id));
 
+
+-- team_memberships: remoção por gerentes (o owner é protegido
+-- na migration de hardening seguinte).
 drop policy if exists "team_memberships_delete_manager" on public.team_memberships;
 create policy "team_memberships_delete_manager"
   on public.team_memberships
   for delete
   to authenticated
   using (public.is_current_user_team_manager(team_page_id));
+
 
 create or replace function public.set_team_member_permissions(
   p_team_page_id uuid,
@@ -135,4 +128,5 @@ begin
 end;
 $$;
 
+revoke execute on function public.set_team_member_permissions(uuid, uuid, boolean, text) from public, anon;
 grant execute on function public.set_team_member_permissions(uuid, uuid, boolean, text) to authenticated;
