@@ -174,3 +174,17 @@ revoke all on public.reactions     from anon;
 revoke truncate, references, trigger
   on all tables in schema public
   from anon, authenticated;
+
+
+-- ------------------------------------------------------------
+-- 11. notifications: só o backend (service_role) cria notificações.
+--     O baseline criava esta policy para todos os roles
+--     (WITH CHECK true); em produção ela já está correta e este
+--     bloco é idempotente.
+-- ------------------------------------------------------------
+drop policy if exists "notifications_insert_system" on public.notifications;
+create policy "notifications_insert_system"
+  on public.notifications
+  for insert
+  to service_role
+  with check (true);
