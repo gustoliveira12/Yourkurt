@@ -188,3 +188,47 @@ create policy "notifications_insert_system"
   for insert
   to service_role
   with check (true);
+
+
+-- ------------------------------------------------------------
+-- 12. Trigger created_by imutável em team_pages.
+--     Já existe em produção (criado manualmente) e não estava em
+--     nenhuma migration; aqui é só codificado.
+-- ------------------------------------------------------------
+create or replace function public.prevent_team_pages_created_by_update()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if new.created_by <> old.created_by then
+    raise exception 'created_by não pode ser alterado';
+  end if;
+  return new;
+end;
+$$;
+
+drop trigger if exists team_pages_created_by_immutable on public.team_pages;
+create trigger team_pages_created_by_immutable
+  before update on public.team_pages
+  for each row
+  execute function public.prevent_team_pages_created_by_update();
+
+revoke execute on function public.prevent_team_pages_created_by_update()
+  from public, anon, authenticated;
+
+
+-- ------------------------------------------------------------
+-- 13. Grants explícitos (clone novo = produção).
+--     anon só lê posts; admin_audit_logs só leitura para authenticated.
+-- ------------------------------------------------------------
+revoke all on all tables in schema public from anon;
+grant select on public.posts to anon;
+
+revoke all on public.admin_audit_logs from authenticated;
+grant select on public.admin_audit_logs to authenticated;
+
+revoke truncate, references, trigger, maintain
+  on all tables in schema public
+  from anon, authenticated;
