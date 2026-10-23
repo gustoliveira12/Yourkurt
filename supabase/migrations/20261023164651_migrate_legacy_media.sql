@@ -28,7 +28,7 @@ from (
 
   union
 
-  -- Fonte 2: image_url (coluna legada única), somente quando image_urls estiver vazio
+  -- Fonte 2: image_url (coluna legada única), também avaliada mesmo com image_urls preenchido
   select distinct
     p.id as post_id,
     nullif(
@@ -44,8 +44,7 @@ from (
       ''
     ) as storage_path
   from public.posts p
-  where coalesce(cardinality(p.image_urls), 0) = 0
-    and p.image_url is not null
+  where p.image_url is not null
     and btrim(p.image_url) <> ''
 ) as src
 where src.storage_path is not null
