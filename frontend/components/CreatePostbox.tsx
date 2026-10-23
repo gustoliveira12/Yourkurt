@@ -246,13 +246,33 @@ export default function CreatePostbox({
 
     // 2) + 3) Upload compressed images, then register them in post_media.
     let media: PostMedia[] = [];
-    let failed = 0;
+    let uploadFailed = false;
     if (selectedImages.length > 0) {
       try {
-        ({ media, failed } = await uploadPostMedia(supabase, data.id));
+        const result = await uploadPostMedia(supabase, data.id);
+        media = result.media;
+        uploadFailed = result.failed > 0;
       } catch {
-        failed = selectedImages.length;
+        uploadFailed = true;
       }
+    }
+
+    if (uploadFailed) {
+      const { error: rollbackError } = await supabase
+        .from("posts")
+        .delete()
+        .eq("id", data.id);
+
+      if (rollbackError) {
+        setError(
+          `Falha ao enviar mídia e ao desfazer o post: ${rollbackError.message}`,
+        );
+      } else {
+        setError("Falha ao enviar mídia. O post foi removido automaticamente.");
+      }
+
+      setSubmitting(false);
+      return;
     }
 
     onPostCreated({
@@ -272,11 +292,7 @@ export default function CreatePostbox({
 
     setContent("");
     setSelectedImages([]);
-    setError(
-      failed > 0
-        ? `Seu post foi publicado, mas ${failed} de ${failed + media.length} imagem(ns) não puderam ser enviadas.`
-        : null,
-    );
+    setError(null);
     setSubmitting(false);
   }
 
