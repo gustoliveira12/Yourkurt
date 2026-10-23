@@ -1,15 +1,25 @@
 -- Migra URLs legadas de posts.image_urls e posts.image_url para public.post_media
--- Extraindo o storage_path relativo ao bucket "post-images".
+-- com lock transacional, preservando ordem e removendo colunas legadas ao final.
+begin;
 
-insert into public.post_media (id, post_id, storage_path, media_type)
+lock table public.posts in exclusive mode;
+
+insert into public.post_media (
+  id,
+  post_id,
+  storage_path,
+  position_index,
+  media_type
+)
 select
   gen_random_uuid() as id,
   src.post_id,
   src.storage_path,
+  src.position_index,
   'image'::text as media_type
 from (
-  -- Fonte 1: image_urls (array)
-  select distinct
+  -- Fonte 1: image_urls (array) com ordem preservada
+  select
     p.id as post_id,
     nullif(
       split_part(
@@ -22,14 +32,16 @@ from (
         1
       ),
       ''
-    ) as storage_path
+    ) as storage_path,
+    greatest(u.ordinality - 1, 0)::integer as position_index
   from public.posts p
-  cross join lateral unnest(coalesce(p.image_urls, '{}'::text[])) as u(url)
+  cross join lateral unnest(coalesce(p.image_urls, '{}'::text[]))
+    with ordinality as u(url, ordinality)
 
   union
 
   -- Fonte 2: image_url (coluna legada única), também avaliada mesmo com image_urls preenchido
-  select distinct
+  select
     p.id as post_id,
     nullif(
       split_part(
@@ -42,7 +54,8 @@ from (
         1
       ),
       ''
-    ) as storage_path
+    ) as storage_path,
+    0::integer as position_index
   from public.posts p
   where p.image_url is not null
     and btrim(p.image_url) <> ''
@@ -55,3 +68,9 @@ where src.storage_path is not null
       and pm.storage_path = src.storage_path
       and pm.media_type = 'image'
   );
+
+alter table public.posts
+  drop column image_url,
+  drop column image_urls;
+
+commit;

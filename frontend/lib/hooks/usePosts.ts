@@ -127,7 +127,7 @@ export function usePosts() {
         }
       }
 
-      const mappedPosts = rawPosts.map((item) => {
+const mappedPosts = rawPosts.map((item) => {
         const media =
           item.media?.map((m) => ({
             ...m,
@@ -158,7 +158,8 @@ export function usePosts() {
     setLoading(false);
   }, []);
 
-  useEffect(() => {
+useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void fetchPosts();
   }, [fetchPosts]);
 
