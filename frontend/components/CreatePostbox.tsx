@@ -258,6 +258,7 @@ export default function CreatePostbox({
       onPostCreated({
         ...data,
         author_team_page_id: data.author_team_page_id ?? null,
+        community_id: data.community_id ?? null,
         image_urls: Array.isArray(data.image_urls)
           ? data.image_urls
           : data.image_url
