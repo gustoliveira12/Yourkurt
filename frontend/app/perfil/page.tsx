@@ -7,7 +7,7 @@ import PageAside from "@/components/navigation/NavBar";
 import ProfileSidebar from "@/components/navigation/ProfileSidebar";
 import RightNavbar from "@/components/PostComposer";
 import PostCard from "@/components/UserPost";
-import { usePosts } from "@/lib/hooks/usePosts";
+import { type PostMedia, usePosts } from "@/lib/hooks/usePosts";
 import { useUserReplies } from "@/lib/hooks/useUserReplies";
 import { createClient } from "@/lib/supabase/client";
 import {
@@ -401,12 +401,17 @@ export default function ProfilePage() {
         ? "Nenhuma resposta ainda."
         : "Nenhuma mídia publicada ainda.";
 
-  function getReplyPostImages(imageUrl: string | null, imageUrls: string[] | null) {
-    return Array.isArray(imageUrls) && imageUrls.length > 0
-      ? imageUrls
-      : imageUrl
-        ? [imageUrl]
-        : [];
+  function getReplyPostImages(media?: PostMedia[] | null) {
+    if (!Array.isArray(media) || media.length === 0) return [];
+
+    return media
+      .filter((item) => item.media_type === "image")
+      .map(
+        (item) =>
+          item.public_url ??
+          supabase.storage.from("post-images").getPublicUrl(item.storage_path).data
+            .publicUrl,
+      );
   }
 
   return (
@@ -676,10 +681,7 @@ export default function ProfilePage() {
                       </div>
                     ) : (
                       replies.map((reply) => {
-                        const replyImages = getReplyPostImages(
-                          reply.posts?.image_url ?? null,
-                          reply.posts?.image_urls ?? null,
-                        );
+                        const replyImages = getReplyPostImages(reply.posts?.media);
 
                         return (
                           <article

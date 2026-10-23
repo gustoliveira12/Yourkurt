@@ -11,14 +11,22 @@ export type PostAuthor = {
   avatar_url: string | null;
 };
 
+export type PostMedia = {
+  id: string;
+  post_id: string;
+  storage_path: string;
+  media_type: "image" | "video";
+  created_at: string;
+  public_url?: string;
+};
+
 export type Post = {
   id: string;
   user_id: string;
   author_team_page_id: string | null;
   community_id: string | null;
   content: string;
-  image_url: string | null;
-  image_urls: string[];
+  media: PostMedia[];
   created_at: string;
   likes_count: number;
   profiles: PostAuthor | null;
@@ -30,8 +38,7 @@ type RawPost = {
   author_team_page_id?: string | null;
   community_id?: string | null;
   content: string;
-  image_url: string | null;
-  image_urls?: string[] | null;
+  media?: PostMedia[] | null;
   created_at: string;
   likes_count: number;
 };
@@ -61,7 +68,7 @@ export function usePosts() {
     setError(null);
     const { data, error } = await supabase
       .from("posts")
-      .select<string, RawPost>("*")
+      .select<string, RawPost>("*, media:post_media(*)")
       .eq("is_public", true)
       .order("created_at", { ascending: false })
       .limit(50);
@@ -120,26 +127,29 @@ export function usePosts() {
         }
       }
 
-      const mappedPosts = rawPosts.map((item) => ({
-        id: item.id,
-        user_id: item.user_id,
-        author_team_page_id: item.author_team_page_id ?? null,
-        community_id: item.community_id ?? null,
-        content: item.content,
-        image_url: item.image_url,
-        image_urls:
-          Array.isArray(item.image_urls) && item.image_urls.length > 0
-            ? item.image_urls
-            : item.image_url
-              ? [item.image_url]
-              : [],
-        created_at: item.created_at,
-        likes_count: item.likes_count,
-        profiles:
-          (item.author_team_page_id
-            ? teamPagesById.get(item.author_team_page_id)
-            : null) ?? profilesById.get(item.user_id) ?? null,
-      }));
+      const mappedPosts = rawPosts.map((item) => {
+        const media =
+          item.media?.map((m) => ({
+            ...m,
+            public_url: supabase.storage.from("post-images").getPublicUrl(m.storage_path)
+              .data.publicUrl,
+          })) ?? [];
+
+        return {
+          id: item.id,
+          user_id: item.user_id,
+          author_team_page_id: item.author_team_page_id ?? null,
+          community_id: item.community_id ?? null,
+          content: item.content,
+          media,
+          created_at: item.created_at,
+          likes_count: item.likes_count,
+          profiles:
+            (item.author_team_page_id
+              ? teamPagesById.get(item.author_team_page_id)
+              : null) ?? profilesById.get(item.user_id) ?? null,
+        };
+      });
 
       setPosts(mappedPosts);
     } else if (error) {

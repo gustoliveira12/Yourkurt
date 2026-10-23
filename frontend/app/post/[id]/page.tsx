@@ -7,7 +7,7 @@ import ProfileSidebar from "@/components/navigation/ProfileSidebar";
 import { useCurrentProfile } from "@/lib/hooks/useCurrentProfile";
 import { useInteractions } from "@/lib/hooks/useInteractions";
 import { useComments, type CommentItem } from "@/lib/hooks/useComments";
-import { type Post } from "@/lib/hooks/usePosts";
+import { type Post, type PostMedia } from "@/lib/hooks/usePosts";
 import { createClient } from "@/lib/supabase/client";
 import {
   ArrowLeftIcon,
@@ -25,6 +25,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+
+const supabase = createClient();
 
 const NAV_ITEMS = [
   { label: "Feed", to: "/", icon: UserIcon },
@@ -55,11 +57,13 @@ function timeAgo(dateStr: string): string {
 function normalizeImages(post: Post | null) {
   if (!post) return [] as string[];
 
-  return Array.isArray(post.image_urls) && post.image_urls.length > 0
-    ? post.image_urls
-    : post.image_url
-      ? [post.image_url]
-      : [];
+  return post.media
+    .filter((item) => item.media_type === "image")
+    .map(
+      (item) =>
+        item.public_url ??
+        supabase.storage.from("post-images").getPublicUrl(item.storage_path).data.publicUrl,
+    );
 }
 
 type RawPostDetail = {
@@ -67,8 +71,7 @@ type RawPostDetail = {
   user_id: string;
   author_team_page_id?: string | null;
   content: string;
-  image_url: string | null;
-  image_urls?: string[] | null;
+  media?: PostMedia[] | null;
   created_at: string;
   likes_count: number;
   profiles:
@@ -117,12 +120,11 @@ export default function PostDetailPage() {
 
       setLoadingPost(true);
       setPostError(null);
-      const supabase = createClient();
 
       const { data, error } = await supabase
         .from("posts")
         .select(
-          "id, user_id, author_team_page_id, content, image_url, image_urls, created_at, likes_count, profiles(name, username, avatar_url)",
+          "id, user_id, author_team_page_id, content, created_at, likes_count, media:post_media(*), profiles(name, username, avatar_url)",
         )
         .eq("id", postId)
         .maybeSingle();
@@ -168,14 +170,13 @@ export default function PostDetailPage() {
         user_id: rawPost.user_id,
         author_team_page_id: rawPost.author_team_page_id ?? null,
         community_id: null,
+        media:
+          rawPost.media?.map((item) => ({
+            ...item,
+            public_url: supabase.storage.from("post-images").getPublicUrl(item.storage_path)
+              .data.publicUrl,
+          })) ?? [],
         content: rawPost.content,
-        image_url: rawPost.image_url,
-        image_urls:
-          Array.isArray(rawPost.image_urls) && rawPost.image_urls.length > 0
-            ? rawPost.image_urls
-            : rawPost.image_url
-              ? [rawPost.image_url]
-              : [],
         created_at: rawPost.created_at,
         likes_count: rawPost.likes_count,
         profiles: postAuthor,
@@ -309,6 +310,7 @@ export default function PostDetailPage() {
                           alt={`Imagem ${index + 1} da publicação`}
                           className="object-cover transition-transform duration-300 hover:scale-[1.03]"
                           sizes="(max-width: 768px) 100vw, 720px"
+                          unoptimized={process.env.NODE_ENV === "development"}
                         />
                       </button>
                     ))}
@@ -481,6 +483,7 @@ export default function PostDetailPage() {
                   alt="Imagem ampliada da publicação"
                   width={1600}
                   height={1600}
+                  unoptimized={process.env.NODE_ENV === "development"}
                   className={`max-h-[92vh] max-w-[92vw] object-contain transition-transform duration-200 ${
                     viewerZoomed ? "scale-150 cursor-zoom-out" : "scale-100 cursor-zoom-in"
                   }`}
