@@ -167,6 +167,7 @@ export default function PostDetailPage() {
         id: rawPost.id,
         user_id: rawPost.user_id,
         author_team_page_id: rawPost.author_team_page_id ?? null,
+        community_id: null,
         content: rawPost.content,
         image_url: rawPost.image_url,
         image_urls:

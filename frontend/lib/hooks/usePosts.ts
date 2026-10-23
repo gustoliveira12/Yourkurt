@@ -15,6 +15,7 @@ export type Post = {
   id: string;
   user_id: string;
   author_team_page_id: string | null;
+  community_id: string | null;
   content: string;
   image_url: string | null;
   image_urls: string[];
@@ -27,6 +28,7 @@ type RawPost = {
   id: string;
   user_id: string;
   author_team_page_id?: string | null;
+  community_id?: string | null;
   content: string;
   image_url: string | null;
   image_urls?: string[] | null;
@@ -122,6 +124,7 @@ export function usePosts() {
         id: item.id,
         user_id: item.user_id,
         author_team_page_id: item.author_team_page_id ?? null,
+        community_id: item.community_id ?? null,
         content: item.content,
         image_url: item.image_url,
         image_urls:
