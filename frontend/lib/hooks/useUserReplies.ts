@@ -1,6 +1,7 @@
 "use client";
 
 import { createClient } from "@/lib/supabase/client";
+import type { PostMedia } from "@/lib/hooks/usePosts";
 import { useCallback, useEffect, useState } from "react";
 
 export type ReplyAuthor = {
@@ -12,8 +13,7 @@ export type ReplyAuthor = {
 export type ReplyPost = {
   id: string;
   content: string;
-  image_url: string | null;
-  image_urls: string[] | null;
+  media?: PostMedia[] | null;
   profiles: ReplyAuthor | ReplyAuthor[] | null;
 };
 
@@ -59,7 +59,7 @@ export function useUserReplies(userId: string) {
     const { data, error: fetchError } = await supabase
       .from("comments")
       .select<string, RawReply>(
-        "id, post_id, user_id, content, created_at, posts(id, content, image_url, image_urls, profiles(name, username, avatar_url))",
+        "id, post_id, user_id, content, created_at, posts(id, content, media:post_media(*), profiles(name, username, avatar_url))",
       )
       .eq("user_id", userId)
       .order("created_at", { ascending: false })

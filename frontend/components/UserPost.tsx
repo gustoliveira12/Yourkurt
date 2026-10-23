@@ -17,6 +17,9 @@ import { useState } from "react";
 import { useLikes } from "@/lib/hooks/useLikes";
 import { useInteractions } from "@/lib/hooks/useInteractions";
 import type { Post } from "@/lib/hooks/usePosts";
+import { createClient } from "@/lib/supabase/client";
+
+const supabase = createClient();
 
 function timeAgo(dateStr: string): string {
   const diff = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
@@ -54,12 +57,13 @@ export default function PostCard({
   const { interactions, loading: loadingInteractions } = useInteractions(post.id);
 
   const author = post.profiles;
-  const postImages =
-    Array.isArray(post.image_urls) && post.image_urls.length > 0
-      ? post.image_urls
-      : post.image_url
-        ? [post.image_url]
-        : [];
+  const postImages = post.media
+    .filter((item) => item.media_type === "image")
+    .map(
+      (item) =>
+        item.public_url ??
+        supabase.storage.from("post-images").getPublicUrl(item.storage_path).data.publicUrl,
+    );
 
   // Save reposted state to localStorage
   const handleRepost = () => {
@@ -170,6 +174,7 @@ export default function PostCard({
               className="object-contain"
               fill
               sizes="(max-width: 768px) 100vw, 768px"
+              unoptimized={process.env.NODE_ENV === "development"}
               alt="Imagem da publicação"
               src={postImages[0]}
             />
@@ -180,6 +185,7 @@ export default function PostCard({
               className="object-contain"
               fill
               sizes="(max-width: 768px) 100vw, 768px"
+              unoptimized={process.env.NODE_ENV === "development"}
               alt="Imagem da publicação"
               src={postImages[0]}
             />
@@ -199,6 +205,7 @@ export default function PostCard({
                   fill
                   className="object-cover"
                   sizes="(max-width: 768px) 50vw, 320px"
+                  unoptimized={process.env.NODE_ENV === "development"}
                   alt={`Imagem ${index + 1} da publicacao`}
                   src={url}
                 />
@@ -212,6 +219,7 @@ export default function PostCard({
                   fill
                   className="object-cover"
                   sizes="(max-width: 768px) 50vw, 320px"
+                  unoptimized={process.env.NODE_ENV === "development"}
                   alt={`Imagem ${index + 1} da publicacao`}
                   src={url}
                 />
