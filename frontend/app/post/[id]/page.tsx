@@ -66,6 +66,7 @@ type RawPostDetail = {
   id: string;
   user_id: string;
   author_team_page_id?: string | null;
+  community_id?: string | null;
   content: string;
   image_url: string | null;
   image_urls?: string[] | null;
@@ -122,7 +123,7 @@ export default function PostDetailPage() {
       const { data, error } = await supabase
         .from("posts")
         .select(
-          "id, user_id, author_team_page_id, content, image_url, image_urls, created_at, likes_count, profiles(name, username, avatar_url)",
+          "id, user_id, author_team_page_id, community_id, content, image_url, image_urls, created_at, likes_count, profiles(name, username, avatar_url)",
         )
         .eq("id", postId)
         .maybeSingle();
@@ -167,7 +168,7 @@ export default function PostDetailPage() {
         id: rawPost.id,
         user_id: rawPost.user_id,
         author_team_page_id: rawPost.author_team_page_id ?? null,
-        community_id: null,
+        community_id: rawPost.community_id ?? null,
         content: rawPost.content,
         image_url: rawPost.image_url,
         image_urls:
