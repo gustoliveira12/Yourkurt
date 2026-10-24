@@ -20,6 +20,7 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "imgs.search.brave.com" },
       { protocol: "https", hostname: "i.pinimg.com" },
       { protocol: "https", hostname: "mockmind-api.uifaces.co" },
+      { protocol: "https", hostname: "mwcpeouwqzkbdbeorkfj.supabase.co" },
       ...(supabaseHostname
         ? [{ protocol: "https" as const, hostname: supabaseHostname }]
         : []),

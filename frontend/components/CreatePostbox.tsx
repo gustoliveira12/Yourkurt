@@ -4,13 +4,20 @@ import { Camera, Music, Pin, Send, SmilePlus } from "lucide-react";
 import { Avatar } from "./Avatar";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import type { Post } from "@/lib/hooks/usePosts";
+import imageCompression from "browser-image-compression";
+import type { Post, PostMedia } from "@/lib/hooks/usePosts";
 
 type CreatePostboxProps = {
   avatarUrl: string | null;
   userId: string;
   profile: { name: string; username: string; avatar_url: string | null } | null;
   onPostCreated: (post: Post) => void;
+};
+
+const EXTENSION_BY_MIME: Record<string, string> = {
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp",
 };
 
 type PostingIdentity = {
@@ -156,36 +163,59 @@ export default function CreatePostbox({
     setSelectedImages((prev) => prev.filter((_, i) => i !== index));
   }
 
-  async function uploadImages(supabase: ReturnType<typeof createClient>) {
-    if (selectedImages.length === 0) return [] as string[];
-
-    const uploadedUrls = await Promise.all(
-      selectedImages.map(async (file, index) => {
-      const extension = file.name.split(".").pop()?.toLowerCase() || "jpg";
-      const filePath = `${userId}/${Date.now()}-${index}.${extension}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from("post-images")
-        .upload(filePath, file, {
-          upsert: false,
-          contentType: file.type,
+  async function uploadPostMedia(
+    supabase: ReturnType<typeof createClient>,
+    postId: string,
+  ) {
+    const results = await Promise.allSettled(
+      selectedImages.map(async (original, index) => {
+        const compressed = await imageCompression(original, {
+          maxSizeMB: 1,
+          maxWidthOrHeight: 1920,
+          useWebWorker: true,
         });
 
-      if (uploadError) {
-        throw new Error(
-          `Erro ao enviar imagem (${uploadError.statusCode ?? "sem status"}): ${uploadError.message}`,
-        );
-      }
+        const extension = EXTENSION_BY_MIME[compressed.type] ?? "jpg";
+        const storagePath = `${userId}/${postId}/${Date.now()}-${index}.${extension}`;
 
-      const {
-        data: { publicUrl },
-      } = supabase.storage.from("post-images").getPublicUrl(filePath);
+        const { error: uploadError } = await supabase.storage
+          .from("post-images")
+          .upload(storagePath, compressed, {
+            upsert: false,
+            contentType: compressed.type,
+          });
 
-      return publicUrl;
-    }),
+        if (uploadError) throw new Error(uploadError.message);
+        return storagePath;
+      }),
     );
 
-    return uploadedUrls;
+    const paths = results.flatMap((r) => (r.status === "fulfilled" ? [r.value] : []));
+    let failed = results.length - paths.length;
+    let media: PostMedia[] = [];
+
+    if (paths.length > 0) {
+      const { data, error: mediaError } = await supabase
+        .from("post_media")
+        .insert(
+          paths.map((storage_path) => ({
+            post_id: postId,
+            storage_path,
+            media_type: "image" as const,
+          })),
+        )
+        .select("id, post_id, storage_path, media_type, created_at");
+
+      if (mediaError || !data) {
+        // Files were uploaded but not registered: remove them to avoid orphans.
+        await supabase.storage.from("post-images").remove(paths);
+        failed = results.length;
+      } else {
+        media = data as PostMedia[];
+      }
+    }
+
+    return { media, failed };
   }
 
   async function handleSubmit() {
@@ -196,84 +226,73 @@ export default function CreatePostbox({
     setError(null);
     const supabase = createClient();
 
-    let imageUrls: string[] = [];
+    // 1) Save the post first (text only) so nothing is uploaded for a failed post.
+    const { data, error: submitError } = await supabase
+      .from("posts")
+      .insert({
+        user_id: userId,
+        author_team_page_id: selectedIdentity.type === "team" ? selectedIdentity.id : null,
+        content: trimmed || "[midia]",
+        is_public: true,
+      })
+      .select("id, user_id, author_team_page_id, content, created_at, likes_count")
+      .single();
 
-    try {
-      imageUrls = await uploadImages(supabase);
-    } catch (uploadErr) {
-      setError(
-        uploadErr instanceof Error ? uploadErr.message : "Erro ao enviar imagens.",
-      );
+    if (submitError || !data) {
+      setError(submitError?.message || "Erro ao publicar post");
       setSubmitting(false);
       return;
     }
 
-    const payload = {
-      user_id: userId,
-      author_team_page_id: selectedIdentity.type === "team" ? selectedIdentity.id : null,
-      content: trimmed || "[midia]",
-      is_public: true,
-      image_url: imageUrls[0] ?? null,
-      image_urls: imageUrls,
-    };
+    // 2) + 3) Upload compressed images, then register them in post_media.
+    let media: PostMedia[] = [];
+    let uploadFailed = false;
+    if (selectedImages.length > 0) {
+      try {
+        const result = await uploadPostMedia(supabase, data.id);
+        media = result.media;
+        uploadFailed = result.failed > 0;
+      } catch {
+        uploadFailed = true;
+      }
+    }
 
-    const buildPostSelect = (supportsMultipleImages: boolean) =>
-      supportsMultipleImages
-        ? "id, user_id, author_team_page_id, content, image_url, image_urls, created_at, likes_count"
-        : "id, user_id, author_team_page_id, content, image_url, created_at, likes_count";
-
-    let data: Post | null = null;
-    let submitError: { message: string } | null = null;
-
-    const primaryInsert = await supabase
-      .from("posts")
-      .insert(payload)
-      .select(buildPostSelect(true))
-      .single();
-
-    data = primaryInsert.data as Post | null;
-    submitError = primaryInsert.error;
-
-    if (submitError && submitError.message.toLowerCase().includes("image_urls")) {
-      const fallbackInsert = await supabase
+    if (uploadFailed) {
+      const { error: rollbackError } = await supabase
         .from("posts")
-        .insert({
-          user_id: userId,
-          author_team_page_id:
-            selectedIdentity.type === "team" ? selectedIdentity.id : null,
-          content: trimmed || "[midia]",
-          is_public: true,
-          image_url: imageUrls[0] ?? null,
-        })
-        .select(buildPostSelect(false))
-        .single();
+        .delete()
+        .eq("id", data.id);
 
-      data = fallbackInsert.data as Post | null;
-      submitError = fallbackInsert.error;
+      if (rollbackError) {
+        setError(
+          `Falha ao enviar mídia e ao desfazer o post: ${rollbackError.message}`,
+        );
+      } else {
+        setError("Falha ao enviar mídia. O post foi removido automaticamente.");
+      }
+
+      setSubmitting(false);
+      return;
     }
 
-    if (submitError) {
-      setError(submitError.message || "Erro ao publicar post");
-    } else if (data) {
-      onPostCreated({
-        ...data,
-        author_team_page_id: data.author_team_page_id ?? null,
-        community_id: data.community_id ?? null,
-        image_urls: Array.isArray(data.image_urls)
-          ? data.image_urls
-          : data.image_url
-            ? [data.image_url]
-            : [],
-        profiles: {
-          name: selectedIdentity.name,
-          username: selectedIdentity.username,
-          avatar_url: selectedIdentity.avatar_url,
-        },
-      } as Post);
-      setContent("");
-      setSelectedImages([]);
-      setError(null);
-    }
+    onPostCreated({
+      ...(data as Omit<Post, "community_id" | "media" | "profiles">),
+      community_id: null,
+      media: media.map((item) => ({
+        ...item,
+        public_url: supabase.storage.from("post-images").getPublicUrl(item.storage_path)
+          .data.publicUrl,
+      })),
+      profiles: {
+        name: selectedIdentity.name,
+        username: selectedIdentity.username,
+        avatar_url: selectedIdentity.avatar_url,
+      },
+    });
+
+    setContent("");
+    setSelectedImages([]);
+    setError(null);
     setSubmitting(false);
   }
 
@@ -345,7 +364,7 @@ export default function CreatePostbox({
       <input
         ref={fileInputRef}
         type="file"
-        accept="image/*"
+        accept="image/jpeg,image/png,image/webp"
         multiple
         className="hidden"
         onChange={handleImageSelect}
