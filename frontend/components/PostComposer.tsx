@@ -30,22 +30,16 @@ export default function RightNavbar({ prop, onPostCreated }: NavlinkProps) {
   return (
     <div className="flex flex-col gap-8 max-w-136">
       {profile && (
-        profile.isAdmin ? (
-          <CreatePostbox
-            avatarUrl={profile.avatarUrl}
-            userId={profile.id}
-            profile={{
-              name: profile.name,
-              username: profile.username,
-              avatar_url: profile.avatarUrl,
-            }}
-            onPostCreated={handlePostCreated}
-          />
-        ) : (
-          <div className="hidden sm:flex w-full max-w-lg rounded-card border border-border-base bg-surface px-4 py-3 text-sm text-subtitle">
-            Apenas administradores podem publicar no momento.
-          </div>
-        )
+        <CreatePostbox
+          avatarUrl={profile.avatarUrl}
+          userId={profile.id}
+          profile={{
+            name: profile.name,
+            username: profile.username,
+            avatar_url: profile.avatarUrl,
+          }}
+          onPostCreated={handlePostCreated}
+        />
       )}
     </div>
   );
