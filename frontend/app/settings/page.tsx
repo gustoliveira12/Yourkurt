@@ -6,6 +6,7 @@ import PageAside from "@/components/navigation/NavBar";
 import ProfileSidebar from "@/components/navigation/ProfileSidebar";
 import ChangePasswordCard from "@/components/settings/ChangePasswordCard";
 import ThemeToggle from "@/components/theme/ThemeToggle";
+import DeleteAccountCard from "@/components/settings/DeleteAccountCard";
 import { useCurrentProfile } from "@/lib/hooks/useCurrentProfile";
 import { createClient } from "@/lib/supabase/client";
 import {
@@ -657,6 +658,8 @@ export default function SettingsPage() {
               <h2 className="text-sm font-bold uppercase tracking-wider text-subtitle">
                 Sessao
               </h2>
+
+              <DeleteAccountCard username={profile?.username ?? ""} />
 
               <div className="rounded-xl border border-border-base bg-background-raised p-4 flex items-start justify-between gap-4">
                 <div className="flex items-start gap-3">
