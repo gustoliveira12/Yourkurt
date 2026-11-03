@@ -135,9 +135,12 @@ export default function LoginPage() {
                   </label>
                 </div>
 
-                <span className="cursor-pointer text-orange-600 hover:underline dark:text-orange-400">
+                <Link
+                  href="/esqueci-senha"
+                  className="text-orange-600 hover:underline dark:text-orange-400"
+                >
                   Esqueci minha senha
-                </span>
+                </Link>
               </div>
 
               <button

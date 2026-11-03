@@ -4,6 +4,7 @@ import MobileHeader from "@/components/navigation/MobileHeader";
 import MobileNav from "@/components/navigation/MobileNav";
 import PageAside from "@/components/navigation/NavBar";
 import ProfileSidebar from "@/components/navigation/ProfileSidebar";
+import ChangePasswordCard from "@/components/settings/ChangePasswordCard";
 import ThemeToggle from "@/components/theme/ThemeToggle";
 import { useCurrentProfile } from "@/lib/hooks/useCurrentProfile";
 import { createClient } from "@/lib/supabase/client";
@@ -14,7 +15,6 @@ import {
   LockOpenIcon,
   GearSixIcon,
   HouseIcon,
-  LockKeyIcon,
   SignOutIcon,
   ShieldCheckIcon,
   UserIcon,
@@ -455,12 +455,7 @@ export default function SettingsPage() {
                 actionText="Gerenciar"
                 icon={<ShieldCheckIcon size={18} weight="fill" />}
               />
-              <SettingsCard
-                title="Senha e autenticação"
-                subtitle="Atualize sua senha e fortaleça sua segurança de acesso."
-                actionText="Atualizar"
-                icon={<LockKeyIcon size={18} weight="fill" />}
-              />
+              <ChangePasswordCard />
               <SettingsCard
                 title="Notificações"
                 subtitle="Defina quando e como você deseja ser notificado."
