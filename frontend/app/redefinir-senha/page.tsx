@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { getAuthErrorMessage, validateNewPassword } from "@/lib/password";
+import { validateNewPassword } from "@/lib/password";
+import { resetPassword } from "./actions";
 
 export default function ResetPasswordPage() {
   const supabase = useMemo(() => createClient(), []);
@@ -13,6 +14,18 @@ export default function ResetPasswordPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const [needsLogoutRetry, setNeedsLogoutRetry] = useState(false);
+
+  async function finishLogout() {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      setMessage("Não foi possível encerrar a sessão. Tente novamente.");
+      return;
+    }
+
+    router.replace("/login");
+    router.refresh();
+  }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -27,17 +40,20 @@ export default function ResetPasswordPage() {
     setIsSaving(true);
     setMessage("");
 
-    const { error } = await supabase.auth.updateUser({ password });
+    const result = await resetPassword(password, confirmPassword);
 
-    if (error) {
-      setIsSaving(false);
-      setMessage(getAuthErrorMessage(error.message));
+    if (result.status === "ok") {
+      router.replace("/login");
+      router.refresh();
       return;
     }
 
-    await supabase.auth.signOut();
-    router.replace("/login");
-    router.refresh();
+    setIsSaving(false);
+    setMessage(result.message);
+
+    if (result.status === "password_updated_logout_failed") {
+      setNeedsLogoutRetry(true);
+    }
   }
 
   return (
@@ -79,7 +95,7 @@ export default function ResetPasswordPage() {
 
           <button
             type="submit"
-            disabled={isSaving}
+            disabled={isSaving || needsLogoutRetry}
             className="rounded-lg bg-orange-500 px-4 py-3 font-bold text-white transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isSaving ? "Salvando..." : "Salvar nova senha"}
@@ -93,6 +109,16 @@ export default function ResetPasswordPage() {
           >
             {message}
           </p>
+        )}
+
+        {needsLogoutRetry && (
+          <button
+            type="button"
+            onClick={() => void finishLogout()}
+            className="rounded-lg border border-orange-400 px-4 py-3 font-bold text-orange-600 transition hover:bg-orange-400/10 dark:text-orange-400"
+          >
+            Tentar sair novamente
+          </button>
         )}
 
         <Link

@@ -61,7 +61,11 @@ export default function ChangePasswordCard() {
         password: currentPassword,
       });
       if (verifyError) {
-        throw new Error("Senha atual incorreta.");
+        throw new Error(
+          verifyError.code === "invalid_credentials"
+            ? "Senha atual incorreta."
+            : getAuthErrorMessage(verifyError.message),
+        );
       }
 
       const { error: updateError } = await supabase.auth.updateUser({

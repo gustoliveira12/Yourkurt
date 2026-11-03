@@ -1,13 +1,19 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { RECOVERY_COOKIE, RECOVERY_PATH } from "./lib/recovery";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-const AUTH_ROUTES = new Set([
+const GUEST_ONLY_ROUTES = new Set([
   "/login",
   "/signup",
   "/signup/verify-email",
+]);
+
+// Acessíveis sem login e também com sessão ativa (ex.: link de recuperação).
+const PUBLIC_ROUTES = new Set([
+  ...GUEST_ONLY_ROUTES,
   "/auth/confirm",
   "/esqueci-senha",
 ]);
@@ -59,17 +65,24 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const isAuthRoute = AUTH_ROUTES.has(request.nextUrl.pathname);
+  const pathname = request.nextUrl.pathname;
+  const isPublicRoute = PUBLIC_ROUTES.has(pathname);
 
-  if (!user && !isAuthRoute) {
+  if (!user && !isPublicRoute) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return withPreservedHeaders(response, NextResponse.redirect(url));
   }
 
-  if (user && isAuthRoute) {
+  if (user && GUEST_ONLY_ROUTES.has(pathname)) {
     const url = request.nextUrl.clone();
     url.pathname = "/";
+    return withPreservedHeaders(response, NextResponse.redirect(url));
+  }
+
+  if (user && pathname === RECOVERY_PATH && !request.cookies.has(RECOVERY_COOKIE)) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/esqueci-senha";
     return withPreservedHeaders(response, NextResponse.redirect(url));
   }
 

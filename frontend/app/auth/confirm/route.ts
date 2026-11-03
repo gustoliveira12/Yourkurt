@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { type EmailOtpType } from "@supabase/supabase-js";
 import { createServerClient } from "@supabase/ssr";
+import {
+  RECOVERY_COOKIE,
+  RECOVERY_MAX_AGE_SECONDS,
+  RECOVERY_PATH,
+} from "@/lib/recovery";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -27,6 +32,34 @@ function withPreservedCookies(baseResponse: NextResponse, redirectResponse: Next
   baseResponse.cookies.getAll().forEach((cookie) => {
     redirectResponse.cookies.set(cookie);
   });
+
+  return redirectResponse;
+}
+
+function isRecoveryNext(next: string) {
+  return next === RECOVERY_PATH || next.startsWith(`${RECOVERY_PATH}?`);
+}
+
+function successRedirect(
+  baseResponse: NextResponse,
+  requestUrl: URL,
+  next: string,
+  grantRecovery: boolean,
+) {
+  const redirectResponse = withPreservedCookies(
+    baseResponse,
+    NextResponse.redirect(new URL(next, requestUrl.origin)),
+  );
+
+  if (grantRecovery && isRecoveryNext(next)) {
+    redirectResponse.cookies.set(RECOVERY_COOKIE, "1", {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      maxAge: RECOVERY_MAX_AGE_SECONDS,
+    });
+  }
 
   return redirectResponse;
 }
@@ -70,10 +103,7 @@ export async function GET(request: NextRequest) {
   if (code) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
-      return withPreservedCookies(
-        response,
-        NextResponse.redirect(new URL(next, requestUrl.origin)),
-      );
+      return successRedirect(response, requestUrl, next, true);
     }
   }
 
@@ -84,20 +114,17 @@ export async function GET(request: NextRequest) {
     });
 
     if (!error) {
-      return withPreservedCookies(
-        response,
-        NextResponse.redirect(new URL(next, requestUrl.origin)),
-      );
+      return successRedirect(response, requestUrl, next, type === "recovery");
     }
   }
 
   const errorUrl = new URL(
-    next.startsWith("/redefinir-senha") ? "/esqueci-senha" : "/signup/verify-email",
+    isRecoveryNext(next) ? "/esqueci-senha" : "/signup/verify-email",
     requestUrl.origin,
   );
   errorUrl.searchParams.set(
     "error",
-    next.startsWith("/redefinir-senha")
+    isRecoveryNext(next)
       ? "Link inválido ou expirado. Solicite um novo."
       : "Nao foi possivel confirmar seu e-mail. Tente novamente usando o link mais recente.",
   );
