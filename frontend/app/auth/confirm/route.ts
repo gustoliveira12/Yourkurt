@@ -91,10 +91,15 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  const errorUrl = new URL("/signup/verify-email", requestUrl.origin);
+  const errorUrl = new URL(
+    next.startsWith("/redefinir-senha") ? "/esqueci-senha" : "/signup/verify-email",
+    requestUrl.origin,
+  );
   errorUrl.searchParams.set(
     "error",
-    "Nao foi possivel confirmar seu e-mail. Tente novamente usando o link mais recente.",
+    next.startsWith("/redefinir-senha")
+      ? "Link inválido ou expirado. Solicite um novo."
+      : "Nao foi possivel confirmar seu e-mail. Tente novamente usando o link mais recente.",
   );
   return NextResponse.redirect(errorUrl);
 }

@@ -9,6 +9,7 @@ const AUTH_ROUTES = new Set([
   "/signup",
   "/signup/verify-email",
   "/auth/confirm",
+  "/esqueci-senha",
 ]);
 
 const SUPER_ADMIN_ROUTES = new Set(["/gerenciamento-usuarios", "/super-admin"]);
