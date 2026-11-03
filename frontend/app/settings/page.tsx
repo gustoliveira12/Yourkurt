@@ -511,7 +511,7 @@ export default function SettingsPage() {
 
                 {!canManageTeamPages && (
                   <p className="rounded-lg border border-border-base bg-background px-3 py-2 text-sm text-subtitle">
-                    Sua conta e de usuario comum. Apenas administradores podem criar equipes e publicar.
+                    Sua conta e de usuario comum. Apenas administradores podem criar equipes.
                   </p>
                 )}
 
