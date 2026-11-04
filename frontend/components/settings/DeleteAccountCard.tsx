@@ -42,7 +42,8 @@ async function removePostImages(supabase: SupabaseClient, userId: string) {
   for (;;) {
     const { data, error } = await supabase
       .from("post_media")
-      .select("storage_path")
+      .select("storage_path, posts!inner(user_id)")
+      .eq("posts.user_id", userId)
       .like("storage_path", `${userId}/%`)
       .limit(pageSize);
     if (error) throw new Error(error.message);
@@ -59,6 +60,7 @@ async function removePostImages(supabase: SupabaseClient, userId: string) {
       .delete()
       .in("storage_path", paths);
     if (deleteError) throw new Error(deleteError.message);
+    if (data.length < pageSize) return;
   }
 }
 
