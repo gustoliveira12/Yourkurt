@@ -1,23 +1,23 @@
 "use server";
 
-import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { getAuthErrorMessage, validateNewPassword } from "@/lib/password";
-import { RECOVERY_COOKIE } from "@/lib/recovery";
+import { isFreshRecoverySession } from "@/lib/recovery";
 
 export type ResetPasswordResult =
   | { status: "ok" }
   | { status: "password_updated_logout_failed"; message: string }
   | { status: "error"; message: string };
 
-// A troca só é aceita com o cookie emitido por /auth/confirm após validar o link de recuperação.
+// A troca só é aceita para uma sessão recém-criada pelo link de recuperação (claim amr assinado).
 export async function resetPassword(
   password: string,
   confirmPassword: string,
 ): Promise<ResetPasswordResult> {
-  const cookieStore = await cookies();
+  const supabase = await createClient();
 
-  if (!cookieStore.has(RECOVERY_COOKIE)) {
+  const { data: claimsData } = await supabase.auth.getClaims();
+  if (!isFreshRecoverySession(claimsData?.claims)) {
     return {
       status: "error",
       message: "Link de recuperação inválido ou expirado. Solicite um novo.",
@@ -29,14 +29,10 @@ export async function resetPassword(
     return { status: "error", message: validationError };
   }
 
-  const supabase = await createClient();
-
   const { error: updateError } = await supabase.auth.updateUser({ password });
   if (updateError) {
     return { status: "error", message: getAuthErrorMessage(updateError.message) };
   }
-
-  cookieStore.delete(RECOVERY_COOKIE);
 
   const { error: signOutError } = await supabase.auth.signOut();
   if (signOutError) {
