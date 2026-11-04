@@ -82,7 +82,8 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  if (tokenHash && isEmailOtpType(type)) {
+  // Recuperação só é aceita via PKCE (?code=): verifyOtp emite amr "otp", sem prova de recuperação.
+  if (tokenHash && isEmailOtpType(type) && type !== "recovery") {
     const { error } = await supabase.auth.verifyOtp({
       token_hash: tokenHash,
       type,
