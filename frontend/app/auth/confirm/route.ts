@@ -1,11 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { type EmailOtpType } from "@supabase/supabase-js";
 import { createServerClient } from "@supabase/ssr";
-import {
-  RECOVERY_COOKIE,
-  RECOVERY_MAX_AGE_SECONDS,
-  RECOVERY_PATH,
-} from "@/lib/recovery";
+import { RECOVERY_PATH } from "@/lib/recovery";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -38,30 +34,6 @@ function withPreservedCookies(baseResponse: NextResponse, redirectResponse: Next
 
 function isRecoveryNext(next: string) {
   return next === RECOVERY_PATH || next.startsWith(`${RECOVERY_PATH}?`);
-}
-
-function successRedirect(
-  baseResponse: NextResponse,
-  requestUrl: URL,
-  next: string,
-  grantRecovery: boolean,
-) {
-  const redirectResponse = withPreservedCookies(
-    baseResponse,
-    NextResponse.redirect(new URL(next, requestUrl.origin)),
-  );
-
-  if (grantRecovery && isRecoveryNext(next)) {
-    redirectResponse.cookies.set(RECOVERY_COOKIE, "1", {
-      httpOnly: true,
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
-      maxAge: RECOVERY_MAX_AGE_SECONDS,
-    });
-  }
-
-  return redirectResponse;
 }
 
 export async function GET(request: NextRequest) {
@@ -103,7 +75,10 @@ export async function GET(request: NextRequest) {
   if (code) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
-      return successRedirect(response, requestUrl, next, true);
+      return withPreservedCookies(
+        response,
+        NextResponse.redirect(new URL(next, requestUrl.origin)),
+      );
     }
   }
 
@@ -114,7 +89,10 @@ export async function GET(request: NextRequest) {
     });
 
     if (!error) {
-      return successRedirect(response, requestUrl, next, type === "recovery");
+      return withPreservedCookies(
+        response,
+        NextResponse.redirect(new URL(next, requestUrl.origin)),
+      );
     }
   }
 

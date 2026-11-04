@@ -40,19 +40,24 @@ export default function ResetPasswordPage() {
     setIsSaving(true);
     setMessage("");
 
-    const result = await resetPassword(password, confirmPassword);
+    try {
+      const result = await resetPassword(password, confirmPassword);
 
-    if (result.status === "ok") {
-      router.replace("/login");
-      router.refresh();
-      return;
-    }
+      if (result.status === "ok") {
+        router.replace("/login");
+        router.refresh();
+        return;
+      }
 
-    setIsSaving(false);
-    setMessage(result.message);
+      setMessage(result.message);
 
-    if (result.status === "password_updated_logout_failed") {
-      setNeedsLogoutRetry(true);
+      if (result.status === "password_updated_logout_failed") {
+        setNeedsLogoutRetry(true);
+      }
+    } catch {
+      setMessage("Não foi possível salvar a nova senha. Verifique sua conexão e tente novamente.");
+    } finally {
+      setIsSaving(false);
     }
   }
 
