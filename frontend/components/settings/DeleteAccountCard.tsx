@@ -22,11 +22,44 @@ function getDeleteErrorMessage(rawMessage: string) {
     return "Super administradores não podem excluir a própria conta.";
   }
 
+  if (rawMessage.includes("invalid_password")) {
+    return "Senha incorreta.";
+  }
+
   if (rawMessage.includes("not_authenticated")) {
     return "Sua sessão expirou. Entre novamente.";
   }
 
   return "Não foi possível excluir a conta. Tente novamente.";
+}
+
+type SupabaseClient = ReturnType<typeof createClient>;
+
+// O banco não consegue apagar arquivos do Storage, então removemos as imagens
+// dos posts do usuário antes de apagar a conta.
+async function removePostImages(supabase: SupabaseClient, userId: string) {
+  const pageSize = 100;
+  for (;;) {
+    const { data, error } = await supabase
+      .from("post_media")
+      .select("storage_path")
+      .like("storage_path", `${userId}/%`)
+      .limit(pageSize);
+    if (error) throw new Error(error.message);
+    if (!data || data.length === 0) return;
+
+    const paths = data.map((item) => item.storage_path);
+    const { error: removeError } = await supabase.storage
+      .from("post-images")
+      .remove(paths);
+    if (removeError) throw new Error(removeError.message);
+
+    const { error: deleteError } = await supabase
+      .from("post_media")
+      .delete()
+      .in("storage_path", paths);
+    if (deleteError) throw new Error(deleteError.message);
+  }
 }
 
 export default function DeleteAccountCard({ username }: { username: string }) {
@@ -53,13 +86,14 @@ export default function DeleteAccountCard({ username }: { username: string }) {
 
     try {
       const { data: userData, error: userError } = await supabase.auth.getUser();
-      const email = userData.user?.email;
-      if (userError || !email) {
+      const user = userData.user;
+      if (userError || !user?.email) {
         throw new Error("not_authenticated");
       }
 
+      // Evita apagar arquivos de quem errou a senha. A RPC valida a senha de novo.
       const { error: verifyError } = await supabase.auth.signInWithPassword({
-        email,
+        email: user.email,
         password,
       });
       if (verifyError) {
@@ -71,7 +105,19 @@ export default function DeleteAccountCard({ username }: { username: string }) {
         return;
       }
 
-      const { error: deleteError } = await supabase.rpc("delete_my_account");
+      const { error: checkError } = await supabase.rpc(
+        "check_my_account_deletable",
+      );
+      if (checkError) {
+        setMessage(getDeleteErrorMessage(checkError.message));
+        return;
+      }
+
+      await removePostImages(supabase, user.id);
+
+      const { error: deleteError } = await supabase.rpc("delete_my_account", {
+        p_password: password,
+      });
       if (deleteError) {
         setMessage(getDeleteErrorMessage(deleteError.message));
         return;
@@ -108,11 +154,12 @@ export default function DeleteAccountCard({ username }: { username: string }) {
         </div>
         <button
           type="button"
+          disabled={isDeleting}
           onClick={() => {
             setIsOpen((open) => !open);
             setMessage("");
           }}
-          className="rounded-lg border border-red-300 bg-red-50 px-3 py-2 text-sm font-semibold text-red-700 hover:bg-red-100"
+          className="rounded-lg border border-red-300 bg-red-50 px-3 py-2 text-sm font-semibold text-red-700 hover:bg-red-100 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isOpen ? "Cancelar" : "Excluir"}
         </button>
