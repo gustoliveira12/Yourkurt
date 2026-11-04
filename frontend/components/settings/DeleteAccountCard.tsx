@@ -111,6 +111,7 @@ export default function DeleteAccountCard({ username }: { username: string }) {
         "check_my_account_deletable",
       );
       if (checkError) {
+        console.error("check_my_account_deletable falhou:", checkError);
         setMessage(getDeleteErrorMessage(checkError.message));
         return;
       }
@@ -121,6 +122,7 @@ export default function DeleteAccountCard({ username }: { username: string }) {
         p_password: password,
       });
       if (deleteError) {
+        console.error("delete_my_account falhou:", deleteError);
         setMessage(getDeleteErrorMessage(deleteError.message));
         return;
       }
@@ -129,6 +131,7 @@ export default function DeleteAccountCard({ username }: { username: string }) {
       router.replace("/login");
       router.refresh();
     } catch (error) {
+      console.error("Falha ao excluir a conta:", error);
       setMessage(
         getDeleteErrorMessage(error instanceof Error ? error.message : ""),
       );
