@@ -4,6 +4,7 @@ import {
   type Icon,
   AlignLeftIcon,
   AlignTopSimpleIcon,
+  BellIcon,
 } from "@phosphor-icons/react";
 import clsx from "clsx";
 import Link from "next/link";
@@ -99,7 +100,11 @@ const PageAside = ({ items }: PageAsideProps) => {
         </div>
         <nav className="flex flex-col justify-center flex-1 p-2">
           <ul className="flex flex-col gap-1">
-            {items.map(({ to, icon: Icon, label, exact }) => {
+            {[...items.filter((item) => item.to !== "/notificacoes"), {
+              to: "/notificacoes",
+              icon: BellIcon,
+              label: "Notificações",
+            }].map(({ to, icon: Icon, label, exact }) => {
               const isActive = isPathActive(pathname, to, exact);
               return (
                 <li key={to}>

@@ -11,7 +11,6 @@ import { useCurrentProfile } from "@/lib/hooks/useCurrentProfile";
 import { createClient } from "@/lib/supabase/client";
 import {
   BellIcon,
-  ChatIcon,
   MegaphoneIcon,
   LockOpenIcon,
   GearSixIcon,
@@ -66,11 +65,6 @@ const NAV_ITEMS = [
     icon: UsersFourIcon,
   },
   {
-    label: "Mensagens",
-    to: "/messages",
-    icon: ChatIcon,
-  },
-  {
     label: "Configurações",
     to: "/settings",
     icon: GearSixIcon,
@@ -97,11 +91,6 @@ const PROFILE_LINKS = [
     text: "Comunidade",
     redirect: "/communities",
     icon: UsersFourIcon,
-  },
-  {
-    text: "Mensagens",
-    redirect: "/messages",
-    icon: ChatIcon,
   },
   {
     text: "Configurações",
