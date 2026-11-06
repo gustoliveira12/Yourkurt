@@ -337,7 +337,7 @@ export default function CreatePostbox({
             value={content}
             onChange={(e) => setContent(e.target.value)}
             onKeyDown={handleKeyDown}
-            maxLength={500}
+            maxLength={2500}
             disabled={submitting}
           />
         </div>
