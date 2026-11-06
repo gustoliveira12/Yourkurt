@@ -13,7 +13,6 @@ import { createClient } from "@/lib/supabase/client";
 import {
   CameraIcon,
   CalendarDotsIcon,
-  ChatIcon,
   GearSixIcon,
   GlobeHemisphereWestIcon,
   HouseIcon,
@@ -41,6 +40,11 @@ type ProfileState = {
   headerUrl: string;
 };
 
+type FollowStats = {
+  followingCount: number;
+  followersCount: number;
+};
+
 const supabase = createClient();
 
 const NAV_ITEMS = [
@@ -63,11 +67,6 @@ const NAV_ITEMS = [
     label: "Comunidade",
     to: "/communities",
     icon: UsersFourIcon,
-  },
-  {
-    label: "Mensagens",
-    to: "/messages",
-    icon: ChatIcon,
   },
   {
     label: "Configurações",
@@ -98,11 +97,6 @@ const PROFILE_LINKS = [
     icon: UsersFourIcon,
   },
   {
-    text: "Mensagens",
-    redirect: "/messages",
-    icon: ChatIcon,
-  },
-  {
     text: "Configurações",
     redirect: "/settings",
     icon: GearSixIcon,
@@ -121,6 +115,11 @@ const INITIAL_PROFILE: ProfileState = {
   headerUrl: "",
 };
 
+const INITIAL_FOLLOW_STATS: FollowStats = {
+  followingCount: 0,
+  followersCount: 0,
+};
+
 const TABS: { key: TabKey; label: string }[] = [
   { key: "posts", label: "Posts" },
   { key: "replies", label: "Respostas" },
@@ -131,6 +130,7 @@ export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState<TabKey>("posts");
   const [isEditing, setIsEditing] = useState(false);
   const [profile, setProfile] = useState<ProfileState>(INITIAL_PROFILE);
+  const [followStats, setFollowStats] = useState<FollowStats>(INITIAL_FOLLOW_STATS);
   const [isLoading, setIsLoading] = useState(true);
   const [saveMessage, setSaveMessage] = useState("");
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
@@ -198,6 +198,26 @@ export default function ProfilePage() {
         avatarUrl: data?.avatar_url ?? "",
         headerUrl: data?.header_url ?? "",
       });
+
+      const [followingResult, followersResult] = await Promise.all([
+        supabase
+          .from("follows")
+          .select("follower_id", { count: "exact", head: true })
+          .eq("follower_id", authUser.id),
+        supabase
+          .from("follows")
+          .select("follower_id", { count: "exact", head: true })
+          .eq("following_id", authUser.id),
+      ]);
+
+      if (followingResult.error || followersResult.error) {
+        setSaveMessage("Não foi possível carregar seguidores/seguindo agora.");
+      } else {
+        setFollowStats({
+          followingCount: followingResult.count ?? 0,
+          followersCount: followersResult.count ?? 0,
+        });
+      }
 
       setIsLoading(false);
     }
@@ -594,11 +614,15 @@ export default function ProfilePage() {
 
                   <div className="mt-4 flex gap-6 text-sm">
                     <span className="text-foreground">
-                      <strong className="font-extrabold">128</strong>{" "}
+                      <strong className="font-extrabold">
+                        {followStats.followingCount}
+                      </strong>{" "}
                       <span className="text-subtitle">seguindo</span>
                     </span>
                     <span className="text-foreground">
-                      <strong className="font-extrabold">2.4k</strong>{" "}
+                      <strong className="font-extrabold">
+                        {followStats.followersCount}
+                      </strong>{" "}
                       <span className="text-subtitle">seguidores</span>
                     </span>
                   </div>

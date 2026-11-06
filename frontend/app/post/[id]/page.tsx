@@ -33,7 +33,6 @@ const NAV_ITEMS = [
   { label: "Perfil", to: "/perfil", icon: UserIcon },
   { label: "Amigos", to: "/friends", icon: UsersIcon },
   { label: "Comunidade", to: "/communities", icon: UsersFourIcon },
-  { label: "Mensagens", to: "/messages", icon: ChatCircleIcon },
   { label: "Configurações", to: "/settings", icon: UserIcon },
 ];
 
@@ -42,7 +41,6 @@ const PROFILE_LINKS = [
   { text: "Perfil", redirect: "/perfil", icon: UserIcon },
   { text: "Amigos", redirect: "/friends", icon: UsersIcon },
   { text: "Comunidade", redirect: "/communities", icon: UsersFourIcon },
-  { text: "Mensagens", redirect: "/messages", icon: ChatCircleIcon },
   { text: "Configurações", redirect: "/settings", icon: UserIcon },
 ];
 

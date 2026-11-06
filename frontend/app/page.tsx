@@ -11,7 +11,6 @@ import {
   UsersIcon,
   UserIcon,
   UsersFourIcon,
-  ChatIcon,
   GearSixIcon,
   GameControllerIcon,
   MusicNotesIcon,
@@ -41,11 +40,6 @@ const NAV_ITEMS = [
     label: "Comunidade",
     to: "/communities",
     icon: UsersFourIcon,
-  },
-  {
-    label: "Mensagens",
-    to: "/messages",
-    icon: ChatIcon,
   },
   {
     label: "Configurações",
