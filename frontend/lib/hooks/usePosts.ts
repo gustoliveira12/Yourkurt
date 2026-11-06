@@ -1,7 +1,7 @@
 "use client";
 
 import { createClient } from "@/lib/supabase/client";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 const supabase = createClient();
 
@@ -57,19 +57,28 @@ type RawTeamPage = {
   avatar_url: string | null;
 };
 
-export function usePosts() {
+export function usePosts(authorId?: string | null) {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [deletingPostId, setDeletingPostId] = useState<string | null>(null);
+  const requestId = useRef(0);
 
   const fetchPosts = useCallback(async () => {
+    if (authorId === null) return;
+    const currentRequest = ++requestId.current;
     setLoading(true);
     setError(null);
-    const { data, error } = await supabase
+    let query = supabase
       .from("posts")
       .select<string, RawPost>("*, media:post_media(*)")
-      .eq("is_public", true)
+      .eq("is_public", true);
+
+    if (authorId !== undefined) {
+      query = query.eq("user_id", authorId);
+    }
+
+    const { data, error } = await query
       .order("created_at", { ascending: false })
       .limit(50);
 
@@ -151,16 +160,19 @@ const mappedPosts = rawPosts.map((item) => {
         };
       });
 
+      if (currentRequest !== requestId.current) return;
       setPosts(mappedPosts);
     } else if (error) {
+      if (currentRequest !== requestId.current) return;
       setError(error.message);
     }
     setLoading(false);
-  }, []);
+  }, [authorId]);
 
 useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     void fetchPosts();
+    return () => { requestId.current += 1; };
   }, [fetchPosts]);
 
   const addPost = useCallback(
