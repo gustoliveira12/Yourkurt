@@ -2,6 +2,7 @@
 
 import { Avatar } from "@/components/Avatar";
 import MobileHeader from "@/components/navigation/MobileHeader";
+import MobileNav from "@/components/navigation/MobileNav";
 import PageAside from "@/components/navigation/NavBar";
 import ProfileSidebar from "@/components/navigation/ProfileSidebar";
 import PostCard from "@/components/UserPost";
@@ -68,7 +69,7 @@ export default function PublicProfilePage() {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const { posts, loading: postsLoading } = usePosts();
+  const { posts, loading: postsLoading, error: postsError } = usePosts(profile?.id ?? null);
 
   useEffect(() => {
     async function load() {
@@ -117,8 +118,6 @@ export default function PublicProfilePage() {
 
     void load();
   }, [username, router]);
-
-  const userPosts = profile ? posts.filter((p) => p.user_id === profile.id) : [];
 
   return (
     <div className="w-dvw min-h-dvh overflow-hidden relative flex h-screen items-center justify-center bg-background font-sans gap-4">
@@ -223,12 +222,16 @@ export default function PublicProfilePage() {
                     <li className="py-8 text-center text-foreground-muted">
                       Carregando posts...
                     </li>
-                  ) : userPosts.length === 0 ? (
+                  ) : postsError ? (
+                    <li className="py-8 text-center text-red-600">
+                      Não foi possível carregar as publicações.
+                    </li>
+                  ) : posts.length === 0 ? (
                     <li className="py-8 text-center text-foreground-muted">
                       Sem novos posts por aqui.
                     </li>
                   ) : (
-                    userPosts.map((post) => (
+                    posts.map((post) => (
                       <li key={post.id} className="py-4">
                         <PostCard post={post} detailHref={`/post/${post.id}`} />
                       </li>
@@ -240,6 +243,7 @@ export default function PublicProfilePage() {
           )}
         </section>
       </main>
+      <MobileNav />
     </div>
   );
 }

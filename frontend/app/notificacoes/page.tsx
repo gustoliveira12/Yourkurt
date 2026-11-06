@@ -35,16 +35,24 @@ const NAV_ITEMS = [
   { label: "Configurações", to: "/settings", icon: GearSixIcon },
 ];
 
-function fetchNotifications(userId: string, offset: number) {
-  return supabase
+function fetchNotifications(userId: string, cursor?: Pick<Notification, "created_at" | "id">) {
+  let query = supabase
     .from("notifications")
     .select<string, Notification>(
       "id, type, created_at, read_at, actor:profiles!notifications_actor_id_fkey(name, username, avatar_url)",
     )
-    .eq("user_id", userId)
+    .eq("user_id", userId);
+
+  if (cursor) {
+    query = query.or(
+      `created_at.lt."${cursor.created_at}",and(created_at.eq."${cursor.created_at}",id.lt.${cursor.id})`,
+    );
+  }
+
+  return query
     .order("created_at", { ascending: false })
     .order("id", { ascending: false })
-    .range(offset, offset + PAGE_SIZE - 1);
+    .limit(PAGE_SIZE);
 }
 
 export default function NotificationsPage() {
@@ -56,17 +64,18 @@ export default function NotificationsPage() {
   const [markingRead, setMarkingRead] = useState(false);
   const userId = profile?.id;
 
-  async function loadNotifications(offset: number) {
+  async function loadNotifications() {
     if (!userId) return;
     setLoading(true);
     setError("");
-    const { data, error: queryError } = await fetchNotifications(userId, offset);
+    const cursor = notifications[notifications.length - 1];
+    const { data, error: queryError } = await fetchNotifications(userId, cursor);
 
     if (queryError) {
       console.error("Erro ao carregar notificações:", queryError);
       setError("Não foi possível carregar as notificações. Tente novamente.");
     } else {
-      setNotifications((previous) => offset === 0 ? data : [...previous, ...data]);
+      setNotifications((previous) => cursor ? [...previous, ...data] : data);
       setHasMore(data.length === PAGE_SIZE);
     }
     setLoading(false);
@@ -77,7 +86,7 @@ export default function NotificationsPage() {
     let active = true;
 
     async function loadInitialNotifications(id: string) {
-      const { data, error: queryError } = await fetchNotifications(id, 0);
+      const { data, error: queryError } = await fetchNotifications(id);
       if (!active) return;
       if (queryError) {
         console.error("Erro ao carregar notificações:", queryError);
@@ -189,7 +198,7 @@ export default function NotificationsPage() {
                 <button
                   type="button"
                   disabled={loading}
-                  onClick={() => void loadNotifications(notifications.length)}
+                  onClick={() => void loadNotifications()}
                   className="text-sm font-semibold text-foreground-brand hover:underline disabled:opacity-50"
                 >
                   {loading ? "Carregando..." : error ? "Tentar novamente" : "Carregar mais"}
