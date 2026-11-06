@@ -357,7 +357,7 @@ community_id: rawPost.community_id ?? null,
                     value={commentContent}
                     onChange={(e) => setCommentContent(e.target.value)}
                     placeholder="Publicar sua resposta"
-                    maxLength={500}
+                    maxLength={2500}
                     className="min-h-24 w-full resize-none rounded-2xl border border-border-base bg-background px-4 py-3 text-foreground placeholder:text-foreground-muted outline-none"
                   />
                   <div className="mt-3 flex items-center justify-between gap-3">
