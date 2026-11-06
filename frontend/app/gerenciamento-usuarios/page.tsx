@@ -7,7 +7,6 @@ import ProfileSidebar from "@/components/navigation/ProfileSidebar";
 import { useCurrentProfile } from "@/lib/hooks/useCurrentProfile";
 import { createClient } from "@/lib/supabase/client";
 import {
-  ChatIcon,
   GearSixIcon,
   HouseIcon,
   MagnifyingGlassIcon,
@@ -37,7 +36,6 @@ const NAV_ITEMS = [
   { label: "Perfil", to: "/perfil", icon: UserIcon },
   { label: "Amigos", to: "/friends", icon: UsersIcon },
   { label: "Comunidade", to: "/communities", icon: UsersFourIcon },
-  { label: "Mensagens", to: "/messages", icon: ChatIcon },
   { label: "Configurações", to: "/settings", icon: GearSixIcon },
 ];
 
@@ -46,7 +44,6 @@ const PROFILE_LINKS = [
   { text: "Perfil", redirect: "/perfil", icon: UserIcon },
   { text: "Amigos", redirect: "/friends", icon: UsersIcon },
   { text: "Comunidade", redirect: "/communities", icon: UsersFourIcon },
-  { text: "Mensagens", redirect: "/messages", icon: ChatIcon },
   { text: "Configurações", redirect: "/settings", icon: GearSixIcon },
 ];
 
