@@ -1,6 +1,6 @@
 # Yourkurt
 
-Yourkurt é uma rede social interna inspirada no Orkut, focada em perfis, posts e interações entre usuários de um mesmo ambiente organizacional. O projeto está em desenvolvimento ativo.
+Yourkurt é uma rede social interna inspirada no Orkut, focada em perfis, posts e interações entre usuários de um mesmo ambiente organizacional. É um projeto da turma 17256 dos aprendizes do Espro e está em desenvolvimento ativo.
 
 ## Funcionalidades
 
@@ -59,76 +59,28 @@ Yourkurt/
 └── backend/           Reservado para um backend próprio (vazio)
 ```
 
-## Como rodar localmente
+## Rodando localmente
 
-### Pré-requisitos
-
-- Node.js 20.9 ou superior.
-- pnpm 10 (`corepack enable` instala a versão definida no `package.json`).
-- Um projeto no Supabase **ou** o [Supabase CLI](https://supabase.com/docs/guides/local-development) com Docker, para rodar o banco localmente.
-
-### 1. Instalar as dependências
-
-As dependências ficam em `frontend/`:
+As dependências e o `.env.local` ficam em `frontend/`, não na raiz:
 
 ```bash
-git clone <url-do-repositorio>
-cd Yourkurt/frontend
+cd frontend
 pnpm install
+pnpm dev        # http://localhost:3000
 ```
 
-### 2. Configurar as variáveis de ambiente
-
-Crie o arquivo `frontend/.env.local`:
+O `frontend/.env.local` precisa de:
 
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=<url-do-projeto-no-supabase>
 NEXT_PUBLIC_SUPABASE_ANON_KEY=<chave-anon-do-supabase>
 ```
 
-Com um projeto na nuvem, os valores ficam em **Project Settings → API**. Com o banco local, veja o passo 3.
+Para usar um banco local, rode `supabase start` e `supabase db reset` na raiz. O seed cria os usuários `dev1@yourkurt.test` e `dev2@yourkurt.test`, com a senha `dev123`.
 
-### 3. (Opcional) Subir o Supabase localmente
+## Migrations
 
-Na raiz do repositório:
-
-```bash
-supabase start      # sobe o Supabase local com Docker
-supabase db reset   # aplica todas as migrations e o seed.sql
-supabase status     # mostra a URL e a chave anon para o .env.local
-```
-
-O `seed.sql` cria os usuários `dev1@yourkurt.test` e `dev2@yourkurt.test`, ambos com a senha `dev123`.
-
-### 4. Rodar a aplicação
-
-```bash
-cd frontend
-pnpm dev
-```
-
-Ou, a partir da raiz, `pnpm dev:front`. A aplicação abre em `http://localhost:3000`.
-
-### Outros comandos (em `frontend/`)
-
-| Comando      | O que faz                          |
-|--------------|------------------------------------|
-| `pnpm build` | Gera o build de produção           |
-| `pnpm start` | Roda o build de produção           |
-| `pnpm lint`  | Roda o ESLint                      |
-
-## Banco de dados e migrations
-
-Toda alteração no banco entra como um novo arquivo em `supabase/migrations/`, nomeado com o timestamp na frente (`AAAAMMDDHHMMSS_descricao.sql`).
-
-Para aplicar as migrations pendentes no projeto remoto:
-
-```bash
-supabase link --project-ref <ref-do-projeto>   # só na primeira vez
-supabase db push
-```
-
-Commite o arquivo da migration logo depois do `db push`. Se o banco remoto tiver uma migration que não existe no repositório, o próximo `db push` de outra pessoa falha.
+Alterações no banco entram como novos arquivos em `supabase/migrations/` e são aplicadas com `supabase db push`. Commite a migration logo depois do push: se o banco remoto tiver uma migration que não está no repositório, o próximo `db push` de outra pessoa falha.
 
 ## Status do projeto
 
@@ -144,7 +96,6 @@ Commite o arquivo da migration logo depois do `db push`. Se o banco remoto tiver
 | Seguir usuários                              | Em andamento    |
 | Comunidades                                  | Em andamento    |
 | Amigos                                       | Em andamento    |
-| Mensagens                                    | Não iniciado    |
 | Backend próprio                              | Não iniciado    |
 
 ## Próximos passos
@@ -152,6 +103,5 @@ Commite o arquivo da migration logo depois do `db push`. Se o banco remoto tiver
 - Botão de seguir e deixar de seguir nos perfis públicos (o banco e as notificações de "seguir" já existem).
 - Telas de comunidades: listagem, criação e página da comunidade (o schema já existe, as rotas ainda são esqueletos).
 - Fluxo de amizades (enviar e aceitar pedidos).
-- Mensagens entre usuários.
 - Definir as responsabilidades do backend próprio.
 - Refinar detalhes visuais (stories, menu, interações de hover).
