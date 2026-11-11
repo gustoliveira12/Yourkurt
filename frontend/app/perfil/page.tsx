@@ -759,7 +759,7 @@ export default function ProfilePage() {
                                   </div>
                                 </div>
 
-                                <p className="mt-3 line-clamp-3 whitespace-pre-wrap text-sm text-foreground">
+                                <p className="mt-3 line-clamp-3 whitespace-pre-wrap break-words text-sm text-foreground">
                                   {reply.posts.content}
                                 </p>
 
@@ -788,7 +788,7 @@ export default function ProfilePage() {
                               <p className="text-xs font-bold uppercase tracking-wider text-subtitle">
                                 Seu comentário
                               </p>
-                              <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-foreground">
+                              <p className="mt-2 whitespace-pre-wrap break-words text-sm leading-relaxed text-foreground">
                                 {reply.content}
                               </p>
                             </div>

@@ -4,6 +4,7 @@ import { Camera, Music, Pin, Send, SmilePlus } from "lucide-react";
 import { Avatar } from "./Avatar";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { MAX_CONTENT_LENGTH } from "@/lib/constants";
 import imageCompression from "browser-image-compression";
 import type { Post, PostMedia } from "@/lib/hooks/usePosts";
 
@@ -337,7 +338,7 @@ export default function CreatePostbox({
             value={content}
             onChange={(e) => setContent(e.target.value)}
             onKeyDown={handleKeyDown}
-            maxLength={2500}
+            maxLength={MAX_CONTENT_LENGTH}
             disabled={submitting}
           />
         </div>

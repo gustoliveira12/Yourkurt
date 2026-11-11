@@ -9,6 +9,7 @@ import { useInteractions } from "@/lib/hooks/useInteractions";
 import { useComments, type CommentItem } from "@/lib/hooks/useComments";
 import { type Post, type PostMedia } from "@/lib/hooks/usePosts";
 import { createClient } from "@/lib/supabase/client";
+import { MAX_CONTENT_LENGTH } from "@/lib/constants";
 import {
   ArrowLeftIcon,
   CalendarDotsIcon,
@@ -281,7 +282,7 @@ community_id: rawPost.community_id ?? null,
                       <span className="text-subtitle">·</span>
                       <span className="text-subtitle">{timeAgo(post.created_at)}</span>
                     </div>
-                    <p className="mt-3 whitespace-pre-wrap text-foreground leading-relaxed">
+                    <p className="mt-3 whitespace-pre-wrap break-words text-foreground leading-relaxed">
                       {post.content}
                     </p>
                   </div>
@@ -357,7 +358,7 @@ community_id: rawPost.community_id ?? null,
                     value={commentContent}
                     onChange={(e) => setCommentContent(e.target.value)}
                     placeholder="Publicar sua resposta"
-                    maxLength={2500}
+                    maxLength={MAX_CONTENT_LENGTH}
                     className="min-h-24 w-full resize-none rounded-2xl border border-border-base bg-background px-4 py-3 text-foreground placeholder:text-foreground-muted outline-none"
                   />
                   <div className="mt-3 flex items-center justify-between gap-3">
@@ -415,7 +416,7 @@ community_id: rawPost.community_id ?? null,
                           <span className="text-subtitle">·</span>
                           <span className="text-subtitle">{timeAgo(comment.created_at)}</span>
                         </div>
-                        <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-foreground">
+                        <p className="mt-2 whitespace-pre-wrap break-words text-sm leading-relaxed text-foreground">
                           {comment.content}
                         </p>
                       </div>

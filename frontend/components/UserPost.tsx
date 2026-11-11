@@ -157,13 +157,13 @@ export default function PostCard({
         </div>
         {detailHref ? (
           <Link href={detailHref} className="block">
-            <span className="font-medium whitespace-pre-wrap hover:underline">
+            <span className="font-medium whitespace-pre-wrap break-words hover:underline">
               {post.content}
             </span>
           </Link>
         ) : (
           <div>
-            <span className="font-medium whitespace-pre-wrap">{post.content}</span>
+            <span className="font-medium whitespace-pre-wrap break-words">{post.content}</span>
           </div>
         )}
       </div>
