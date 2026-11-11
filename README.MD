@@ -1,117 +1,157 @@
 # Yourkurt
 
-Yourkurt é uma rede social interna inspirada no Orkut, focada em perfis, posts e interações entre usuários de um mesmo ambiente organizacional. O projeto está em desenvolvimento ativo e já oferece autenticação, perfil, feed de posts, curtidas e navegação mobile.
+Yourkurt é uma rede social interna inspirada no Orkut, focada em perfis, posts e interações entre usuários de um mesmo ambiente organizacional. O projeto está em desenvolvimento ativo.
 
-## Funcionalidades Principais
+## Funcionalidades
 
-- Autenticação (login e cadastro de usuários).
-- Perfis com avatar e imagem de capa.
-- Feed de posts com limite de 500 caracteres.
-- Curtidas, contagem de interações e exibição de dados do autor.
-- Navegação mobile integrada ao layout principal.
-- Alternância entre tema claro e escuro, com persistência local de preferências visuais.
+**Conta e autenticação**
+- Cadastro com verificação de e-mail e login.
+- Recuperação de senha por e-mail e troca de senha nas configurações.
+- Exclusão da própria conta.
 
-## Stack Tecnológica
+**Perfis**
+- Perfil com avatar, imagem de capa e dados editáveis.
+- Perfis públicos em `/perfil/<username>`, com contagem de seguidores e seguindo.
 
-O projeto utiliza a seguinte stack:
+**Posts e interações**
+- Feed de posts com até 2.500 caracteres e várias imagens por post (comprimidas no navegador antes do envio).
+- Página de detalhe do post com comentários de até 2.500 caracteres.
+- Curtidas e contagem de comentários e reposts.
+- Aba de respostas no perfil.
 
-| Camada                 | Tecnologia                                |
-|------------------------|-------------------------------------------|
-| Framework              | Next.js 16.2.4 (App Router)               |
-| Interface              | React 19.2.4                              |
-| Linguagem              | TypeScript                                |
-| Estilização            | Tailwind CSS 4                            |
-| Componentes de UI      | Radix UI                                  |
-| Ícones                 | Lucide React e Phosphor Icons             |
-| Backend as a Service   | Supabase (Supabase JS e Supabase SSR)     |
-| Gerenciador de pacotes | pnpm                                      |
-| Hospedagem             | Vercel                                    |
+**Páginas de equipe e administração**
+- Páginas de equipe: membros autorizados podem publicar em nome da equipe.
+- Painel de gerenciamento de usuários e permissões (`/gerenciamento-usuarios`), restrito ao super admin.
 
-Supabase é utilizado como Backend as a Service, fornecendo autenticação, banco de dados PostgreSQL, armazenamento de arquivos e consultas.
+**Outros**
+- Notificações (por exemplo, novos seguidores), com marcação de lidas.
+- Tema claro e escuro, com a preferência salva no navegador.
+- Navegação mobile e página 404 personalizada.
 
-## Estrutura do Repositório
+## Stack
 
-A estrutura de alto nível do monorepo é:
+| Camada                 | Tecnologia                                 |
+|------------------------|--------------------------------------------|
+| Framework              | Next.js 16 (App Router)                    |
+| Interface              | React 19                                   |
+| Linguagem              | TypeScript                                 |
+| Estilização            | Tailwind CSS 4                             |
+| Componentes de UI      | Radix UI                                   |
+| Ícones                 | Lucide React e Phosphor Icons              |
+| Backend as a Service   | Supabase (Auth, PostgreSQL, Storage)       |
+| Gerenciador de pacotes | pnpm                                       |
+| Hospedagem             | Vercel                                     |
+
+O frontend fala direto com o Supabase. As regras de acesso ficam no banco, em policies de RLS, triggers e funções definidas nas migrations de `supabase/migrations`.
+
+## Estrutura do repositório
 
 ```text
 Yourkurt/
-├── frontend/   Aplicação Next.js
-├── backend/    Reservado para backend próprio
-├── supabase/   Migrations e configuração do Supabase
-├── package.json
-└── pnpm-lock.yaml
+├── frontend/          Aplicação Next.js
+│   ├── app/           Rotas (App Router)
+│   ├── components/    Componentes de interface
+│   └── lib/           Hooks, cliente Supabase e utilitários
+├── supabase/
+│   ├── migrations/    Schema, policies, triggers e buckets
+│   ├── seed.sql       Dados falsos para o ambiente local
+│   └── config.toml    Configuração do Supabase CLI
+└── backend/           Reservado para um backend próprio (vazio)
 ```
-
-- `frontend/`: código da aplicação web (App Router, componentes, hooks).
-- `backend/`: diretório reservado para um backend próprio futuro.
-- `supabase/`: scripts de migrations, configuração de buckets, triggers e policies.
 
 ## Como rodar localmente
 
 ### Pré-requisitos
 
-- Node.js (versão compatível com Next.js 16.x).
-- pnpm instalado globalmente.
-- Conta e projeto no Supabase configurados.
+- Node.js 20.9 ou superior.
+- pnpm 10 (`corepack enable` instala a versão definida no `package.json`).
+- Um projeto no Supabase **ou** o [Supabase CLI](https://supabase.com/docs/guides/local-development) com Docker, para rodar o banco localmente.
 
-### Passos
+### 1. Instalar as dependências
 
-1. Clonar o repositório:
+As dependências ficam em `frontend/`:
 
-   ```bash
-   git clone <url-do-repositorio>
-   cd Yourkurt
-   ```
+```bash
+git clone <url-do-repositorio>
+cd Yourkurt/frontend
+pnpm install
+```
 
-2. Instalar dependências:
+### 2. Configurar as variáveis de ambiente
 
-   ```bash
-   pnpm install
-   ```
+Crie o arquivo `frontend/.env.local`:
 
-3. Configurar as variáveis de ambiente (por exemplo em `.env.local`):
+```bash
+NEXT_PUBLIC_SUPABASE_URL=<url-do-projeto-no-supabase>
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<chave-anon-do-supabase>
+```
 
-   ```bash
-   NEXT_PUBLIC_SUPABASE_URL=<url-do-projeto-no-supabase>
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=<chave-anon-do-supabase>
-   ```
+Com um projeto na nuvem, os valores ficam em **Project Settings → API**. Com o banco local, veja o passo 3.
 
-   A aplicação depende dessas variáveis para se conectar ao backend de dados.
+### 3. (Opcional) Subir o Supabase localmente
 
-4. Subir o ambiente de desenvolvimento:
+Na raiz do repositório:
 
-   ```bash
-   cd frontend
-   pnpm dev
-   ```
+```bash
+supabase start      # sobe o Supabase local com Docker
+supabase db reset   # aplica todas as migrations e o seed.sql
+supabase status     # mostra a URL e a chave anon para o .env.local
+```
 
-5. Acessar no navegador:
+O `seed.sql` cria os usuários `dev1@yourkurt.test` e `dev2@yourkurt.test`, ambos com a senha `dev123`.
 
-   - `http://localhost:3000`
+### 4. Rodar a aplicação
 
-## Status do Projeto
+```bash
+cd frontend
+pnpm dev
+```
 
-O status atual das principais áreas é:
+Ou, a partir da raiz, `pnpm dev:front`. A aplicação abre em `http://localhost:3000`.
 
-| Área                                   | Status        |
-|----------------------------------------|---------------|
-| Autenticação (login e cadastro)        | Concluído     |
-| Feed e criação de posts                | Concluído     |
-| Perfil de usuário                      | Concluído     |
-| Curtidas e interações                  | Concluído     |
-| Upload de arquivos (Supabase Storage)  | Concluído     |
-| Navegação mobile                       | Concluído     |
-| Amigos                                 | Não iniciado  |
-| Comunidades                            | Não iniciado  |
-| Mensagens                              | Não iniciado  |
-| Backend próprio                        | Não iniciado  |
+### Outros comandos (em `frontend/`)
 
-Essas informações são detalhadas na Documentação Técnica do projeto.
+| Comando      | O que faz                          |
+|--------------|------------------------------------|
+| `pnpm build` | Gera o build de produção           |
+| `pnpm start` | Roda o build de produção           |
+| `pnpm lint`  | Roda o ESLint                      |
 
-## Roadmap (Próximos Passos)
+## Banco de dados e migrations
 
-- Implementar páginas de amigos, comunidades e mensagens.
-- Implementar o backend próprio e definir suas responsabilidades.
-- Aplicar migrations pendentes no ambiente Supabase.
+Toda alteração no banco entra como um novo arquivo em `supabase/migrations/`, nomeado com o timestamp na frente (`AAAAMMDDHHMMSS_descricao.sql`).
+
+Para aplicar as migrations pendentes no projeto remoto:
+
+```bash
+supabase link --project-ref <ref-do-projeto>   # só na primeira vez
+supabase db push
+```
+
+Commite o arquivo da migration logo depois do `db push`. Se o banco remoto tiver uma migration que não existe no repositório, o próximo `db push` de outra pessoa falha.
+
+## Status do projeto
+
+| Área                                         | Status          |
+|----------------------------------------------|-----------------|
+| Autenticação, recuperação de senha e conta   | Concluído       |
+| Perfil e perfis públicos                     | Concluído       |
+| Feed, posts com imagens e comentários        | Concluído       |
+| Curtidas e interações                        | Concluído       |
+| Notificações                                 | Concluído       |
+| Páginas de equipe e gestão de usuários       | Concluído       |
+| Navegação mobile e tema claro/escuro         | Concluído       |
+| Seguir usuários                              | Em andamento    |
+| Comunidades                                  | Em andamento    |
+| Amigos                                       | Em andamento    |
+| Mensagens                                    | Não iniciado    |
+| Backend próprio                              | Não iniciado    |
+
+## Próximos passos
+
+- Botão de seguir e deixar de seguir nos perfis públicos (o banco e as notificações de "seguir" já existem).
+- Telas de comunidades: listagem, criação e página da comunidade (o schema já existe, as rotas ainda são esqueletos).
+- Fluxo de amizades (enviar e aceitar pedidos).
+- Mensagens entre usuários.
+- Definir as responsabilidades do backend próprio.
 - Refinar detalhes visuais (stories, menu, interações de hover).
-- Finalizar a funcionalidade completa de comunidades.
