@@ -17,6 +17,7 @@ import { useState } from "react";
 import { useLikes } from "@/lib/hooks/useLikes";
 import { useInteractions } from "@/lib/hooks/useInteractions";
 import type { Post } from "@/lib/hooks/usePosts";
+import { profileHref } from "@/lib/profile";
 import { createClient } from "@/lib/supabase/client";
 
 const supabase = createClient();
@@ -57,6 +58,9 @@ export default function PostCard({
   const { interactions, loading: loadingInteractions } = useInteractions(post.id);
 
   const author = post.profiles;
+  const authorName = author?.name ?? "Usuário";
+  // Posts de equipe não têm link: ainda não existe tela de equipe.
+  const authorHref = post.author_team_page_id ? null : profileHref(author?.username);
   const postImages = post.media
     .filter((item) => item.media_type === "image")
     .map(
@@ -98,37 +102,39 @@ export default function PostCard({
     <div className="flex flex-col md:py-4 md:w-full md:rounded-card md:bg-surface md:shadow-card gap-2 w-dvw">
       <div className="flex flex-col gap-4 px-3">
         <div className="flex justify-between items-center">
-          {detailHref ? (
-            <Link href={detailHref} className="flex gap-4 group min-w-0 flex-1">
-              <div>
+          <div className="flex gap-4 min-w-0 flex-1">
+            {/* Foto e nome levam ao perfil do autor; texto, imagens e hora, ao post. */}
+            {authorHref ? (
+              <Link href={authorHref} tabIndex={-1} aria-hidden="true" className="shrink-0">
+                <Avatar src={author?.avatar_url ?? null} />
+              </Link>
+            ) : (
+              <div className="shrink-0">
                 <Avatar src={author?.avatar_url ?? null} />
               </div>
-              <div className="flex flex-col min-w-0">
-                <h3 className="text-lg font-bold text-foreground cursor-pointer group-hover:underline truncate">
-                  {author?.name ?? "Usuário"}
-                </h3>
-                <div className="flex gap-4 text-subtitle flex-wrap">
-                  <span>@{author?.username ?? "usuario"}</span>
+            )}
+            <div className="flex flex-col min-w-0">
+              <h3 className="text-lg font-bold text-foreground truncate">
+                {authorHref ? (
+                  <Link href={authorHref} className="hover:underline">
+                    {authorName}
+                  </Link>
+                ) : (
+                  authorName
+                )}
+              </h3>
+              <div className="flex gap-4 text-subtitle flex-wrap">
+                <span>@{author?.username ?? "usuario"}</span>
+                {detailHref ? (
+                  <Link href={detailHref} className="hover:underline">
+                    {timeAgo(post.created_at)}
+                  </Link>
+                ) : (
                   <span>{timeAgo(post.created_at)}</span>
-                </div>
-              </div>
-            </Link>
-          ) : (
-            <div className="flex gap-4 ">
-              <div>
-                <Avatar src={author?.avatar_url ?? null} />
-              </div>
-              <div className="flex flex-col">
-                <h3 className="text-lg font-bold text-foreground cursor-pointer">
-                  {author?.name ?? "Usuário"}
-                </h3>
-                <div className="flex gap-4 text-subtitle">
-                  <span>@{author?.username ?? "usuario"}</span>
-                  <span>{timeAgo(post.created_at)}</span>
-                </div>
+                )}
               </div>
             </div>
-          )}
+          </div>
           <div className="relative">
             <button
               type="button"
