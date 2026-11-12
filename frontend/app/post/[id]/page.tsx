@@ -4,12 +4,14 @@ import MobileHeader from "@/components/navigation/MobileHeader";
 import MobileNav from "@/components/navigation/MobileNav";
 import PageAside from "@/components/navigation/NavBar";
 import ProfileSidebar from "@/components/navigation/ProfileSidebar";
+import { ProfileLink } from "@/components/ProfileLink";
 import { useCurrentProfile } from "@/lib/hooks/useCurrentProfile";
 import { useInteractions } from "@/lib/hooks/useInteractions";
 import { useComments, type CommentItem } from "@/lib/hooks/useComments";
 import { type Post, type PostMedia } from "@/lib/hooks/usePosts";
 import { createClient } from "@/lib/supabase/client";
 import { MAX_CONTENT_LENGTH } from "@/lib/constants";
+import { profileHref } from "@/lib/profile";
 import {
   ArrowLeftIcon,
   CalendarDotsIcon,
@@ -228,6 +230,10 @@ community_id: rawPost.community_id ?? null,
 
   const currentImage = viewerIndex !== null ? postImages[viewerIndex] : null;
 
+
+  // Posts de equipe não têm link: ainda não existe tela de equipe.
+  const postAuthorHref = post?.author_team_page_id ? null : profileHref(post?.profiles?.username);
+
   return (
     <div className="w-dvw min-h-dvh overflow-hidden relative flex h-screen items-center justify-center bg-background font-sans gap-4">
       <PageAside items={NAV_ITEMS} />
@@ -266,7 +272,12 @@ community_id: rawPost.community_id ?? null,
             ) : post ? (
               <article className="p-4 md:p-6 border-b border-border-base">
                 <div className="flex items-start gap-3">
-                  <div className="size-12 overflow-hidden rounded-full">
+                  <ProfileLink
+                    href={postAuthorHref}
+                    tabIndex={-1}
+                    aria-hidden="true"
+                    className="size-12 shrink-0 overflow-hidden rounded-full"
+                  >
                     <Image
                       src={post.profiles?.avatar_url ?? "/favicon.ico"}
                       alt={post.profiles?.name ?? "Usuário"}
@@ -274,10 +285,14 @@ community_id: rawPost.community_id ?? null,
                       height={48}
                       className="h-full w-full object-cover"
                     />
-                  </div>
+                  </ProfileLink>
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                      <h2 className="font-bold text-foreground">{post.profiles?.name ?? "Usuário"}</h2>
+                      <h2 className="font-bold text-foreground">
+                        <ProfileLink href={postAuthorHref} className="hover:underline">
+                          {post.profiles?.name ?? "Usuário"}
+                        </ProfileLink>
+                      </h2>
                       <span className="text-subtitle">@{post.profiles?.username ?? "usuario"}</span>
                       <span className="text-subtitle">·</span>
                       <span className="text-subtitle">{timeAgo(post.created_at)}</span>
@@ -398,7 +413,12 @@ community_id: rawPost.community_id ?? null,
                 <div className="flex flex-col gap-4">
                   {comments.map((comment) => (
                     <div key={comment.id} className="flex gap-3 rounded-2xl border border-border-base bg-background p-4">
-                      <div className="size-10 overflow-hidden rounded-full">
+                      <ProfileLink
+                        href={profileHref(comment.profiles?.username)}
+                        tabIndex={-1}
+                        aria-hidden="true"
+                        className="size-10 shrink-0 overflow-hidden rounded-full"
+                      >
                         <Image
                           src={comment.profiles?.avatar_url ?? "/favicon.ico"}
                           alt={comment.profiles?.name ?? "Usuário"}
@@ -406,12 +426,15 @@ community_id: rawPost.community_id ?? null,
                           height={40}
                           className="h-full w-full object-cover"
                         />
-                      </div>
+                      </ProfileLink>
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm">
-                          <span className="font-bold text-foreground">
+                          <ProfileLink
+                            href={profileHref(comment.profiles?.username)}
+                            className="font-bold text-foreground hover:underline"
+                          >
                             {comment.profiles?.name ?? "Usuário"}
-                          </span>
+                          </ProfileLink>
                           <span className="text-subtitle">@{comment.profiles?.username ?? "usuario"}</span>
                           <span className="text-subtitle">·</span>
                           <span className="text-subtitle">{timeAgo(comment.created_at)}</span>
