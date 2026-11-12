@@ -27,7 +27,7 @@ export default function SignupPage() {
   const [themePreference, setThemePreference] = useState<
     "system" | "light" | "dark"
   >("system");
-  const [receiveProductUpdates, setReceiveProductUpdates] = useState(true);
+  const [receiveProductUpdates, setReceiveProductUpdates] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -219,7 +219,7 @@ export default function SignupPage() {
                       Perfil privado
                     </span>
                     <span className="text-sm text-subtitle">
-                      Somente pessoas aprovadas podem ver seus posts.
+                      Só quem você aprovar vê seus posts e dados pessoais.
                     </span>
                   </span>
                 </label>
@@ -237,7 +237,7 @@ export default function SignupPage() {
                       Receber novidades do produto
                     </span>
                     <span className="text-sm text-subtitle">
-                      Envio de recursos novos e melhorias da plataforma.
+                      Avisos por e-mail sobre recursos novos. Opcional.
                     </span>
                   </span>
                 </label>
@@ -281,6 +281,17 @@ export default function SignupPage() {
               <div className="flex flex-col gap-1">
                 <p className="text-xs text-subtitle">
                   * O preenchimento do campo é obrigatório.
+                </p>
+                <p className="text-xs text-subtitle">
+                  Ao criar a conta, você declara ter lido a{" "}
+                  <Link
+                    href="/privacidade"
+                    target="_blank"
+                    className="font-semibold text-foreground-brand underline"
+                  >
+                    Política de Privacidade
+                  </Link>
+                  .
                 </p>
                 <p className="text-sm text-subtitle">
                   Já tem conta?{" "}

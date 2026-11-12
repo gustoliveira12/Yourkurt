@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { getAuthErrorMessage } from "@/lib/password";
 import { createClient } from "@/lib/supabase/client";
+import { PROFILE_IMAGE_BUCKETS, removeUserFiles } from "@/lib/storage";
 
 function normalizeHandle(value: string) {
   return value.trim().replace(/^@/, "");
@@ -36,7 +37,7 @@ function getDeleteErrorMessage(rawMessage: string) {
 type SupabaseClient = ReturnType<typeof createClient>;
 
 // O banco não consegue apagar arquivos do Storage, então removemos as imagens
-// dos posts do usuário antes de apagar a conta.
+// do usuário (posts, avatar e capa) antes de apagar a conta.
 async function removePostImages(supabase: SupabaseClient, userId: string) {
   const pageSize = 100;
   for (;;) {
@@ -117,6 +118,9 @@ export default function DeleteAccountCard({ username }: { username: string }) {
       }
 
       await removePostImages(supabase, user.id);
+      for (const bucket of PROFILE_IMAGE_BUCKETS) {
+        await removeUserFiles(supabase, bucket, user.id);
+      }
 
       const { error: deleteError } = await supabase.rpc("delete_my_account", {
         p_password: password,

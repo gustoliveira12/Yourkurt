@@ -16,6 +16,7 @@ const PUBLIC_ROUTES = new Set([
   ...GUEST_ONLY_ROUTES,
   "/auth/confirm",
   "/esqueci-senha",
+  "/privacidade",
 ]);
 
 const SUPER_ADMIN_ROUTES = new Set(["/gerenciamento-usuarios", "/super-admin"]);
