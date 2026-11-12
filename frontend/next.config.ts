@@ -1,5 +1,7 @@
 import type { NextConfig } from "next";
 
+// Libera o next/image só para os arquivos públicos do Storage do projeto
+// Supabase configurado no .env.
 const supabaseHostname = (() => {
   try {
     return process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -16,15 +18,15 @@ const nextConfig: NextConfig = {
   },
   images: {
     qualities: [75, 90, 100],
-    remotePatterns: [
-      { protocol: "https", hostname: "imgs.search.brave.com" },
-      { protocol: "https", hostname: "i.pinimg.com" },
-      { protocol: "https", hostname: "mockmind-api.uifaces.co" },
-      { protocol: "https", hostname: "mwcpeouwqzkbdbeorkfj.supabase.co" },
-      ...(supabaseHostname
-        ? [{ protocol: "https" as const, hostname: supabaseHostname }]
-        : []),
-    ],
+    remotePatterns: supabaseHostname
+      ? [
+          {
+            protocol: "https",
+            hostname: supabaseHostname,
+            pathname: "/storage/v1/object/public/**",
+          },
+        ]
+      : [],
   },
 };
 
