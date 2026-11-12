@@ -7,6 +7,7 @@ import ProfileSidebar from "@/components/navigation/ProfileSidebar";
 import ChangePasswordCard from "@/components/settings/ChangePasswordCard";
 import ThemeToggle from "@/components/theme/ThemeToggle";
 import DeleteAccountCard from "@/components/settings/DeleteAccountCard";
+import PrivacyCard from "@/components/settings/PrivacyCard";
 import { useCurrentProfile } from "@/lib/hooks/useCurrentProfile";
 import { createClient } from "@/lib/supabase/client";
 import {
@@ -16,7 +17,6 @@ import {
   GearSixIcon,
   HouseIcon,
   SignOutIcon,
-  ShieldCheckIcon,
   UserIcon,
   UsersFourIcon,
   UsersIcon,
@@ -439,12 +439,7 @@ export default function SettingsPage() {
               <h2 className="text-sm font-bold uppercase tracking-wider text-subtitle">
                 Privacidade e Segurança
               </h2>
-              <SettingsCard
-                title="Privacidade do perfil"
-                subtitle="Controle quem pode ver suas publicações e informações pessoais."
-                actionText="Gerenciar"
-                icon={<ShieldCheckIcon size={18} weight="fill" />}
-              />
+              <PrivacyCard />
               <ChangePasswordCard />
               <SettingsCard
                 title="Notificações"

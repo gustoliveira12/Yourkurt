@@ -20,6 +20,7 @@ import { useEffect, useState } from "react";
 type Notification = {
   id: string;
   type: string;
+  entity_id: string | null;
   created_at: string;
   read_at: string | null;
   actor: { name: string | null; username: string | null; avatar_url: string | null } | null;
@@ -27,6 +28,12 @@ type Notification = {
 
 const supabase = createClient();
 const PAGE_SIZE = 30;
+
+const NOTIFICATION_TEXT: Record<string, string> = {
+  follow: "começou a seguir você.",
+  follow_request: "pediu para seguir você.",
+  follow_accepted: "aceitou seu pedido para seguir.",
+};
 const NAV_ITEMS = [
   { label: "Feed", to: "/", icon: HouseIcon },
   { label: "Perfil", to: "/perfil", icon: UserIcon },
@@ -39,7 +46,7 @@ function fetchNotifications(userId: string, cursor?: Pick<Notification, "created
   let query = supabase
     .from("notifications")
     .select<string, Notification>(
-      "id, type, created_at, read_at, actor:profiles!notifications_actor_id_fkey(name, username, avatar_url)",
+      "id, type, entity_id, created_at, read_at, actor:profiles!notifications_actor_id_fkey(name, username, avatar_url)",
     )
     .eq("user_id", userId);
 
@@ -62,6 +69,7 @@ export default function NotificationsPage() {
   const [hasMore, setHasMore] = useState(true);
   const [error, setError] = useState("");
   const [markingRead, setMarkingRead] = useState(false);
+  const [answeringId, setAnsweringId] = useState<string | null>(null);
   const userId = profile?.id;
 
   async function loadNotifications() {
@@ -101,6 +109,39 @@ export default function NotificationsPage() {
     void loadInitialNotifications(userId);
     return () => { active = false; };
   }, [userId]);
+
+  // Pedido para seguir um perfil privado: aceitar ou recusar.
+  async function answerFollowRequest(notification: Notification, accept: boolean) {
+    if (!userId || !notification.entity_id || answeringId) return;
+    setAnsweringId(notification.id);
+    setError("");
+
+    const { error: answerError } = accept
+      ? await supabase.rpc("accept_follow_request", { p_follower_id: notification.entity_id })
+      : await supabase
+          .from("follows")
+          .delete()
+          .eq("follower_id", notification.entity_id)
+          .eq("following_id", userId);
+
+    if (answerError) {
+      console.error("Erro ao responder pedido para seguir:", answerError);
+      setError("Não foi possível responder ao pedido. Tente novamente.");
+    } else if (accept) {
+      const readAt = new Date().toISOString();
+      setNotifications((previous) =>
+        previous.map((item) =>
+          item.id === notification.id
+            ? { ...item, type: "follow", read_at: item.read_at ?? readAt }
+            : item,
+        ),
+      );
+    } else {
+      // Recusar apaga o pedido, e o banco apaga a notificação junto.
+      setNotifications((previous) => previous.filter((item) => item.id !== notification.id));
+    }
+    setAnsweringId(null);
+  }
 
   async function markAllRead() {
     if (!userId) return;
@@ -179,7 +220,7 @@ export default function NotificationsPage() {
                         ) : (
                           <span className="font-bold">{actorName}</span>
                         )}{" "}
-                        {notification.type === "follow" ? "começou a seguir você." : "enviou uma notificação."}
+                        {NOTIFICATION_TEXT[notification.type] ?? "enviou uma notificação."}
                         {!notification.read_at && <span className="ml-2 text-xs font-semibold text-foreground-brand">Nova</span>}
                         <time dateTime={notification.created_at} className="mt-1 block text-xs text-subtitle">
                           {new Date(notification.created_at).toLocaleString("pt-BR", {
@@ -187,6 +228,26 @@ export default function NotificationsPage() {
                             timeStyle: "short",
                           })}
                         </time>
+                        {notification.type === "follow_request" && (
+                          <div className="mt-2 flex gap-2">
+                            <button
+                              type="button"
+                              onClick={() => void answerFollowRequest(notification, true)}
+                              disabled={answeringId !== null}
+                              className="rounded-full px-4 py-1.5 text-xs font-bold text-foreground-inverted gradient-to-l hover:brightness-95 disabled:opacity-60"
+                            >
+                              Aceitar
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => void answerFollowRequest(notification, false)}
+                              disabled={answeringId !== null}
+                              className="rounded-full border border-border-base px-4 py-1.5 text-xs font-bold text-foreground hover:bg-background disabled:opacity-60"
+                            >
+                              Recusar
+                            </button>
+                          </div>
+                        )}
                       </div>
                     </li>
                   );

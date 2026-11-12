@@ -23,21 +23,43 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+type FollowStatus = "none" | "pending" | "accepted";
+
+// Retorno de get_public_profile. Em perfis privados que a pessoa não pode ver,
+// bio, localização, site e aniversário vêm vazios.
 type PublicProfile = {
   id: string;
   name: string;
   username: string;
+  avatar_url: string | null;
+  header_url: string | null;
+  is_private: boolean;
+  can_view: boolean;
   bio: string | null;
   location: string | null;
   website: string | null;
-  birthday: string | null;
-  avatar_url: string | null;
-  header_url: string | null;
+  birthday_day_month: string | null; // "MM-DD"
   followers_count: number;
   following_count: number;
-  i_follow: boolean;
+  follow_status: FollowStatus;
   follows_me: boolean;
 };
+
+// "03-10" -> "10 de março". O ano nunca é exposto.
+function formatBirthday(dayMonth: string | null) {
+  if (!dayMonth) return null;
+  const [month, day] = dayMonth.split("-").map(Number);
+  return new Date(2000, month - 1, day).toLocaleDateString("pt-BR", {
+    day: "numeric",
+    month: "long",
+  });
+}
+
+function followButtonLabel(profile: PublicProfile) {
+  if (profile.follow_status === "accepted") return "Seguindo";
+  if (profile.follow_status === "pending") return "Pedido enviado";
+  return profile.is_private ? "Pedir para seguir" : "Seguir";
+}
 
 const supabase = createClient();
 
@@ -62,6 +84,7 @@ export default function PublicProfilePage() {
   const router = useRouter();
   const [profile, setProfile] = useState<PublicProfile | null>(null);
   const [viewer, setViewer] = useState({
+    id: "",
     name: "",
     username: "",
     avatarUrl: "",
@@ -69,6 +92,7 @@ export default function PublicProfilePage() {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [isFollowBusy, setIsFollowBusy] = useState(false);
   const { posts, loading: postsLoading, error: postsError } = usePosts(profile?.id ?? null);
 
   useEffect(() => {
@@ -102,6 +126,7 @@ export default function PublicProfilePage() {
       }
 
       setViewer({
+        id: user.id,
         name: me?.name ?? "",
         username: me?.username ?? "",
         avatarUrl: me?.avatar_url ?? "",
@@ -118,6 +143,36 @@ export default function PublicProfilePage() {
 
     void load();
   }, [username, router]);
+
+  async function refreshProfile(targetUsername: string) {
+    const { data } = await supabase.rpc("get_public_profile", { p_username: targetUsername });
+    const next = (data?.[0] as PublicProfile | undefined) ?? null;
+    if (next) setProfile(next);
+  }
+
+  // Seguir, pedir para seguir, cancelar o pedido ou deixar de seguir.
+  async function toggleFollow() {
+    if (!profile || !viewer.id || isFollowBusy) return;
+    setIsFollowBusy(true);
+
+    const { error: followError } =
+      profile.follow_status === "none"
+        ? await supabase
+            .from("follows")
+            .insert({ follower_id: viewer.id, following_id: profile.id })
+        : await supabase
+            .from("follows")
+            .delete()
+            .eq("follower_id", viewer.id)
+            .eq("following_id", profile.id);
+
+    if (followError) {
+      setError("Não foi possível atualizar. Tente novamente.");
+    } else {
+      await refreshProfile(profile.username);
+    }
+    setIsFollowBusy(false);
+  }
 
   return (
     <div className="w-dvw min-h-dvh overflow-hidden relative flex h-screen items-center justify-center bg-background font-sans gap-4">
@@ -161,6 +216,19 @@ export default function PublicProfilePage() {
                   <div className="rounded-full border-4 border-background-raised">
                     <Avatar src={profile.avatar_url} name={profile.name} sizes="xl" />
                   </div>
+                  <button
+                    type="button"
+                    onClick={() => void toggleFollow()}
+                    disabled={isFollowBusy}
+                    aria-pressed={profile.follow_status !== "none"}
+                    className={`rounded-full px-5 py-2 text-sm font-bold transition disabled:opacity-60 ${
+                      profile.follow_status === "none"
+                        ? "gradient-to-l text-foreground-inverted hover:brightness-95"
+                        : "border border-border-base text-foreground hover:bg-background"
+                    }`}
+                  >
+                    {followButtonLabel(profile)}
+                  </button>
                 </div>
 
                 <div className="mt-4">
@@ -173,11 +241,14 @@ export default function PublicProfilePage() {
                       Segue você
                     </span>
                   )}
-                  <p className="mt-3 text-foreground leading-relaxed max-w-2xl">
-                    {profile.bio || "Sem bio."}
-                  </p>
+                  {profile.can_view && (
+                    <p className="mt-3 text-foreground leading-relaxed max-w-2xl">
+                      {profile.bio || "Sem bio."}
+                    </p>
+                  )}
                 </div>
 
+                {profile.can_view && (
                 <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-sm text-subtitle">
                   <span className="inline-flex items-center gap-1.5">
                     <MapPinIcon size={16} weight="fill" />
@@ -185,7 +256,7 @@ export default function PublicProfilePage() {
                   </span>
                   <span className="inline-flex items-center gap-1.5">
                     <CalendarDotsIcon size={16} weight="fill" />
-                    {profile.birthday || "Sem aniversário"}
+                    {formatBirthday(profile.birthday_day_month) || "Sem aniversário"}
                   </span>
                   {profile.website ? (
                     <Link
@@ -204,6 +275,8 @@ export default function PublicProfilePage() {
                   )}
                 </div>
 
+                )}
+
                 <div className="mt-4 flex gap-6 text-sm">
                   <span className="text-foreground">
                     <strong className="font-extrabold">{profile.following_count}</strong>{" "}
@@ -218,7 +291,14 @@ export default function PublicProfilePage() {
 
               <div className="border-t border-border-base px-5 md:px-7 py-2">
                 <ul className="divide-y divide-border-base">
-                  {postsLoading ? (
+                  {!profile.can_view ? (
+                    <li className="py-8 text-center text-foreground-muted">
+                      Este perfil é privado.{" "}
+                      {profile.follow_status === "pending"
+                        ? "Seu pedido para seguir está aguardando aprovação."
+                        : "Peça para seguir para ver os posts e as informações."}
+                    </li>
+                  ) : postsLoading ? (
                     <li className="py-8 text-center text-foreground-muted">
                       Carregando posts...
                     </li>

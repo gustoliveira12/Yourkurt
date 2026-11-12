@@ -10,6 +10,7 @@ import PostCard from "@/components/UserPost";
 import { type PostMedia, usePosts } from "@/lib/hooks/usePosts";
 import { useUserReplies } from "@/lib/hooks/useUserReplies";
 import { createClient } from "@/lib/supabase/client";
+import { removeUserFiles } from "@/lib/storage";
 import {
   CameraIcon,
   CalendarDotsIcon,
@@ -142,7 +143,7 @@ export default function ProfilePage() {
     addPost,
     deletePost,
     deletingPostId,
-  } = usePosts();
+  } = usePosts(profile.id || null); // null enquanto o perfil carrega: não busca nada
   const {
     replies,
     loading: repliesLoading,
@@ -154,10 +155,13 @@ export default function ProfilePage() {
       setIsLoading(true);
       setSaveMessage("");
 
+      // getSession lê a sessão já salva no navegador, sem ida ao servidor. Aqui
+      // o id serve só para montar as consultas: quem garante o acesso é o RLS.
       const {
-        data: { user: authUser },
+        data: { session },
         error: authError,
-      } = await supabase.auth.getUser();
+      } = await supabase.auth.getSession();
+      const authUser = session?.user;
 
       if (authError || !authUser) {
         setSaveMessage("Não foi possível carregar o usuário autenticado.");
@@ -165,13 +169,27 @@ export default function ProfilePage() {
         return;
       }
 
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("id, name, username, bio, location, website, birthday, avatar_url, header_url")
-        .eq("id", authUser.id)
-        .maybeSingle();
+      // Bio, aniversário, localização e site não são legíveis direto na tabela
+      // (dependem da privacidade do perfil); o próprio usuário lê tudo por RPC.
+      // Perfil e contagens em paralelo: uma ida ao servidor em vez de três.
+      const [profileResult, followingResult, followersResult] = await Promise.all([
+        supabase.rpc("get_my_profile"),
+        supabase
+          .from("follows")
+          .select("follower_id", { count: "exact", head: true })
+          .eq("follower_id", authUser.id)
+          .eq("status", "accepted"),
+        supabase
+          .from("follows")
+          .select("follower_id", { count: "exact", head: true })
+          .eq("following_id", authUser.id)
+          .eq("status", "accepted"),
+      ]);
+      const { error } = profileResult;
+      const data = profileResult.data?.[0];
 
       if (error) {
+        console.error("Erro ao carregar o perfil (get_my_profile):", error);
         setSaveMessage("Não foi possível carregar seu perfil.");
         setIsLoading(false);
         return;
@@ -199,18 +217,11 @@ export default function ProfilePage() {
         headerUrl: data?.header_url ?? "",
       });
 
-      const [followingResult, followersResult] = await Promise.all([
-        supabase
-          .from("follows")
-          .select("follower_id", { count: "exact", head: true })
-          .eq("follower_id", authUser.id),
-        supabase
-          .from("follows")
-          .select("follower_id", { count: "exact", head: true })
-          .eq("following_id", authUser.id),
-      ]);
-
       if (followingResult.error || followersResult.error) {
+        console.error(
+          "Erro ao carregar seguidores:",
+          followingResult.error ?? followersResult.error,
+        );
         setSaveMessage("Não foi possível carregar seguidores/seguindo agora.");
       } else {
         setFollowStats({
@@ -328,6 +339,13 @@ export default function ProfilePage() {
       return;
     }
 
+    // A imagem anterior não pode continuar pública pela URL antiga.
+    try {
+      await removeUserFiles(supabase, "avatars", profile.id, filePath);
+    } catch (cleanupError) {
+      console.error("Erro ao apagar imagens antigas (avatars):", cleanupError);
+    }
+
     const {
       data: { user: currentUser },
     } = await supabase.auth.getUser();
@@ -394,6 +412,13 @@ export default function ProfilePage() {
       setSaveMessage("Não foi possível salvar as alterações. Tente novamente em instantes.");
       setIsUploadingHeader(false);
       return;
+    }
+
+    // A imagem anterior não pode continuar pública pela URL antiga.
+    try {
+      await removeUserFiles(supabase, "headers", profile.id, filePath);
+    } catch (cleanupError) {
+      console.error("Erro ao apagar imagens antigas (headers):", cleanupError);
     }
 
     const {
@@ -671,14 +696,12 @@ export default function ProfilePage() {
                       <li className="py-8 text-center text-foreground-muted">
                         Carregando posts...
                       </li>
-                    ) : posts.filter((p) => p.user_id === profile.id).length === 0 ? (
+                    ) : posts.length === 0 ? (
                       <li className="py-8 text-center text-foreground-muted">
                         Sem novos posts por aqui.
                       </li>
                     ) : (
-                      posts
-                        .filter((p) => p.user_id === profile.id)
-                        .map((post) => (
+                      posts.map((post) => (
                           <li key={post.id} className="py-4">
                             <PostCard
                               post={post}
