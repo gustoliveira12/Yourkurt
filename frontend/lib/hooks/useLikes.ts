@@ -16,9 +16,12 @@ export function useLikes(postId: string, initialLikesCount: number) {
     async function loadLikeStatus() {
       setLoading(true);
 
+      // getSession lê a sessão salva no navegador. getUser faria uma ida ao
+      // servidor de autenticação para cada post da lista.
       const {
-        data: { user },
-      } = await supabase.auth.getUser();
+        data: { session },
+      } = await supabase.auth.getSession();
+      const user = session?.user;
 
       if (!user) {
         setUserId(null);
