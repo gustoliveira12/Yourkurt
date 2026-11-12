@@ -34,7 +34,7 @@ function withPreservedHeaders(baseResponse: NextResponse, redirectResponse: Next
   return redirectResponse;
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   if (!supabaseUrl || !supabaseAnonKey) {
     return NextResponse.next({ request });
   }

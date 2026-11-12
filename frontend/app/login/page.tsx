@@ -5,7 +5,7 @@ import * as Checkbox from "@radix-ui/react-checkbox";
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import supabase from "../../lib/api";
+import { createClient } from "@/lib/supabase/client";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -20,6 +20,7 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
+      const supabase = createClient();
       const { error } = await supabase.auth.signInWithPassword({
         email: email.trim(),
         password,
