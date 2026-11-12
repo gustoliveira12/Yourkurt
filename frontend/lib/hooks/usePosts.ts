@@ -99,7 +99,7 @@ export function usePosts(authorId?: string | null) {
       if (uniqueUserIds.length > 0) {
         const { data: profilesData } = await supabase
           .from("profiles")
-          .select<string, RawProfile>("*")
+          .select<string, RawProfile>("id, name, username, avatar_url")
           .in("id", uniqueUserIds);
 
         if (profilesData) {
