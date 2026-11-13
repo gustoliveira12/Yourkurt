@@ -17,7 +17,6 @@ interface NavProps extends AvatarProps {
 }
 
 type ProfileStats = {
-  friendsCount: number;
   communitiesCount: number;
   postsCount: number;
 };
@@ -30,49 +29,45 @@ export default function LeftNavbar({
   headerUrl,
 }: NavProps) {
   const [error, setError] = useState(false);
-  const [stats, setStats] = useState<ProfileStats>({
-    friendsCount: 0,
-    communitiesCount: 0,
-    postsCount: 0,
-  });
-  const [loadingStats, setLoadingStats] = useState(true);
-  const { friends, loading: loadingFriends } = useFriends(6);
+  const [stats, setStats] = useState<ProfileStats | null>(null);
+  // Amigos = quem você segue e segue você de volta (get_my_follow_lists).
+  const { friends, total: friendsCount, loading: loadingFriends } = useFriends(6);
 
   useEffect(() => {
+    let active = true;
+
     async function loadStats() {
-      setLoadingStats(true);
       const supabase = createClient();
-
+      // getSession lê a sessão salva no navegador; o RLS protege as consultas.
       const {
-        data: { user },
-      } = await supabase.auth.getUser();
+        data: { session },
+      } = await supabase.auth.getSession();
+      const userId = session?.user.id;
+      if (!userId) return;
 
-      if (!user) {
-        setLoadingStats(false);
-        return;
-      }
-
-      const { count: postsCount } = await supabase
-        .from("posts")
-        .select("id", { count: "exact" })
-        .eq("user_id", user.id);
-
-      const { count: friendsCount } = await supabase
-        .from("friendships")
-        .select("id", { count: "exact" })
-        .eq("status", "accepted")
-        .or(`requester_id.eq.${user.id},addressee_id.eq.${user.id}`);
+      // head: true pede só a contagem, sem baixar as linhas.
+      const [posts, communities] = await Promise.all([
+        supabase.from("posts").select("id", { count: "exact", head: true }).eq("user_id", userId),
+        supabase
+          .from("community_memberships")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", userId),
+      ]);
+      if (!active) return;
 
       setStats({
-        postsCount: postsCount ?? 0,
-        friendsCount: friendsCount ?? 0,
-        communitiesCount: 0, // TODO: implement communities feature
+        postsCount: posts.count ?? 0,
+        communitiesCount: communities.count ?? 0,
       });
-      setLoadingStats(false);
     }
 
     void loadStats();
+    return () => {
+      active = false;
+    };
   }, []);
+
+  const loadingStats = !stats;
 
   return (
     <div className="hidden md:flex flex-col gap-6 max-w-80">
@@ -132,13 +127,13 @@ export default function LeftNavbar({
           {/* Números do perfil: termo + valor (dl), não títulos. */}
           <dl className="border-t border-border-base flex justify-between p-2 gap-2">
             {[
-              { label: "Amigos", value: stats.friendsCount },
-              { label: "Comunidades", value: stats.communitiesCount },
-              { label: "Publicações", value: stats.postsCount },
-            ].map(({ label, value }) => (
+              { label: "Amigos", value: friendsCount, loading: loadingFriends },
+              { label: "Comunidades", value: stats?.communitiesCount, loading: loadingStats },
+              { label: "Publicações", value: stats?.postsCount, loading: loadingStats },
+            ].map(({ label, value, loading }) => (
               <div key={label} className="flex flex-col-reverse items-center justify-center">
                 <dt className="text-sm text-subtitle font-medium">{label}</dt>
-                <dd className="text-lg font-bold">{loadingStats ? "..." : value}</dd>
+                <dd className="text-lg font-bold">{loading ? "..." : value}</dd>
               </div>
             ))}
           </dl>
@@ -149,24 +144,29 @@ export default function LeftNavbar({
           <h2 className=" flex items-center uppercase font-bold tracking-wide text-sm text-foreground ">
             Seus amigos
           </h2>
-          <span className="flex items-center text-foreground-brand font-medium text-sm px-2 py-1">
-            {loadingStats ? "..." : stats.friendsCount}
-          </span>
+          <Link
+            href="/friends"
+            className="flex items-center text-foreground-brand font-medium text-sm px-2 py-1 rounded-sm hover:underline"
+          >
+            {loadingFriends ? "Ver todos" : `Ver todos (${friendsCount})`}
+          </Link>
         </div>
         <div className="flex flex-wrap gap-4">
           {loadingFriends ? (
             <p className="text-xs text-subtitle">Carregando...</p>
           ) : friends.length === 0 ? (
-            <p className="text-xs text-subtitle">Nenhum amigo ainda</p>
+            <p className="text-xs text-subtitle">
+              Nenhum amigo ainda. Amigos são as pessoas que você segue e que seguem você de volta.
+            </p>
           ) : (
             friends.map((friend) => (
               <Link
                 key={friend.id}
-                href={`/perfil/${friend.username}`}
+                href={`/perfil/${encodeURIComponent(friend.username)}`}
                 className="flex flex-col justify-center items-center gap-2 text-xs text-subtitle truncate max-w-16 hover:opacity-80 transition-opacity"
               >
                 <div className="flex flex-col rounded-full size-16 items-center justify-center">
-                  <Avatar src={friend.avatar_url} />
+                  <Avatar src={friend.avatar_url} name={friend.name} decorative />
                 </div>
                 <span title={friend.name} className="w-full min-w-0 truncate">
                   {friend.name}
