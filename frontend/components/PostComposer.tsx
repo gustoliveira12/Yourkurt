@@ -1,24 +1,16 @@
 "use client";
-import { LucideIcon } from "lucide-react";
-import type { UrlObject } from "url";
 import CreatePostbox from "./CreatePostbox";
 import { useCurrentProfile } from "@/lib/hooks/useCurrentProfile";
 import type { Post } from "@/lib/hooks/usePosts";
 
-interface CommunityItems {
-  text: string;
-  redirect: UrlObject | string;
-  icon: LucideIcon;
-  color: string;
-}
-
-type NavlinkProps = {
-  prop: CommunityItems[];
+type PostComposerProps = {
   onPostCreated?: (post: Post) => void;
+  /** Classes do contêiner; controla em que telas a caixa aparece. */
+  className?: string;
 };
 
-export default function RightNavbar({ prop, onPostCreated }: NavlinkProps) {
-  void prop;
+// Caixa de novo post com o perfil do usuário logado.
+export default function RightNavbar({ onPostCreated, className = "flex" }: PostComposerProps) {
   const { profile } = useCurrentProfile();
 
   const handlePostCreated = (post: Post) => {
@@ -28,7 +20,7 @@ export default function RightNavbar({ prop, onPostCreated }: NavlinkProps) {
   };
 
   return (
-    <div className="flex flex-col gap-8 max-w-136">
+    <div className={`${className} flex-col gap-8 max-w-136`}>
       {profile && (
         <CreatePostbox
           avatarUrl={profile.avatarUrl}

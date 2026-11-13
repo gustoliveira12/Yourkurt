@@ -14,12 +14,7 @@ import {
   BellIcon,
   MegaphoneIcon,
   LockOpenIcon,
-  GearSixIcon,
-  HouseIcon,
   SignOutIcon,
-  UserIcon,
-  UsersFourIcon,
-  UsersIcon,
 } from "@phosphor-icons/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -43,61 +38,7 @@ type TeamPageMember = {
 
 type TeamPageMembersMap = Record<string, TeamPageMember[]>;
 
-const NAV_ITEMS = [
-  {
-    label: "Feed",
-    to: "/",
-    icon: HouseIcon,
-  },
-  {
-    label: "Perfil",
-    to: "/perfil",
-    icon: UserIcon,
-  },
-  {
-    label: "Amigos",
-    to: "/friends",
-    icon: UsersIcon,
-  },
-  {
-    label: "Comunidade",
-    to: "/communities",
-    icon: UsersFourIcon,
-  },
-  {
-    label: "Configurações",
-    to: "/settings",
-    icon: GearSixIcon,
-  },
-];
 
-const PROFILE_LINKS = [
-  {
-    text: "Feed",
-    redirect: "/",
-    icon: HouseIcon,
-  },
-  {
-    text: "Perfil",
-    redirect: "/perfil",
-    icon: UserIcon,
-  },
-  {
-    text: "Amigos",
-    redirect: "/friends",
-    icon: UsersIcon,
-  },
-  {
-    text: "Comunidade",
-    redirect: "/communities",
-    icon: UsersFourIcon,
-  },
-  {
-    text: "Configurações",
-    redirect: "/settings",
-    icon: GearSixIcon,
-  },
-];
 
 function SettingsCard({
   title,
@@ -302,7 +243,7 @@ export default function SettingsPage() {
         .single();
 
       if (pageError || !pageData) {
-        throw new Error(pageError?.message || "Nao foi possivel criar a equipe.");
+        throw new Error(pageError?.message || "Não foi possível criar a equipe.");
       }
 
       const { error: membershipError } = await supabase.from("team_memberships").insert({
@@ -313,14 +254,14 @@ export default function SettingsPage() {
       });
 
       if (membershipError) {
-        throw new Error(membershipError.message || "Nao foi possivel vincular voce a equipe.");
+        throw new Error(membershipError.message || "Não foi possível vincular você à equipe.");
       }
 
       setTeamPages((prev) => [...prev, pageData]);
       setTeamName("");
       setTeamSlug("");
       setTeamAvatarUrl("");
-      setTeamMessage("Equipe criada. Agora voce ja pode postar em nome dela.");
+      setTeamMessage("Equipe criada. Agora você já pode postar em nome dela.");
     } catch (error) {
       setTeamMessage(error instanceof Error ? error.message : "Erro ao criar equipe.");
     } finally {
@@ -346,7 +287,7 @@ export default function SettingsPage() {
       });
 
       if (error) {
-        throw new Error(error.message || "Nao foi possivel atualizar permissões do membro.");
+        throw new Error(error.message || "Não foi possível atualizar permissões do membro.");
       }
 
       const updated = data as { id: string; user_id: string; role: string; can_post: boolean } | null;
@@ -398,14 +339,13 @@ export default function SettingsPage() {
 
   return (
     <div className="w-dvw min-h-dvh overflow-hidden relative flex h-screen items-center justify-center bg-background font-sans gap-4">
-      <PageAside items={NAV_ITEMS} />
+      <PageAside />
       <MobileHeader />
 
       <main className="overflow-auto h-dvh flex-1 w-full flex items-start justify-center pt-20 gap-4 sm:pt-12">
         <ProfileSidebar
           alt="Foto de perfil"
           size={1}
-          prop={PROFILE_LINKS}
           name={profile?.name ?? "Carregando..."}
           at={profile?.username ?? "usuario"}
           src={profile?.avatarUrl ?? null}
@@ -473,7 +413,7 @@ export default function SettingsPage() {
 
             <div className="flex flex-col gap-3">
               <h2 className="text-sm font-bold uppercase tracking-wider text-subtitle">
-                Equipes e Paginas
+                Equipes e páginas
               </h2>
 
               <div className="rounded-xl border border-border-base bg-background-raised p-4 flex flex-col gap-3">
@@ -482,43 +422,53 @@ export default function SettingsPage() {
                     <MegaphoneIcon size={18} weight="fill" />
                   </span>
                   <div className="flex flex-col">
-                    <h3 className="text-base font-semibold text-foreground">Criar equipe para publicacoes</h3>
+                    <h3 className="text-base font-semibold text-foreground">Criar equipe para publicações</h3>
                     <p className="text-sm text-subtitle">
-                      Crie uma pagina (ex.: marketing) e publique no nome dela.
+                      Crie uma página (ex.: marketing) e publique no nome dela.
                     </p>
                   </div>
                 </div>
 
                 {!canManageTeamPages && (
                   <p className="rounded-lg border border-border-base bg-background px-3 py-2 text-sm text-subtitle">
-                    Sua conta e de usuario comum. Apenas administradores podem criar equipes.
+                    Sua conta é de usuário comum. Apenas administradores podem criar equipes.
                   </p>
                 )}
 
                 <div className="grid gap-2 md:grid-cols-2">
-                  <input
-                    value={teamName}
-                    onChange={(e) => setTeamName(e.target.value)}
-                    placeholder="Nome da equipe"
-                    disabled={!canManageTeamPages}
-                    className="rounded-lg border border-border-base bg-background px-3 py-2 text-sm text-foreground"
-                  />
-                  <input
-                    value={teamSlug}
-                    onChange={(e) => setTeamSlug(e.target.value)}
-                    placeholder="Slug (ex.: time-marketing)"
-                    disabled={!canManageTeamPages}
-                    className="rounded-lg border border-border-base bg-background px-3 py-2 text-sm text-foreground"
-                  />
+                  <label className="flex flex-col gap-1 text-sm font-medium text-foreground">
+                    Nome da equipe
+                    <input
+                      value={teamName}
+                      onChange={(e) => setTeamName(e.target.value)}
+                      placeholder="Ex.: Marketing"
+                      disabled={!canManageTeamPages}
+                      className="rounded-lg border border-border-base bg-background px-3 py-2 text-sm font-normal text-foreground"
+                    />
+                  </label>
+                  <label className="flex flex-col gap-1 text-sm font-medium text-foreground">
+                    Slug
+                    <input
+                      value={teamSlug}
+                      onChange={(e) => setTeamSlug(e.target.value)}
+                      placeholder="Ex.: time-marketing"
+                      disabled={!canManageTeamPages}
+                      className="rounded-lg border border-border-base bg-background px-3 py-2 text-sm font-normal text-foreground"
+                    />
+                  </label>
                 </div>
 
-                <input
-                  value={teamAvatarUrl}
-                  onChange={(e) => setTeamAvatarUrl(e.target.value)}
-                  placeholder="URL do avatar da pagina (opcional)"
-                  disabled={!canManageTeamPages}
-                  className="rounded-lg border border-border-base bg-background px-3 py-2 text-sm text-foreground"
-                />
+                <label className="flex flex-col gap-1 text-sm font-medium text-foreground">
+                  URL do avatar da página (opcional)
+                  <input
+                    type="url"
+                    value={teamAvatarUrl}
+                    onChange={(e) => setTeamAvatarUrl(e.target.value)}
+                    placeholder="https://..."
+                    disabled={!canManageTeamPages}
+                    className="rounded-lg border border-border-base bg-background px-3 py-2 text-sm font-normal text-foreground"
+                  />
+                </label>
 
                 <div className="flex items-center justify-between gap-3">
                   <button
@@ -530,7 +480,7 @@ export default function SettingsPage() {
                     {isCreatingTeam ? "Criando..." : "Criar equipe"}
                   </button>
 
-                  <span className="text-xs text-subtitle">{teamPages.length} equipe(s) com permissao de postagem</span>
+                  <span className="text-xs text-subtitle">{teamPages.length} equipe(s) com permissão de postagem</span>
                 </div>
 
                 {teamPages.length > 0 && (
@@ -640,7 +590,7 @@ export default function SettingsPage() {
 
             <div className="flex flex-col gap-3">
               <h2 className="text-sm font-bold uppercase tracking-wider text-subtitle">
-                Sessao
+                Sessão
               </h2>
 
               <DeleteAccountCard username={profile?.username ?? ""} />
@@ -653,7 +603,7 @@ export default function SettingsPage() {
                   <div className="flex flex-col">
                     <h3 className="text-base font-semibold text-foreground">Sair da conta</h3>
                     <p className="text-sm text-subtitle">
-                      Encerre sua sessao neste dispositivo com seguranca.
+                      Encerre sua sessão neste dispositivo com segurança.
                     </p>
                   </div>
                 </div>

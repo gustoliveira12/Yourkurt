@@ -1,0 +1,3 @@
+# Yourkurt é uma rede social interna: nada deve ser indexado por buscadores.
+User-agent: *
+Disallow: /

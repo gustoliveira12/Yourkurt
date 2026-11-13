@@ -1,37 +1,20 @@
 "use client";
 
-import type { UrlObject } from "url";
 import { Avatar, AvatarProps } from "../Avatar";
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { type Icon, ArrowRightIcon, UserIcon } from "@phosphor-icons/react";
+import { UserIcon } from "@phosphor-icons/react";
 import { createClient } from "@/lib/supabase/client";
 import { useFriends } from "@/lib/hooks/useFriends";
 
-export interface NavlinksItem {
-  text?: string;
-  redirect?: UrlObject | string;
-  icon: Icon;
-  label?: string;
-  to?: string;
-}
-
 interface NavProps extends AvatarProps {
-  prop?: NavlinksItem[];
   size: number;
   alt: string;
   name: string;
   at: string;
   headerUrl?: string | null;
 }
-
-type NavlinkProps = {
-  prop: NavlinksItem[];
-  avatar: AvatarProps;
-  size: number;
-  alt: string;
-};
 
 type ProfileStats = {
   friendsCount: number;
@@ -40,10 +23,7 @@ type ProfileStats = {
 };
 
 export default function LeftNavbar({
-  prop,
-  size,
   alt,
-  sizes,
   src,
   name,
   at,
@@ -136,17 +116,12 @@ export default function LeftNavbar({
         </Link>
         <div className="flex flex-col px-6 py-4 gap-4 relative pt-10">
           <div className="flex flex-col w-full">
-            <div className="flex w-full justify-between">
-              <Link
-                href="/perfil"
-                className="text-xl text-foreground font-bold hover:underline"
-              >
-                {name}
-              </Link>
-              <button className="text-sm text-foreground-brand cursor-pointer">
-                trocar
-              </button>
-            </div>
+            <Link
+              href="/perfil"
+              className="text-xl text-foreground font-bold hover:underline w-fit"
+            >
+              {name}
+            </Link>
             <Link
               href="/perfil"
               className="text-subtitle hover:underline w-fit"
@@ -154,30 +129,19 @@ export default function LeftNavbar({
               @{at}
             </Link>
           </div>
-          <div className="border-t border-border-base flex justify-between p-2 gap-2">
-            <div className="flex flex-col items-center justify-center">
-              <h3 className="text-lg font-bold">
-                {loadingStats ? "..." : stats.friendsCount}
-              </h3>
-              <span className="text-sm text-subtitle font-medium ">Amigos</span>
-            </div>
-            <div className="flex flex-col items-center justify-center">
-              <h3 className="text-lg font-bold">
-                {loadingStats ? "..." : stats.communitiesCount}
-              </h3>
-              <span className="text-sm text-subtitle font-medium ">
-                Comunidades
-              </span>
-            </div>
-            <div className="flex flex-col items-center justify-center">
-              <h3 className="text-lg font-bold">
-                {loadingStats ? "..." : stats.postsCount}
-              </h3>
-              <span className="text-sm text-subtitle font-medium ">
-                Publicações
-              </span>
-            </div>
-          </div>
+          {/* Números do perfil: termo + valor (dl), não títulos. */}
+          <dl className="border-t border-border-base flex justify-between p-2 gap-2">
+            {[
+              { label: "Amigos", value: stats.friendsCount },
+              { label: "Comunidades", value: stats.communitiesCount },
+              { label: "Publicações", value: stats.postsCount },
+            ].map(({ label, value }) => (
+              <div key={label} className="flex flex-col-reverse items-center justify-center">
+                <dt className="text-sm text-subtitle font-medium">{label}</dt>
+                <dd className="text-lg font-bold">{loadingStats ? "..." : value}</dd>
+              </div>
+            ))}
+          </dl>
         </div>
       </div>
       <div className="flex flex-col rounded-card bg-surface shadow-card overflow-hidden h-fit px-6 py-4 gap-2">
@@ -185,10 +149,9 @@ export default function LeftNavbar({
           <h2 className=" flex items-center uppercase font-bold tracking-wide text-sm text-foreground ">
             Seus amigos
           </h2>
-          <button className="flex items-center justify-center  text-foreground-brand font-medium text-sm hover:bg-foreground-brand/15 px-2 py-1 rounded-sm transition-all duration-150 gap-1 cursor-pointer ">
+          <span className="flex items-center text-foreground-brand font-medium text-sm px-2 py-1">
             {loadingStats ? "..." : stats.friendsCount}
-            <ArrowRightIcon size={12} />
-          </button>
+          </span>
         </div>
         <div className="flex flex-wrap gap-4">
           {loadingFriends ? (

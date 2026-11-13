@@ -59,6 +59,9 @@ export default function PostCard({
 
   const author = post.profiles;
   const authorName = author?.name ?? "Usuário";
+  const commentsLabel = loadingInteractions
+    ? "carregando comentários"
+    : `${interactions.commentsCount} ${interactions.commentsCount === 1 ? "comentário" : "comentários"}`;
   // Posts de equipe não têm link: ainda não existe tela de equipe.
   const authorHref = post.author_team_page_id ? null : profileHref(author?.username);
   const postImages = post.media
@@ -91,7 +94,7 @@ export default function PostCard({
 
     const deleted = await onDelete(post.id);
     if (!deleted) {
-      alert("Nao foi possivel apagar o post. Tente novamente.");
+      alert("Não foi possível apagar o post. Tente novamente.");
       return;
     }
 
@@ -114,7 +117,7 @@ export default function PostCard({
               </div>
             )}
             <div className="flex flex-col min-w-0">
-              <h3 className="text-lg font-bold text-foreground truncate">
+              <h2 className="text-lg font-bold text-foreground truncate">
                 {authorHref ? (
                   <Link href={authorHref} className="hover:underline">
                     {authorName}
@@ -122,7 +125,7 @@ export default function PostCard({
                 ) : (
                   authorName
                 )}
-              </h3>
+              </h2>
               <div className="flex gap-4 text-subtitle flex-wrap">
                 <span>@{author?.username ?? "usuario"}</span>
                 {detailHref ? (
@@ -135,10 +138,13 @@ export default function PostCard({
               </div>
             </div>
           </div>
+          {/* O menu só tem "Apagar post"; sem permissão, não há o que mostrar. */}
+          {canDelete && (
           <div className="relative">
             <button
               type="button"
               aria-label="Abrir menu do post"
+              aria-expanded={menuOpen}
               onClick={() => setMenuOpen((prev) => !prev)}
               disabled={deleting}
               className="p-2 rounded-sm hover:bg-background transition-all duration-100 ease-out text-foreground cursor-pointer disabled:opacity-60"
@@ -146,7 +152,7 @@ export default function PostCard({
               {deleting ? <Loader2 className="animate-spin" /> : <Ellipsis />}
             </button>
 
-            {menuOpen && canDelete && (
+            {menuOpen && (
               <div className="absolute right-0 top-11 z-20 min-w-40 rounded-control border border-border-base bg-surface-raised p-1 shadow-card">
                 <button
                   type="button"
@@ -160,6 +166,7 @@ export default function PostCard({
               </div>
             )}
           </div>
+          )}
         </div>
         {detailHref ? (
           <Link href={detailHref} className="block">
@@ -212,7 +219,7 @@ export default function PostCard({
                   className="object-cover"
                   sizes="(max-width: 768px) 50vw, 320px"
                   unoptimized={process.env.NODE_ENV === "development"}
-                  alt={`Imagem ${index + 1} da publicacao`}
+                  alt={`Imagem ${index + 1} da publicação`}
                   src={url}
                 />
               </Link>
@@ -226,7 +233,7 @@ export default function PostCard({
                   className="object-cover"
                   sizes="(max-width: 768px) 50vw, 320px"
                   unoptimized={process.env.NODE_ENV === "development"}
-                  alt={`Imagem ${index + 1} da publicacao`}
+                  alt={`Imagem ${index + 1} da publicação`}
                   src={url}
                 />
               </div>
@@ -238,7 +245,10 @@ export default function PostCard({
         <div className="flex justify-between items-center">
           <div className="flex gap-6 items-center">
             <button
+              type="button"
               onClick={() => void toggleLike()}
+              aria-label={`${liked ? "Descurtir" : "Curtir"}, ${likesCount} ${likesCount === 1 ? "curtida" : "curtidas"}`}
+              aria-pressed={liked}
               className={clsx(
                 "flex gap-2 items-center group cursor-pointer transition-colors duration-150",
                 liked
@@ -246,31 +256,31 @@ export default function PostCard({
                   : "text-foreground dark:hover:text-rose-300 hover:text-rose-600",
               )}
             >
-              <Heart />
-              <span>{likesCount}</span>
+              <Heart aria-hidden="true" />
+              <span aria-hidden="true">{likesCount}</span>
             </button>
             {detailHref ? (
               <Link
                 href={detailHref}
-                className={clsx(
-                  "flex gap-2 items-center hover:text-zinc-600 text-foreground cursor-pointer",
-                )}
+                aria-label={`Comentar, ${commentsLabel}`}
+                className="flex gap-2 items-center hover:text-zinc-600 text-foreground cursor-pointer"
               >
-                <MessageSquare />
-                <span>{loadingInteractions ? "..." : interactions.commentsCount}</span>
+                <MessageSquare aria-hidden="true" />
+                <span aria-hidden="true">{loadingInteractions ? "..." : interactions.commentsCount}</span>
               </Link>
             ) : (
-              <button
-                className={clsx(
-                  "flex gap-2 items-center hover:text-zinc-600 text-foreground cursor-pointer",
-                )}
-              >
-                <MessageSquare />
-                <span>{loadingInteractions ? "..." : interactions.commentsCount}</span>
-              </button>
+              // Já na tela do post: só mostra a contagem.
+              <span className="flex gap-2 items-center text-foreground">
+                <MessageSquare aria-hidden="true" />
+                <span className="sr-only">{commentsLabel}</span>
+                <span aria-hidden="true">{loadingInteractions ? "..." : interactions.commentsCount}</span>
+              </span>
             )}
             <button
+              type="button"
               onClick={handleRepost}
+              aria-label={`Repostar, ${loadingInteractions ? "carregando" : `${interactions.repostsCount} reposts`}`}
+              aria-pressed={reposted}
               className={clsx(
                 "flex gap-2 items-center cursor-pointer",
                 reposted
@@ -278,15 +288,19 @@ export default function PostCard({
                   : "text-foreground dark:hover:text-sky-200 hover:text-sky-600",
               )}
             >
-              <Repeat2 />
-              <span>{loadingInteractions ? "..." : interactions.repostsCount}</span>
+              <Repeat2 aria-hidden="true" />
+              <span aria-hidden="true">{loadingInteractions ? "..." : interactions.repostsCount}</span>
             </button>
           </div>
           <button
+            type="button"
             onClick={handleBookmark}
+            aria-label={bookmarked ? "Remover dos salvos" : "Salvar post"}
+            aria-pressed={bookmarked}
             className="cursor-pointer py-2 px-4 text-foreground rounded-sm hover:bg-background-brand/15 hover:text-foreground-brand transition-all duration-150"
           >
             <Bookmark
+              aria-hidden="true"
               className={clsx(
                 bookmarked ? "fill-background-brand text-foreground-brand" : "",
               )}

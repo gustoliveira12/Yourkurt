@@ -67,7 +67,7 @@ function ForgotPasswordContent() {
     <main className="min-h-dvh w-full flex items-center justify-center bg-white p-4 font-sans text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100">
       <div className="flex w-full max-w-md flex-col gap-6">
         <div className="flex flex-col gap-2 text-center">
-          <span className="text-lg font-bold tracking-widest text-orange-600 dark:text-orange-400 uppercase">
+          <span className="text-lg font-bold tracking-widest text-orange-700 dark:text-orange-400 uppercase">
             Yourkurt
           </span>
           <h1 className="text-3xl font-bold">Esqueceu a senha?</h1>
@@ -93,7 +93,7 @@ function ForgotPasswordContent() {
           <button
             type="submit"
             disabled={isSending || isCooldownActive}
-            className="rounded-lg bg-orange-500 px-4 py-3 font-bold text-white transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60"
+            className="rounded-lg btn-gradient px-4 py-3 font-bold transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isSending
               ? "Enviando..."
@@ -118,7 +118,7 @@ function ForgotPasswordContent() {
 
         <Link
           href="/login"
-          className="text-center text-sm font-medium text-orange-600 underline dark:text-orange-400"
+          className="text-center text-sm font-medium text-orange-700 underline dark:text-orange-400"
         >
           Voltar para o login
         </Link>

@@ -10,13 +10,8 @@ import { usePosts } from "@/lib/hooks/usePosts";
 import { createClient } from "@/lib/supabase/client";
 import {
   CalendarDotsIcon,
-  GearSixIcon,
   GlobeHemisphereWestIcon,
-  HouseIcon,
   MapPinIcon,
-  UserIcon,
-  UsersFourIcon,
-  UsersIcon,
 } from "@phosphor-icons/react";
 import Image from "next/image";
 import Link from "next/link";
@@ -63,21 +58,7 @@ function followButtonLabel(profile: PublicProfile) {
 
 const supabase = createClient();
 
-const NAV_ITEMS = [
-  { label: "Feed", to: "/", icon: HouseIcon },
-  { label: "Perfil", to: "/perfil", icon: UserIcon },
-  { label: "Amigos", to: "/friends", icon: UsersIcon },
-  { label: "Comunidade", to: "/communities", icon: UsersFourIcon },
-  { label: "Configurações", to: "/settings", icon: GearSixIcon },
-];
 
-const PROFILE_LINKS = [
-  { text: "Feed", redirect: "/", icon: HouseIcon },
-  { text: "Perfil", redirect: "/perfil", icon: UserIcon },
-  { text: "Amigos", redirect: "/friends", icon: UsersIcon },
-  { text: "Comunidade", redirect: "/communities", icon: UsersFourIcon },
-  { text: "Configurações", redirect: "/settings", icon: GearSixIcon },
-];
 
 export default function PublicProfilePage() {
   const { username } = useParams<{ username: string }>();
@@ -176,14 +157,13 @@ export default function PublicProfilePage() {
 
   return (
     <div className="w-dvw min-h-dvh overflow-hidden relative flex h-screen items-center justify-center bg-background font-sans gap-4">
-      <PageAside items={NAV_ITEMS} />
+      <PageAside />
       <MobileHeader />
 
       <main className="overflow-auto h-dvh flex-1 w-full flex items-start justify-center pt-20 gap-4 sm:pt-12">
         <ProfileSidebar
           alt="Foto de perfil"
           size={1}
-          prop={PROFILE_LINKS}
           name={viewer.name || "Carregando..."}
           at={viewer.username || "usuario"}
           src={viewer.avatarUrl || null}
@@ -223,7 +203,7 @@ export default function PublicProfilePage() {
                     aria-pressed={profile.follow_status !== "none"}
                     className={`rounded-full px-5 py-2 text-sm font-bold transition disabled:opacity-60 ${
                       profile.follow_status === "none"
-                        ? "gradient-to-l text-foreground-inverted hover:brightness-95"
+                        ? "btn-gradient hover:brightness-110"
                         : "border border-border-base text-foreground hover:bg-background"
                     }`}
                   >

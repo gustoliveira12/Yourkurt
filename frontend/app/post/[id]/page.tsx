@@ -5,6 +5,7 @@ import MobileNav from "@/components/navigation/MobileNav";
 import PageAside from "@/components/navigation/NavBar";
 import ProfileSidebar from "@/components/navigation/ProfileSidebar";
 import { ProfileLink } from "@/components/ProfileLink";
+import { Avatar } from "@/components/Avatar";
 import { useCurrentProfile } from "@/lib/hooks/useCurrentProfile";
 import { useInteractions } from "@/lib/hooks/useInteractions";
 import { useComments, type CommentItem } from "@/lib/hooks/useComments";
@@ -16,12 +17,7 @@ import {
   ArrowLeftIcon,
   CalendarDotsIcon,
   ChatCircleIcon,
-  GlobeHemisphereWestIcon,
-  MapPinIcon,
   PaperPlaneRightIcon,
-  UserIcon,
-  UsersFourIcon,
-  UsersIcon,
 } from "@phosphor-icons/react";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import Image from "next/image";
@@ -31,21 +27,7 @@ import { useEffect, useMemo, useState } from "react";
 
 const supabase = createClient();
 
-const NAV_ITEMS = [
-  { label: "Feed", to: "/", icon: UserIcon },
-  { label: "Perfil", to: "/perfil", icon: UserIcon },
-  { label: "Amigos", to: "/friends", icon: UsersIcon },
-  { label: "Comunidade", to: "/communities", icon: UsersFourIcon },
-  { label: "Configurações", to: "/settings", icon: UserIcon },
-];
 
-const PROFILE_LINKS = [
-  { text: "Feed", redirect: "/", icon: UserIcon },
-  { text: "Perfil", redirect: "/perfil", icon: UserIcon },
-  { text: "Amigos", redirect: "/friends", icon: UsersIcon },
-  { text: "Comunidade", redirect: "/communities", icon: UsersFourIcon },
-  { text: "Configurações", redirect: "/settings", icon: UserIcon },
-];
 
 function timeAgo(dateStr: string): string {
   const diff = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
@@ -236,7 +218,7 @@ community_id: rawPost.community_id ?? null,
 
   return (
     <div className="w-dvw min-h-dvh overflow-hidden relative flex h-screen items-center justify-center bg-background font-sans gap-4">
-      <PageAside items={NAV_ITEMS} />
+      <PageAside />
       <MobileHeader />
 
       <main className="overflow-auto h-dvh flex-1 w-full flex items-start justify-center pt-20 gap-4 sm:pt-12">
@@ -244,7 +226,6 @@ community_id: rawPost.community_id ?? null,
           <ProfileSidebar
             alt="Foto de perfil"
             size={1}
-            prop={PROFILE_LINKS}
             name={profile.name}
             at={profile.username}
             src={profile.avatarUrl ?? null}
@@ -276,15 +257,9 @@ community_id: rawPost.community_id ?? null,
                     href={postAuthorHref}
                     tabIndex={-1}
                     aria-hidden="true"
-                    className="size-12 shrink-0 overflow-hidden rounded-full"
+                    className="shrink-0 rounded-full"
                   >
-                    <Image
-                      src={post.profiles?.avatar_url ?? "/favicon.ico"}
-                      alt={post.profiles?.name ?? "Usuário"}
-                      width={48}
-                      height={48}
-                      className="h-full w-full object-cover"
-                    />
+                    <Avatar src={post.profiles?.avatar_url} name={post.profiles?.name ?? "Usuário"} sizes="sm" />
                   </ProfileLink>
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
@@ -333,20 +308,13 @@ community_id: rawPost.community_id ?? null,
                 )}
 
                 <div className="mt-4 flex flex-wrap gap-4 text-sm text-subtitle">
-                  <span className="inline-flex items-center gap-1.5">
-                    <MapPinIcon size={16} weight="fill" />
-                    {post.profiles?.username ? `@${post.profiles.username}` : ""}
-                  </span>
-                  <span className="inline-flex items-center gap-1.5">
-                    <CalendarDotsIcon size={16} weight="fill" />
-                    {new Date(post.created_at).toLocaleDateString("pt-BR")}
-                  </span>
-                  {post.profiles?.username && (
-                    <span className="inline-flex items-center gap-1.5 text-foreground-brand">
-                      <GlobeHemisphereWestIcon size={16} weight="fill" />
-                      @{post.profiles.username}
-                    </span>
-                  )}
+                  <time dateTime={post.created_at} className="inline-flex items-center gap-1.5">
+                    <CalendarDotsIcon size={16} weight="fill" aria-hidden="true" />
+                    {new Date(post.created_at).toLocaleString("pt-BR", {
+                      dateStyle: "short",
+                      timeStyle: "short",
+                    })}
+                  </time>
                 </div>
 
                 <div className="mt-5 flex items-center gap-8 border-t border-border-base pt-4 text-sm text-subtitle">
@@ -359,32 +327,25 @@ community_id: rawPost.community_id ?? null,
 
             <section className="border-b border-border-base p-4 md:p-6">
               <div className="flex items-start gap-3">
-                <div className="size-10 overflow-hidden rounded-full">
-                  <Image
-                    src={profile?.avatarUrl ?? "/favicon.ico"}
-                    alt={profile?.name ?? "Seu perfil"}
-                    width={40}
-                    height={40}
-                    className="h-full w-full object-cover"
-                  />
-                </div>
+                <Avatar src={profile?.avatarUrl} name={profile?.name ?? "Seu perfil"} sizes="sm" />
                 <div className="flex-1">
                   <textarea
                     value={commentContent}
                     onChange={(e) => setCommentContent(e.target.value)}
                     placeholder="Publicar sua resposta"
+                    aria-label="Sua resposta"
                     maxLength={MAX_CONTENT_LENGTH}
-                    className="min-h-24 w-full resize-none rounded-2xl border border-border-base bg-background px-4 py-3 text-foreground placeholder:text-foreground-muted outline-none"
+                    className="min-h-24 w-full resize-none rounded-2xl border border-border-base bg-background px-4 py-3 text-foreground placeholder:text-subtitle outline-none"
                   />
                   <div className="mt-3 flex items-center justify-between gap-3">
                     <p className="text-xs text-subtitle">
-                      Dê duplo clique na imagem para ampliar.
+                      {postImages.length > 0 ? "Dê duplo clique na imagem para ampliar." : ""}
                     </p>
                     <button
                       type="button"
                       onClick={() => void handleSubmitComment()}
                       disabled={!commentContent.trim() || submittingComment || !profile}
-                      className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-bold text-foreground-inverted gradient-to-l disabled:opacity-60"
+                      className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-bold btn-gradient disabled:opacity-60"
                     >
                       <PaperPlaneRightIcon size={16} weight="fill" />
                       Responder
@@ -417,15 +378,9 @@ community_id: rawPost.community_id ?? null,
                         href={profileHref(comment.profiles?.username)}
                         tabIndex={-1}
                         aria-hidden="true"
-                        className="size-10 shrink-0 overflow-hidden rounded-full"
+                        className="shrink-0 rounded-full"
                       >
-                        <Image
-                          src={comment.profiles?.avatar_url ?? "/favicon.ico"}
-                          alt={comment.profiles?.name ?? "Usuário"}
-                          width={40}
-                          height={40}
-                          className="h-full w-full object-cover"
-                        />
+                        <Avatar src={comment.profiles?.avatar_url} name={comment.profiles?.name ?? "Usuário"} sizes="sm" />
                       </ProfileLink>
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm">

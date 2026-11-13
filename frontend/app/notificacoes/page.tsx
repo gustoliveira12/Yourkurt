@@ -8,11 +8,6 @@ import ProfileSidebar from "@/components/navigation/ProfileSidebar";
 import { useCurrentProfile } from "@/lib/hooks/useCurrentProfile";
 import { createClient } from "@/lib/supabase/client";
 import {
-  GearSixIcon,
-  HouseIcon,
-  UserIcon,
-  UsersFourIcon,
-  UsersIcon,
 } from "@phosphor-icons/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -34,13 +29,6 @@ const NOTIFICATION_TEXT: Record<string, string> = {
   follow_request: "pediu para seguir você.",
   follow_accepted: "aceitou seu pedido para seguir.",
 };
-const NAV_ITEMS = [
-  { label: "Feed", to: "/", icon: HouseIcon },
-  { label: "Perfil", to: "/perfil", icon: UserIcon },
-  { label: "Amigos", to: "/friends", icon: UsersIcon },
-  { label: "Comunidade", to: "/communities", icon: UsersFourIcon },
-  { label: "Configurações", to: "/settings", icon: GearSixIcon },
-];
 
 function fetchNotifications(userId: string, cursor?: Pick<Notification, "created_at" | "id">) {
   let query = supabase
@@ -170,7 +158,7 @@ export default function NotificationsPage() {
 
   return (
     <div className="w-dvw min-h-dvh overflow-hidden relative flex h-screen items-center justify-center bg-background font-sans gap-4">
-      <PageAside items={NAV_ITEMS} />
+      <PageAside />
       <MobileHeader />
       <main className="overflow-auto h-dvh flex-1 w-full flex items-start justify-center pt-20 gap-4 sm:pt-12">
         <ProfileSidebar
@@ -234,7 +222,7 @@ export default function NotificationsPage() {
                               type="button"
                               onClick={() => void answerFollowRequest(notification, true)}
                               disabled={answeringId !== null}
-                              className="rounded-full px-4 py-1.5 text-xs font-bold text-foreground-inverted gradient-to-l hover:brightness-95 disabled:opacity-60"
+                              className="rounded-full px-4 py-1.5 text-xs font-bold btn-gradient hover:brightness-110 disabled:opacity-60"
                             >
                               Aceitar
                             </button>

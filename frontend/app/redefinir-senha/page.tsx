@@ -65,7 +65,7 @@ export default function ResetPasswordPage() {
     <main className="min-h-dvh w-full flex items-center justify-center bg-white p-4 font-sans text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100">
       <div className="flex w-full max-w-md flex-col gap-6">
         <div className="flex flex-col gap-2 text-center">
-          <span className="text-lg font-bold tracking-widest text-orange-600 dark:text-orange-400 uppercase">
+          <span className="text-lg font-bold tracking-widest text-orange-700 dark:text-orange-400 uppercase">
             Yourkurt
           </span>
           <h1 className="text-3xl font-bold">Criar nova senha</h1>
@@ -101,7 +101,7 @@ export default function ResetPasswordPage() {
           <button
             type="submit"
             disabled={isSaving || needsLogoutRetry}
-            className="rounded-lg bg-orange-500 px-4 py-3 font-bold text-white transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60"
+            className="rounded-lg btn-gradient px-4 py-3 font-bold transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isSaving ? "Salvando..." : "Salvar nova senha"}
           </button>
@@ -120,7 +120,7 @@ export default function ResetPasswordPage() {
           <button
             type="button"
             onClick={() => void finishLogout()}
-            className="rounded-lg border border-orange-400 px-4 py-3 font-bold text-orange-600 transition hover:bg-orange-400/10 dark:text-orange-400"
+            className="rounded-lg border border-orange-400 px-4 py-3 font-bold text-orange-700 transition hover:bg-orange-400/10 dark:text-orange-400"
           >
             Tentar sair novamente
           </button>
@@ -128,7 +128,7 @@ export default function ResetPasswordPage() {
 
         <Link
           href="/esqueci-senha"
-          className="text-center text-sm font-medium text-orange-600 underline dark:text-orange-400"
+          className="text-center text-sm font-medium text-orange-700 underline dark:text-orange-400"
         >
           Solicitar novo link
         </Link>

@@ -1,17 +1,13 @@
 "use client";
 
 import {
-  BellSimpleRingingIcon,
-  GlobeHemisphereWestIcon,
-  LockSimpleIcon,
-  PaletteIcon,
   UserCirclePlusIcon,
 } from "@phosphor-icons/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { BellIcon, Lightbulb, Lock, LockIcon, Palette } from "lucide-react";
+import { BellIcon, Lightbulb, LockIcon, Palette } from "lucide-react";
 //TODO: TIRAR ALERT DO NAVEGADOR, E MOSTRAR MENSAGEM DE ERRO NA TELA
 const supabase = createClient();
 
@@ -132,7 +128,7 @@ export default function SignupPage() {
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="rounded-xl border border-border-base bg-background px-3.5 py-2.5 text-foreground placeholder:text-foreground-muted"
+                className="rounded-xl border border-border-base bg-background px-3.5 py-2.5 text-foreground placeholder:text-subtitle"
                 placeholder="Ex.: Lucas Silva"
               />
             </label>
@@ -146,7 +142,7 @@ export default function SignupPage() {
                 onChange={(e) =>
                   setUsername(e.target.value.replace(/\s+/g, ""))
                 }
-                className="rounded-xl border border-border-base bg-background px-3.5 py-2.5 text-foreground placeholder:text-foreground-muted"
+                className="rounded-xl border border-border-base bg-background px-3.5 py-2.5 text-foreground placeholder:text-subtitle"
                 placeholder="ex.: lucas.silva"
               />
             </label>
@@ -158,7 +154,7 @@ export default function SignupPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="rounded-xl border border-border-base bg-background px-3.5 py-2.5 text-foreground placeholder:text-foreground-muted"
+                className="rounded-xl border border-border-base bg-background px-3.5 py-2.5 text-foreground placeholder:text-subtitle"
                 placeholder="email@example.com"
               />
             </label>
@@ -168,7 +164,7 @@ export default function SignupPage() {
               <textarea
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
-                className="min-h-24 rounded-xl border border-border-base bg-background px-3.5 py-2.5 text-foreground placeholder:text-foreground-muted"
+                className="min-h-24 rounded-xl border border-border-base bg-background px-3.5 py-2.5 text-foreground placeholder:text-subtitle"
                 placeholder="Conte em uma frase o que você curte compartilhar"
                 maxLength={120}
               />
@@ -182,7 +178,7 @@ export default function SignupPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 minLength={8}
-                className="rounded-xl border border-border-base bg-background px-3.5 py-2.5 text-foreground placeholder:text-foreground-muted"
+                className="rounded-xl border border-border-base bg-background px-3.5 py-2.5 text-foreground placeholder:text-subtitle"
                 placeholder="Mínimo de 8 caracteres"
               />
             </label>
@@ -195,7 +191,7 @@ export default function SignupPage() {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 minLength={8}
-                className="rounded-xl border border-border-base bg-background px-3.5 py-2.5 text-foreground placeholder:text-foreground-muted"
+                className="rounded-xl border border-border-base bg-background px-3.5 py-2.5 text-foreground placeholder:text-subtitle"
                 placeholder="Repita sua senha"
               />
             </label>
@@ -253,9 +249,10 @@ export default function SignupPage() {
                         key={option}
                         type="button"
                         onClick={() => setThemePreference(option)}
+                        aria-pressed={themePreference === option}
                         className={`rounded-lg border px-3 py-2 text-sm font-semibold capitalize transition-colors ${
                           themePreference === option
-                            ? "border-background-brand bg-background-brand text-foreground-inverted"
+                            ? "border-transparent btn-gradient"
                             : "border-border-base bg-background text-foreground hover:bg-background-raised"
                         }`}
                       >
@@ -307,7 +304,7 @@ export default function SignupPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="inline-flex items-center justify-center rounded-xl px-5 py-2.5 font-bold text-foreground-inverted gradient-to-l disabled:opacity-70"
+                className="inline-flex items-center justify-center rounded-xl px-5 py-2.5 font-bold btn-gradient disabled:opacity-70"
               >
                 {loading ? "Criando conta..." : "Criar conta"}
               </button>
@@ -325,7 +322,7 @@ export default function SignupPage() {
 
           <div className="mt-5 rounded-2xl border border-border-base bg-background p-5">
             <div className="flex items-center gap-3">
-              <div className="flex size-14 items-center justify-center rounded-full gradient-to-l text-xl font-black text-foreground-inverted">
+              <div className="flex size-14 items-center justify-center rounded-full btn-gradient text-xl font-black">
                 {(name.trim()[0] ?? "E").toUpperCase()}
               </div>
               <div>

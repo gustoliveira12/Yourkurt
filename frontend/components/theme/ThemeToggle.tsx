@@ -21,7 +21,10 @@ export default function ThemeToggle() {
     <button
       type="button"
       onClick={handleToggle}
-      aria-label={isDark ? "Ativar modo claro" : "Ativar modo escuro"}
+      // Interruptor: o nome é o texto visível ("Aparência, Modo escuro ativado")
+      // e o estado vem de aria-checked (ligado = escuro).
+      role="switch"
+      aria-checked={isDark}
       className="group flex w-full items-center justify-between rounded-xl border border-border-base bg-background px-4 py-3 transition-colors hover:bg-background-raised"
     >
       <span className="flex items-center gap-3">

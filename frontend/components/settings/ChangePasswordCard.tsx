@@ -154,7 +154,7 @@ export default function ChangePasswordCard() {
           <button
             type="submit"
             disabled={isSaving}
-            className="self-start rounded-lg bg-orange-500 px-4 py-2 text-sm font-semibold text-white transition hover:brightness-95 disabled:opacity-60"
+            className="self-start rounded-lg btn-gradient px-4 py-2 text-sm font-semibold transition hover:brightness-110 disabled:opacity-60"
           >
             {isSaving ? "Salvando..." : "Salvar nova senha"}
           </button>
