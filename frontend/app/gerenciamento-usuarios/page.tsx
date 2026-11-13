@@ -7,13 +7,8 @@ import ProfileSidebar from "@/components/navigation/ProfileSidebar";
 import { useCurrentProfile } from "@/lib/hooks/useCurrentProfile";
 import { createClient } from "@/lib/supabase/client";
 import {
-  GearSixIcon,
-  HouseIcon,
   MagnifyingGlassIcon,
   ShieldCheckIcon,
-  UserIcon,
-  UsersFourIcon,
-  UsersIcon,
 } from "@phosphor-icons/react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
@@ -31,21 +26,7 @@ type ManagedUser = {
 type RoleFilter = "all" | "user" | "admin" | "super_admin";
 type SortBy = "created_desc" | "created_asc" | "name_asc" | "role_desc";
 
-const NAV_ITEMS = [
-  { label: "Feed", to: "/", icon: HouseIcon },
-  { label: "Perfil", to: "/perfil", icon: UserIcon },
-  { label: "Amigos", to: "/friends", icon: UsersIcon },
-  { label: "Comunidade", to: "/communities", icon: UsersFourIcon },
-  { label: "Configurações", to: "/settings", icon: GearSixIcon },
-];
 
-const PROFILE_LINKS = [
-  { text: "Feed", redirect: "/", icon: HouseIcon },
-  { text: "Perfil", redirect: "/perfil", icon: UserIcon },
-  { text: "Amigos", redirect: "/friends", icon: UsersIcon },
-  { text: "Comunidade", redirect: "/communities", icon: UsersFourIcon },
-  { text: "Configurações", redirect: "/settings", icon: GearSixIcon },
-];
 
 export default function SuperAdminPage() {
   const { profile, loading: loadingProfile } = useCurrentProfile();
@@ -193,14 +174,13 @@ export default function SuperAdminPage() {
   if (!profile?.isSuperAdmin) {
     return (
       <div className="w-dvw min-h-dvh overflow-hidden relative flex h-screen items-center justify-center bg-background font-sans gap-4">
-        <PageAside items={NAV_ITEMS} />
+        <PageAside />
         <MobileHeader />
 
         <main className="overflow-auto h-dvh flex-1 w-full flex items-start justify-center pt-20 gap-4 sm:pt-12">
           <ProfileSidebar
             alt="Foto de perfil"
             size={1}
-            prop={PROFILE_LINKS}
             name={profile?.name ?? "Usuario"}
             at={profile?.username ?? "usuario"}
             src={profile?.avatarUrl ?? null}
@@ -230,14 +210,13 @@ export default function SuperAdminPage() {
 
   return (
     <div className="w-dvw min-h-dvh overflow-hidden relative flex h-screen items-center justify-center bg-background font-sans gap-4">
-      <PageAside items={NAV_ITEMS} />
+      <PageAside />
       <MobileHeader />
 
       <main className="overflow-auto h-dvh flex-1 w-full flex items-start justify-center pt-20 gap-4 sm:pt-12">
         <ProfileSidebar
           alt="Foto de perfil"
           size={1}
-          prop={PROFILE_LINKS}
           name={profile.name}
           at={profile.username}
           src={profile.avatarUrl ?? null}

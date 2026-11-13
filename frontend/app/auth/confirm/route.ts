@@ -105,7 +105,7 @@ export async function GET(request: NextRequest) {
     "error",
     isRecoveryNext(next)
       ? "Link inválido ou expirado. Solicite um novo."
-      : "Nao foi possivel confirmar seu e-mail. Tente novamente usando o link mais recente.",
+      : "Não foi possível confirmar seu e-mail. Tente novamente usando o link mais recente.",
   );
   return NextResponse.redirect(errorUrl);
 }

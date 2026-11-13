@@ -24,7 +24,7 @@ export default function NotFound() {
       </div>
       <Link
         href="/"
-        className="rounded-lg bg-orange-500 px-5 py-3 font-bold text-white transition hover:brightness-95"
+        className="rounded-lg btn-gradient px-5 py-3 font-bold transition hover:brightness-110"
       >
         Voltar para o início
       </Link>

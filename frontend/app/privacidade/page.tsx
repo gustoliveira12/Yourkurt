@@ -21,7 +21,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 export default function PrivacyPolicyPage() {
   return (
-    <main className="min-h-dvh w-full bg-background px-4 py-10 sm:py-16">
+    <main className="min-h-dvh w-full bg-background px-4 py-10 font-sans sm:py-16">
       <article className="mx-auto flex max-w-2xl flex-col gap-8">
         <header className="flex flex-col gap-2">
           <Link href="/" className="text-sm font-black tracking-wide text-foreground-brand">

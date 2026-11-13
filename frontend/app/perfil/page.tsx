@@ -14,14 +14,9 @@ import { removeUserFiles } from "@/lib/storage";
 import {
   CameraIcon,
   CalendarDotsIcon,
-  GearSixIcon,
   GlobeHemisphereWestIcon,
-  HouseIcon,
   MapPinIcon,
   PencilSimpleLineIcon,
-  UserIcon,
-  UsersFourIcon,
-  UsersIcon,
 } from "@phosphor-icons/react";
 import Image from "next/image";
 import Link from "next/link";
@@ -48,61 +43,7 @@ type FollowStats = {
 
 const supabase = createClient();
 
-const NAV_ITEMS = [
-  {
-    label: "Feed",
-    to: "/",
-    icon: HouseIcon,
-  },
-  {
-    label: "Perfil",
-    to: "/perfil",
-    icon: UserIcon,
-  },
-  {
-    label: "Amigos",
-    to: "/friends",
-    icon: UsersIcon,
-  },
-  {
-    label: "Comunidade",
-    to: "/communities",
-    icon: UsersFourIcon,
-  },
-  {
-    label: "Configurações",
-    to: "/settings",
-    icon: GearSixIcon,
-  },
-];
 
-const PROFILE_LINKS = [
-  {
-    text: "Feed",
-    redirect: "/",
-    icon: HouseIcon,
-  },
-  {
-    text: "Perfil",
-    redirect: "/perfil",
-    icon: UserIcon,
-  },
-  {
-    text: "Amigos",
-    redirect: "/friends",
-    icon: UsersIcon,
-  },
-  {
-    text: "Comunidade",
-    redirect: "/communities",
-    icon: UsersFourIcon,
-  },
-  {
-    text: "Configurações",
-    redirect: "/settings",
-    icon: GearSixIcon,
-  },
-];
 
 const INITIAL_PROFILE: ProfileState = {
   id: "",
@@ -461,14 +402,13 @@ export default function ProfilePage() {
 
   return (
     <div className="w-dvw min-h-dvh overflow-hidden relative flex h-screen items-center justify-center bg-background font-sans gap-4">
-      <PageAside items={NAV_ITEMS} />
+      <PageAside />
       <MobileHeader />
 
       <main className="overflow-auto h-dvh flex-1 w-full flex items-start justify-center pt-20 gap-4 sm:pt-12">
         <ProfileSidebar
           alt="Foto de perfil"
           size={1}
-          prop={PROFILE_LINKS}
           name={profile.name || "Carregando..."}
           at={profile.username || "usuario"}
           src={profile.avatarUrl || null}
@@ -674,6 +614,7 @@ export default function ProfilePage() {
                       key={tab.key}
                       type="button"
                       onClick={() => setActiveTab(tab.key)}
+                      aria-pressed={active}
                       className={`px-3 py-3 text-sm font-bold transition-colors ${
                         active
                           ? "text-foreground border-b-2 border-background-brand"
@@ -830,7 +771,7 @@ export default function ProfilePage() {
           </div>
         </section>
 
-        <RightNavbar prop={[]} onPostCreated={addPost} />
+        <RightNavbar onPostCreated={addPost} className="hidden sm:flex" />
       </main>
 
       <MobileNav />

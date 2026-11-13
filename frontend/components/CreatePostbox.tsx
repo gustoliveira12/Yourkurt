@@ -1,6 +1,6 @@
 "use client";
 
-import { Camera, Music, Pin, Send, SmilePlus } from "lucide-react";
+import { Camera, Send } from "lucide-react";
 import { Avatar } from "./Avatar";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
@@ -304,7 +304,7 @@ export default function CreatePostbox({
   }
 
   return (
-    <div className=" flex-col w-full px-6 py-4 rounded-card bg-surface shadow-card gap-4 max-w-lg hidden sm:flex">
+    <div className="flex flex-col w-full px-6 py-4 rounded-card bg-surface shadow-card gap-4 max-w-lg">
       {error && (
         <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-sm text-red-600 dark:text-red-400 text-sm">
           {error}
@@ -312,7 +312,10 @@ export default function CreatePostbox({
       )}
       <div className="flex gap-4">
         <div className="rounded-full flex items-start justify-center w-fit h-fit mt-1">
-          <Avatar src={selectedIdentity?.avatar_url ?? avatarUrl} />
+          <Avatar
+            src={selectedIdentity?.avatar_url ?? avatarUrl}
+            name={selectedIdentity?.name ?? profile?.name}
+          />
         </div>
         <div className="w-full flex flex-col gap-2">
           {postingIdentities.length > 1 && (
@@ -333,8 +336,9 @@ export default function CreatePostbox({
             </label>
           )}
           <textarea
+            aria-label="Escreva seu post"
             placeholder="O que está passando pela sua órbita?"
-            className="bg-background-raised w-full rounded-control transition-all duration-100 border border-border-base px-4 py-2 placeholder:text-foreground-muted text-foreground resize-none min-h-[80px] disabled:opacity-50"
+            className="bg-background-raised w-full rounded-control transition-all duration-100 border border-border-base px-4 py-2 placeholder:text-subtitle text-foreground resize-none min-h-[80px] disabled:opacity-50"
             value={content}
             onChange={(e) => setContent(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -377,6 +381,7 @@ export default function CreatePostbox({
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={submitting}
+            aria-label="Adicionar fotos"
             className="justify-center aspect-square md:aspect-auto text-sm font-medium flex border border-border-base text-foreground rounded-sm px-2 h-full gap-2 items-center hover:bg-purple-200 hover:border-purple-600  dark:hover:border-purple-400 dark:hover:bg-purple-500/10 transition-all duration-150 ease-out disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Camera
@@ -385,41 +390,15 @@ export default function CreatePostbox({
             />
             <span className="hidden md:flex">Foto</span>
           </button>
-          <button
-            disabled={submitting}
-            className="justify-center aspect-square md:aspect-auto text-sm font-medium flex border border-border-base text-foreground rounded-sm px-2 h-full gap-2 items-center hover:bg-emerald-100 hover:border-emerald-600 dark:hover:border-emerald-400 dark:hover:bg-emerald-500/10 transition-all duration-150 ease-out disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <Music
-              className="dark:text-emerald-500 text-emerald-600"
-              size={16}
-            />
-            <span className="hidden md:flex">Música</span>
-          </button>
-          <button
-            disabled={submitting}
-            className="justify-center aspect-square md:aspect-auto text-sm font-medium flex border border-border-base text-foreground rounded-sm px-2 h-full gap-2 items-center hover:border-red-500 hover:bg-red-200 dark:hover:border-red-400 dark:hover:bg-red-500/10 transition-all duration-150 ease-out disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <Pin className="dark:text-red-400 text-red-600" size={16} />
-            <span className="hidden md:flex">Local</span>
-          </button>
-          <button
-            disabled={submitting}
-            className="justify-center aspect-square md:aspect-auto text-sm font-medium flex border border-border-base text-foreground rounded-sm px-2 h-full gap-2 items-center hover:border-yellow-700 dark:hover:border-yellow-500 hover:bg-yellow-200 dark:hover:bg-yellow-500/10 transition-all duration-150 ease-out disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <SmilePlus
-              strokeWidth={3}
-              className="text-yellow-600 dark:text-yellow-400"
-              size={16}
-            />
-            <span className="hidden md:flex">Humor</span>
-          </button>
         </div>
         <button
+          type="button"
           onClick={() => void handleSubmit()}
           disabled={(!content.trim() && selectedImages.length === 0) || submitting}
-          className="aspect-square md:aspect-auto brightness-90 flex justify-center items-center h-full w-12 gradient-to-l rounded-sm font-bold text-foreground hover:brightness-80 disabled:opacity-40 disabled:cursor-not-allowed transition-opacity duration-150"
+          aria-label={submitting ? "Publicando" : "Publicar"}
+          className="flex justify-center items-center h-full w-12 btn-gradient rounded-sm font-bold hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed transition-opacity duration-150"
         >
-          <Send size={20} />
+          <Send size={20} aria-hidden="true" />
         </button>
       </div>
     </div>

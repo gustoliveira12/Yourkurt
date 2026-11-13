@@ -1,7 +1,5 @@
 "use client";
 
-import { CheckIcon, GoogleLogoIcon } from "@phosphor-icons/react";
-import * as Checkbox from "@radix-ui/react-checkbox";
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -10,7 +8,6 @@ import { createClient } from "@/lib/supabase/client";
 export default function LoginPage() {
   const router = useRouter();
 
-  const [checked, setChecked] = useState<boolean | "indeterminate">(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -51,13 +48,13 @@ export default function LoginPage() {
           </span>
 
           <div className="relative z-10 flex flex-col gap-4">
-            <h1 className="max-w-xl text-4xl font-bold leading-tight tracking-wide xl:text-6xl">
+            <p className="max-w-xl text-4xl font-bold leading-tight tracking-wide xl:text-6xl">
               Conecte.
               <br />
               Compartilhe.
               <br />
               Inspire.
-            </h1>
+            </p>
 
             <p className="max-w-md text-base text-white/90 sm:text-lg">
               Entre e descubra pessoas, ideias e momentos incríveis.
@@ -67,7 +64,7 @@ export default function LoginPage() {
 
         <section className="flex min-w-0 flex-col justify-between gap-8 p-5 text-neutral-900 dark:text-neutral-100 sm:p-8 md:p-10 lg:p-8 xl:p-12">
           <div className="flex flex-col gap-2 lg:hidden">
-            <span className="text-lg font-bold tracking-widest text-orange-600 dark:text-orange-400 uppercase">
+            <span className="text-lg font-bold tracking-widest text-orange-700 dark:text-orange-400 uppercase">
               Yourkurt
             </span>
 
@@ -82,9 +79,9 @@ export default function LoginPage() {
 
           <div className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center gap-8">
             <div className="flex flex-col items-center gap-2 text-center">
-              <h2 className="text-3xl font-bold tracking-wide sm:text-4xl">
+              <h1 className="text-3xl font-bold tracking-wide sm:text-4xl">
                 Bem-vindo
-              </h2>
+              </h1>
 
               <p className="text-sm text-neutral-600 dark:text-neutral-300 sm:text-base">
                 Insira seu e-mail e senha para acessar sua conta
@@ -98,7 +95,7 @@ export default function LoginPage() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full min-w-0 rounded-lg border border-neutral-300 bg-white px-4 py-3 text-base text-neutral-900 placeholder:text-neutral-500 outline-none transition focus:border-orange-400 focus:ring-2 focus:ring-orange-400/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-400"
+                  className="w-full min-w-0 rounded-lg border border-neutral-300 bg-white px-4 py-3 text-base text-neutral-900 placeholder:text-subtitle outline-none transition focus:border-orange-400 focus:ring-2 focus:ring-orange-400/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 "
                   placeholder="email@example.com"
                   autoComplete="email"
                   required
@@ -111,34 +108,17 @@ export default function LoginPage() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full min-w-0 rounded-lg border border-neutral-300 bg-white px-4 py-3 text-base text-neutral-900 placeholder:text-neutral-500 outline-none transition focus:border-orange-400 focus:ring-2 focus:ring-orange-400/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-400"
+                  className="w-full min-w-0 rounded-lg border border-neutral-300 bg-white px-4 py-3 text-base text-neutral-900 placeholder:text-subtitle outline-none transition focus:border-orange-400 focus:ring-2 focus:ring-orange-400/30 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 "
                   placeholder="Digite sua senha"
                   autoComplete="current-password"
                   required
                 />
               </label>
 
-              <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-neutral-600 dark:text-neutral-300">
-                <div className="flex items-center gap-2">
-                  <Checkbox.Root
-                    id="c1"
-                    checked={checked}
-                    onCheckedChange={setChecked}
-                    className="flex size-4 shrink-0 items-center justify-center rounded-sm border border-neutral-400 data-[state=checked]:border-orange-500 data-[state=checked]:bg-orange-500"
-                  >
-                    <Checkbox.Indicator>
-                      <CheckIcon weight="bold" className="text-white" />
-                    </Checkbox.Indicator>
-                  </Checkbox.Root>
-
-                  <label htmlFor="c1" className="cursor-pointer">
-                    Lembrar-se
-                  </label>
-                </div>
-
+              <div className="flex justify-end text-sm">
                 <Link
                   href="/esqueci-senha"
-                  className="text-orange-600 hover:underline dark:text-orange-400"
+                  className="text-orange-700 hover:underline dark:text-orange-400"
                 >
                   Esqueci minha senha
                 </Link>
@@ -147,17 +127,9 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="flex w-full items-center justify-center rounded-lg bg-gr p-2 gradient-to-l px-4 py-3 font-bold text-white transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60"
+                className="flex w-full items-center justify-center rounded-lg btn-gradient px-4 py-3 font-bold transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {loading ? "Entrando..." : "Entrar"}
-              </button>
-
-              <button
-                type="button"
-                className="flex w-full it ems-center justify-center gap-2 rounded-lg border border-orange-400 px-4 py-3 font-medium text-neutral-800 transition hover:bg-orange-400/10 dark:text-neutral-100"
-              >
-                <GoogleLogoIcon weight="bold" size={20} />
-                Entrar com o Google
               </button>
             </form>
           </div>
@@ -166,7 +138,7 @@ export default function LoginPage() {
             Não tem uma conta?{" "}
             <Link
               href="/signup"
-              className="font-medium text-orange-600 underline dark:text-orange-400"
+              className="font-medium text-orange-700 underline dark:text-orange-400"
             >
               Registrar
             </Link>

@@ -1,15 +1,11 @@
 import { useReducer } from "react";
 
-import {
-  type Icon,
-  AlignLeftIcon,
-  AlignTopSimpleIcon,
-  BellIcon,
-} from "@phosphor-icons/react";
+import { AlignLeftIcon, AlignTopSimpleIcon } from "@phosphor-icons/react";
 import clsx from "clsx";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import ThemeToggleCompact from "@/components/theme/ThemeToggleCompact";
+import { type NavItem, NAV_ITEMS, isPathActive } from "./navItems";
 
 type AsideState = {
   isExpanded: boolean;
@@ -42,38 +38,11 @@ function asideReducer(state: AsideState, action: AsideAction): AsideState {
   }
 }
 
-export type NavItem = {
-  to: string;
-  icon: Icon;
-  label: string;
-  exact?: boolean;
-};
-
 export type PageAsideProps = {
-  items: NavItem[];
+  items?: NavItem[];
 };
 
-function normalizePath(path: string): string {
-  if (!path) return "/";
-  return path.length > 1 && path.endsWith("/") ? path.slice(0, -1) : path;
-}
-
-function isPathActive(pathname: string, to: string, exact?: boolean): boolean {
-  const current = normalizePath(pathname);
-  const target = normalizePath(to);
-
-  if (target === "/") {
-    return current === "/";
-  }
-
-  if (exact) {
-    return current === target;
-  }
-
-  return current === target || current.startsWith(`${target}/`);
-}
-
-const PageAside = ({ items }: PageAsideProps) => {
+const PageAside = ({ items = NAV_ITEMS }: PageAsideProps) => {
   const [state, dispatch] = useReducer(asideReducer, {
     isExpanded: false,
     isPinned: false,
@@ -94,22 +63,25 @@ const PageAside = ({ items }: PageAsideProps) => {
         onMouseLeave={() => dispatch({ type: "LEAVE" })}
       >
         <div className="flex items-center justify-center h-14 px-2.5 shrink-0 overflow-hidden">
-          <h1 className="text-2xl font-black gradient-to-l text-transparent bg-clip-text">
+          {/* Logo, não título: cada página tem o próprio h1. */}
+          <span
+            aria-hidden="true"
+            className="text-2xl font-black gradient-to-l text-transparent bg-clip-text"
+          >
             Y
-          </h1>
+          </span>
         </div>
         <nav className="flex flex-col justify-center flex-1 p-2">
           <ul className="flex flex-col gap-1">
-            {[...items.filter((item) => item.to !== "/notificacoes"), {
-              to: "/notificacoes",
-              icon: BellIcon,
-              label: "Notificações",
-            }].map(({ to, icon: Icon, label, exact }) => {
+            {items.map(({ to, icon: Icon, label, exact }) => {
               const isActive = isPathActive(pathname, to, exact);
               return (
                 <li key={to}>
                   <Link
                     href={to}
+                    // O texto some com o menu fechado; o aria-label mantém o nome.
+                    aria-label={label}
+                    aria-current={isActive ? "page" : undefined}
                     className="hover:bg-background-raised flex items-center w-full py-4 px-2.5 gap-3 font-bold uppercase rounded-lg text-subtitle"
                   >
                     <Icon
@@ -137,7 +109,10 @@ const PageAside = ({ items }: PageAsideProps) => {
         <div className="flex flex-col items-center justify-center w-14 pb-4 gap-1">
           <ThemeToggleCompact isOpen={isOpen} />
           <button
+            type="button"
             title="Manter minimizado"
+            aria-label="Manter minimizado"
+            aria-pressed={state.isKeepMinimized}
             className={clsx(
               "p-2 hover:bg-background-raised rounded-lg text-subtitle",
               {
@@ -149,7 +124,10 @@ const PageAside = ({ items }: PageAsideProps) => {
             <AlignLeftIcon weight="fill" size={28} />
           </button>
           <button
+            type="button"
             title="Fixar aberta"
+            aria-label="Fixar aberta"
+            aria-pressed={state.isPinned}
             className={clsx(
               "p-2 hover:bg-background-raised rounded-lg text-subtitle",
               {

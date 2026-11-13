@@ -5,124 +5,31 @@ import PageAside from "@/components/navigation/NavBar";
 import ProfileSidebar from "@/components/navigation/ProfileSidebar";
 import PostCard from "@/components/UserPost";
 import RightNavbar from "@/components/PostComposer";
-import Story from "@/components/Stories";
-import {
-  HouseIcon,
-  UsersIcon,
-  UserIcon,
-  UsersFourIcon,
-  GearSixIcon,
-  GameControllerIcon,
-  MusicNotesIcon,
-  BookIcon,
-  AirplaneIcon,
-} from "@phosphor-icons/react";
 import MobileNav from "@/components/navigation/MobileNav";
 import MobileHeader from "@/components/navigation/MobileHeader";
-
-const NAV_ITEMS = [
-  {
-    label: "Feed",
-    to: "/",
-    icon: HouseIcon,
-  },
-  {
-    label: "Perfil",
-    to: "/perfil",
-    icon: UserIcon,
-  },
-  {
-    label: "Amigos",
-    to: "/friends",
-    icon: UsersIcon,
-  },
-  {
-    label: "Comunidade",
-    to: "/communities",
-    icon: UsersFourIcon,
-  },
-  {
-    label: "Configurações",
-    to: "/settings",
-    icon: GearSixIcon,
-  },
-];
 
 export default function Home() {
   const { profile } = useCurrentProfile();
   const { posts, loading, error, addPost, deletePost, deletingPostId } = usePosts();
 
-  const feedStoryNames = Array.from(
-    new Set(
-      posts
-        .map((post) => post.profiles?.name)
-        .filter((name): name is string => Boolean(name)),
-    ),
-  )
-    .filter((name) => name !== profile?.name)
-    .slice(0, 6);
-
-  const Comunnities = [
-    {
-      text: "GamersBr",
-      redirect: "/",
-      icon: GameControllerIcon,
-      color: "rose",
-    },
-    {
-      text: "Indie Music",
-      redirect: "/",
-      icon: MusicNotesIcon,
-      color: "emerald",
-    },
-    {
-      text: "Clube do livro",
-      redirect: "/",
-      icon: BookIcon,
-      color: "sky",
-    },
-    {
-      text: "Mochileiros",
-      redirect: "/",
-      icon: AirplaneIcon,
-      color: "amber",
-    },
-  ];
-
   return (
     <div className="w-dvw min-h-dvh overflow-hidden relative flex h-screen items-center justify-center bg-background font-sans gap-2">
-      <PageAside items={NAV_ITEMS} />
+      <PageAside />
       <MobileHeader />
       <main className="overflow-auto h-dvh flex-1 w-full flex items-start justify-center pt-20 gap-6 sm:pt-12">
         <ProfileSidebar
-          alt="string"
+          alt="Foto de perfil"
           size={1}
-          prop={NAV_ITEMS}
           name={profile?.name ?? "Carregando..."}
           at={profile?.username ?? "usuario"}
           src={profile?.avatarUrl ?? null}
           headerUrl={profile?.headerUrl}
         />
         <div className="flex flex-col md:gap-12 items-center md:min-w-168 md:px-3">
-          <div className="flex flex-col w-full ">
-            <div className="flex md:gap-6 gap-2 justify-start items-center max-w-dvw lg:max-w-192 overflow-hidden px-2 py-3 md:rounded-card md:bg-surface md:shadow-card">
-              <Story
-                key={`story-${profile?.id}`}
-                hasStory
-                name={profile?.name ?? "Usuário"}
-                src={profile?.avatarUrl ?? null}
-              />
-              {feedStoryNames.map((name, index) => (
-                <Story
-                  key={`story-feed-${index}`}
-                  hasStory
-                  name={name}
-                  src={null}
-                />
-              ))}
-            </div>
-          </div>
           <div className="flex flex-col w-full gap-4 max-w-2xl">
+            <h1 className="sr-only">Feed</h1>
+            {/* No celular a coluna da direita some: a caixa de post fica no topo do feed. */}
+            <RightNavbar onPostCreated={addPost} className="flex sm:hidden px-2" />
             {loading && (
               <p className="text-center text-foreground-muted py-8">Carregando posts...</p>
             )}
@@ -144,7 +51,7 @@ export default function Home() {
             ))}
           </div>
         </div>
-        <RightNavbar prop={Comunnities} onPostCreated={addPost} />
+        <RightNavbar onPostCreated={addPost} className="hidden sm:flex" />
       </main>
       <MobileNav />
     </div>
