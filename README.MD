@@ -14,6 +14,7 @@ Yourkurt é uma rede social interna inspirada no Orkut, focada em perfis, posts 
 - Perfis públicos em `/perfil/<username>`, com botão de seguir e contagem de seguidores e seguindo.
 - Perfil privado: seguir vira um pedido que o dono aceita ou recusa, e só seguidores aprovados veem posts, bio, localização, site e aniversário.
 - Do aniversário, as outras pessoas veem só o dia e o mês.
+- Amigos são as pessoas que você segue e que seguem você de volta; a página `/friends` lista amigos, seguidores e quem você segue.
 
 **Posts e interações**
 - Feed de posts com até 2.500 caracteres e várias imagens por post (comprimidas no navegador antes do envio).
@@ -83,7 +84,7 @@ NEXT_PUBLIC_SUPABASE_URL=<url-do-projeto-no-supabase>
 NEXT_PUBLIC_SUPABASE_ANON_KEY=<chave-anon-do-supabase>
 ```
 
-Para usar um banco local, rode `supabase start` e `supabase db reset` na raiz e coloque a URL e a chave anon mostradas por `supabase status` em `frontend/.env.development.local` (no `pnpm dev`, ele tem prioridade sobre o `.env.local`). O seed cria os usuários `dev1@yourkurt.test` (super admin, perfil público) e `dev2@yourkurt.test` (perfil privado), com a senha `dev123`.
+Para usar um banco local, rode `supabase start` e `supabase db reset` na raiz e coloque a URL e a chave anon mostradas por `supabase status` em `frontend/.env.development.local` (no `pnpm dev`, ele tem prioridade sobre o `.env.local`). O seed cria os usuários `dev1@yourkurt.test` (super admin, perfil público), `dev2@yourkurt.test` (perfil privado) e `dev3@yourkurt.test` (perfil público, amigo do dev1), todos com a senha `dev123`.
 
 ## Migrations
 
@@ -101,14 +102,13 @@ Alterações no banco entram como novos arquivos em `supabase/migrations/` e sã
 | Páginas de equipe e gestão de usuários       | Concluído       |
 | Navegação mobile e tema claro/escuro         | Concluído       |
 | Seguir usuários e perfil privado             | Concluído       |
+| Amigos (seguidores mútuos)                   | Concluído       |
 | Privacidade (LGPD) e acessibilidade          | Concluído       |
-| Amigos                                       | Em andamento    |
 | Comunidades                                  | Em andamento    |
 | Backend próprio                              | Não iniciado    |
 
 ## Próximos passos
 
-- Amigos: página `/friends` com amigos (quem você segue e segue você de volta), seguidores e seguindo.
 - Telas de comunidades: listagem, criação e página da comunidade (o schema já existe, as rotas ainda são esqueletos).
 - Preferências de notificação, e repost e salvar gravados no banco (hoje ficam só no navegador).
 - Imagens em buckets privados, com URLs assinadas.
