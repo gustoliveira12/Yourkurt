@@ -6,6 +6,7 @@
 -- Usuários (senha de todos: dev123):
 --   dev1@yourkurt.test  @dev1  super admin, perfil público
 --   dev2@yourkurt.test  @dev2  usuário comum, perfil privado
+--   dev3@yourkurt.test  @dev3  usuário comum, perfil público
 
 -- 1. Usuários. O trigger handle_new_user cria os perfis a partir dos metadados.
 --    Os campos de token vazios e a linha em auth.identities são exigidos pelo
@@ -25,6 +26,11 @@ VALUES
  'dev2@yourkurt.test', crypt('dev123', gen_salt('bf')), now(),
  '{"provider": "email", "providers": ["email"]}',
  '{"name": "Desenvolvedor 2", "username": "dev2", "profile_visibility": "private"}',
+ now(), now(), '', '', '', ''),
+('00000000-0000-0000-0000-000000000000', '66666666-6666-6666-6666-666666666666', 'authenticated', 'authenticated',
+ 'dev3@yourkurt.test', crypt('dev123', gen_salt('bf')), now(),
+ '{"provider": "email", "providers": ["email"]}',
+ '{"name": "Desenvolvedor 3", "username": "dev3"}',
  now(), now(), '', '', '', '');
 
 INSERT INTO auth.identities (id, user_id, provider_id, provider, identity_data, last_sign_in_at, created_at, updated_at)
@@ -32,7 +38,8 @@ SELECT gen_random_uuid(), u.id, u.id::text, 'email',
        jsonb_build_object('sub', u.id::text, 'email', u.email, 'email_verified', true),
        now(), now(), now()
 FROM auth.users u
-WHERE u.id IN ('11111111-1111-1111-1111-111111111111', '22222222-2222-2222-2222-222222222222');
+WHERE u.id IN ('11111111-1111-1111-1111-111111111111', '22222222-2222-2222-2222-222222222222',
+               '66666666-6666-6666-6666-666666666666');
 
 -- 2. dev1 vira super admin. O trigger profiles_privilege_guard só permite essa
 --    troca para um super admin logado, então é desligado durante o seed.
@@ -62,3 +69,15 @@ VALUES
  'Fala galera! Testando o feed da comunidade com o novo banco de dados limpo.'),
 ('55555555-5555-5555-5555-555555555555', '22222222-2222-2222-2222-222222222222', NULL,
  'Este é um post no perfil privado do dev2: só aparece para quem ele aprovou.');
+
+-- 5. Seguidores. O trigger set_follow_status decide o status: seguir o dev2
+--    (privado) vira pedido pendente.
+--    dev1 <-> dev3: seguem um ao outro, então são amigos.
+--    dev2  -> dev1: seguidor, mas não amigo (o dev1 só pediu para seguir o dev2).
+--    dev1  -> dev2: pedido pendente, aparece nas notificações do dev2.
+INSERT INTO public.follows (follower_id, following_id)
+VALUES
+('11111111-1111-1111-1111-111111111111', '66666666-6666-6666-6666-666666666666'),
+('66666666-6666-6666-6666-666666666666', '11111111-1111-1111-1111-111111111111'),
+('22222222-2222-2222-2222-222222222222', '11111111-1111-1111-1111-111111111111'),
+('11111111-1111-1111-1111-111111111111', '22222222-2222-2222-2222-222222222222');
