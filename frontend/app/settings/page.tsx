@@ -18,7 +18,7 @@ import {
 } from "@phosphor-icons/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 
 type TeamPageItem = {
   id: string;
@@ -72,10 +72,17 @@ function SettingsCard({
   );
 }
 
+const subscribeNoop = () => () => {};
+
 export default function SettingsPage() {
   const router = useRouter();
   const { profile } = useCurrentProfile();
-  const [hasMounted, setHasMounted] = useState(false);
+  // false on the server and during hydration, true afterwards (no setState-in-effect).
+  const hasMounted = useSyncExternalStore(
+    subscribeNoop,
+    () => true,
+    () => false,
+  );
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [logoutError, setLogoutError] = useState("");
   const [teamName, setTeamName] = useState("");
@@ -85,10 +92,6 @@ export default function SettingsPage() {
   const [isCreatingTeam, setIsCreatingTeam] = useState(false);
   const [teamPages, setTeamPages] = useState<TeamPageItem[]>([]);
   const [teamMembersByPage, setTeamMembersByPage] = useState<TeamPageMembersMap>({});
-
-  useEffect(() => {
-    setHasMounted(true);
-  }, []);
 
   useEffect(() => {
     async function loadTeamPages() {

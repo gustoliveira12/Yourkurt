@@ -40,54 +40,69 @@ function normalizeReplyPost(post: ReplyPost | ReplyPost[] | null) {
   return Array.isArray(post) ? post[0] ?? null : post;
 }
 
+// Result of the last fetch, tagged with the request it answers.
+// `loading` is derived from it, so the effect never sets state synchronously.
+type RepliesState = {
+  userId: string;
+  reload: number;
+  replies: UserReply[];
+  error: string | null;
+};
+
+const NO_REPLIES: UserReply[] = [];
+
 export function useUserReplies(userId: string) {
-  const [replies, setReplies] = useState<UserReply[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchReplies = useCallback(async () => {
-    if (!userId) {
-      setReplies([]);
-      setLoading(false);
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-
-    const supabase = createClient();
-    const { data, error: fetchError } = await supabase
-      .from("comments")
-      .select<string, RawReply>(
-        "id, post_id, user_id, content, created_at, posts(id, content, media:post_media(*), profiles(name, username, avatar_url))",
-      )
-      .eq("user_id", userId)
-      .order("created_at", { ascending: false })
-      .limit(60);
-
-    if (fetchError) {
-      setError(fetchError.message);
-      setReplies([]);
-      setLoading(false);
-      return;
-    }
-
-    const mappedReplies = (data ?? []).map((item) => ({
-      id: item.id,
-      post_id: item.post_id,
-      user_id: item.user_id,
-      content: item.content,
-      created_at: item.created_at,
-      posts: normalizeReplyPost(item.posts),
-    }));
-
-    setReplies(mappedReplies);
-    setLoading(false);
-  }, [userId]);
+  const [reload, setReload] = useState(0);
+  const [state, setState] = useState<RepliesState | null>(null);
 
   useEffect(() => {
-    void fetchReplies();
-  }, [fetchReplies]);
+    if (!userId) return;
+    let active = true;
 
-  return { replies, loading, error, refetch: fetchReplies };
+    async function loadReplies() {
+      const supabase = createClient();
+      const { data, error: fetchError } = await supabase
+        .from("comments")
+        .select<string, RawReply>(
+          "id, post_id, user_id, content, created_at, posts(id, content, media:post_media(*), profiles(name, username, avatar_url))",
+        )
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false })
+        .limit(60);
+
+      if (!active) return;
+
+      if (fetchError) {
+        setState({ userId, reload, replies: [], error: fetchError.message });
+        return;
+      }
+
+      const mappedReplies = (data ?? []).map((item) => ({
+        id: item.id,
+        post_id: item.post_id,
+        user_id: item.user_id,
+        content: item.content,
+        created_at: item.created_at,
+        posts: normalizeReplyPost(item.posts),
+      }));
+
+      setState({ userId, reload, replies: mappedReplies, error: null });
+    }
+
+    void loadReplies();
+    return () => {
+      active = false;
+    };
+  }, [userId, reload]);
+
+  const current = state?.userId === userId && state.reload === reload ? state : null;
+
+  const refetch = useCallback(() => setReload((n) => n + 1), []);
+
+  return {
+    replies: current?.replies ?? NO_REPLIES,
+    loading: Boolean(userId) && !current,
+    error: current?.error ?? null,
+    refetch,
+  };
 }

@@ -1,117 +1,107 @@
 # Yourkurt
 
-Yourkurt é uma rede social interna inspirada no Orkut, focada em perfis, posts e interações entre usuários de um mesmo ambiente organizacional. O projeto está em desenvolvimento ativo e já oferece autenticação, perfil, feed de posts, curtidas e navegação mobile.
+Yourkurt é uma rede social interna inspirada no Orkut, focada em perfis, posts e interações entre usuários de um mesmo ambiente organizacional. É um projeto da turma 17256 dos aprendizes do Espro e está em desenvolvimento ativo.
 
-## Funcionalidades Principais
+## Funcionalidades
 
-- Autenticação (login e cadastro de usuários).
-- Perfis com avatar e imagem de capa.
-- Feed de posts com limite de 500 caracteres.
-- Curtidas, contagem de interações e exibição de dados do autor.
-- Navegação mobile integrada ao layout principal.
-- Alternância entre tema claro e escuro, com persistência local de preferências visuais.
+**Conta e autenticação**
+- Cadastro com verificação de e-mail e login.
+- Recuperação de senha por e-mail e troca de senha nas configurações.
+- Exclusão da própria conta.
 
-## Stack Tecnológica
+**Perfis**
+- Perfil com avatar, imagem de capa e dados editáveis.
+- Perfis públicos em `/perfil/<username>`, com contagem de seguidores e seguindo.
 
-O projeto utiliza a seguinte stack:
+**Posts e interações**
+- Feed de posts com até 2.500 caracteres e várias imagens por post (comprimidas no navegador antes do envio).
+- Página de detalhe do post com comentários de até 2.500 caracteres.
+- Curtidas e contagem de comentários e reposts.
+- Aba de respostas no perfil.
 
-| Camada                 | Tecnologia                                |
-|------------------------|-------------------------------------------|
-| Framework              | Next.js 16.2.4 (App Router)               |
-| Interface              | React 19.2.4                              |
-| Linguagem              | TypeScript                                |
-| Estilização            | Tailwind CSS 4                            |
-| Componentes de UI      | Radix UI                                  |
-| Ícones                 | Lucide React e Phosphor Icons             |
-| Backend as a Service   | Supabase (Supabase JS e Supabase SSR)     |
-| Gerenciador de pacotes | pnpm                                      |
-| Hospedagem             | Vercel                                    |
+**Páginas de equipe e administração**
+- Páginas de equipe: membros autorizados podem publicar em nome da equipe.
+- Painel de gerenciamento de usuários e permissões (`/gerenciamento-usuarios`), restrito ao super admin.
 
-Supabase é utilizado como Backend as a Service, fornecendo autenticação, banco de dados PostgreSQL, armazenamento de arquivos e consultas.
+**Outros**
+- Notificações (por exemplo, novos seguidores), com marcação de lidas.
+- Tema claro e escuro, com a preferência salva no navegador.
+- Navegação mobile e página 404 personalizada.
 
-## Estrutura do Repositório
+## Stack
 
-A estrutura de alto nível do monorepo é:
+| Camada                 | Tecnologia                                 |
+|------------------------|--------------------------------------------|
+| Framework              | Next.js 16 (App Router)                    |
+| Interface              | React 19                                   |
+| Linguagem              | TypeScript                                 |
+| Estilização            | Tailwind CSS 4                             |
+| Componentes de UI      | Radix UI                                   |
+| Ícones                 | Lucide React e Phosphor Icons              |
+| Backend as a Service   | Supabase (Auth, PostgreSQL, Storage)       |
+| Gerenciador de pacotes | pnpm                                       |
+| Hospedagem             | Vercel                                     |
+
+O frontend fala direto com o Supabase. As regras de acesso ficam no banco, em policies de RLS, triggers e funções definidas nas migrations de `supabase/migrations`.
+
+## Estrutura do repositório
 
 ```text
 Yourkurt/
-├── frontend/   Aplicação Next.js
-├── backend/    Reservado para backend próprio
-├── supabase/   Migrations e configuração do Supabase
-├── package.json
-└── pnpm-lock.yaml
+├── frontend/          Aplicação Next.js
+│   ├── app/           Rotas (App Router)
+│   ├── components/    Componentes de interface
+│   └── lib/           Hooks, cliente Supabase e utilitários
+├── supabase/
+│   ├── migrations/    Schema, policies, triggers e buckets
+│   ├── seed.sql       Dados falsos para o ambiente local
+│   └── config.toml    Configuração do Supabase CLI
+└── backend/           Reservado para um backend próprio (vazio)
 ```
 
-- `frontend/`: código da aplicação web (App Router, componentes, hooks).
-- `backend/`: diretório reservado para um backend próprio futuro.
-- `supabase/`: scripts de migrations, configuração de buckets, triggers e policies.
+## Rodando localmente
 
-## Como rodar localmente
+As dependências e o `.env.local` ficam em `frontend/`, não na raiz:
 
-### Pré-requisitos
+```bash
+cd frontend
+pnpm install
+pnpm dev        # http://localhost:3000
+```
 
-- Node.js (versão compatível com Next.js 16.x).
-- pnpm instalado globalmente.
-- Conta e projeto no Supabase configurados.
+O `frontend/.env.local` precisa de:
 
-### Passos
+```bash
+NEXT_PUBLIC_SUPABASE_URL=<url-do-projeto-no-supabase>
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<chave-anon-do-supabase>
+```
 
-1. Clonar o repositório:
+Para usar um banco local, rode `supabase start` e `supabase db reset` na raiz. O seed cria os usuários `dev1@yourkurt.test` e `dev2@yourkurt.test`, com a senha `dev123`.
 
-   ```bash
-   git clone <url-do-repositorio>
-   cd Yourkurt
-   ```
+## Migrations
 
-2. Instalar dependências:
+Alterações no banco entram como novos arquivos em `supabase/migrations/` e são aplicadas com `supabase db push`. Commite a migration logo depois do push: se o banco remoto tiver uma migration que não está no repositório, o próximo `db push` de outra pessoa falha.
 
-   ```bash
-   pnpm install
-   ```
+## Status do projeto
 
-3. Configurar as variáveis de ambiente (por exemplo em `.env.local`):
+| Área                                         | Status          |
+|----------------------------------------------|-----------------|
+| Autenticação, recuperação de senha e conta   | Concluído       |
+| Perfil e perfis públicos                     | Concluído       |
+| Feed, posts com imagens e comentários        | Concluído       |
+| Curtidas e interações                        | Concluído       |
+| Notificações                                 | Concluído       |
+| Páginas de equipe e gestão de usuários       | Concluído       |
+| Navegação mobile e tema claro/escuro         | Concluído       |
+| Seguir usuários                              | Em andamento    |
+| Comunidades                                  | Em andamento    |
+| Amigos                                       | Em andamento    |
+| Backend próprio                              | Não iniciado    |
 
-   ```bash
-   NEXT_PUBLIC_SUPABASE_URL=<url-do-projeto-no-supabase>
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=<chave-anon-do-supabase>
-   ```
+## Próximos passos
 
-   A aplicação depende dessas variáveis para se conectar ao backend de dados.
-
-4. Subir o ambiente de desenvolvimento:
-
-   ```bash
-   cd frontend
-   pnpm dev
-   ```
-
-5. Acessar no navegador:
-
-   - `http://localhost:3000`
-
-## Status do Projeto
-
-O status atual das principais áreas é:
-
-| Área                                   | Status        |
-|----------------------------------------|---------------|
-| Autenticação (login e cadastro)        | Concluído     |
-| Feed e criação de posts                | Concluído     |
-| Perfil de usuário                      | Concluído     |
-| Curtidas e interações                  | Concluído     |
-| Upload de arquivos (Supabase Storage)  | Concluído     |
-| Navegação mobile                       | Concluído     |
-| Amigos                                 | Não iniciado  |
-| Comunidades                            | Não iniciado  |
-| Mensagens                              | Não iniciado  |
-| Backend próprio                        | Não iniciado  |
-
-Essas informações são detalhadas na Documentação Técnica do projeto.
-
-## Roadmap (Próximos Passos)
-
-- Implementar páginas de amigos, comunidades e mensagens.
-- Implementar o backend próprio e definir suas responsabilidades.
-- Aplicar migrations pendentes no ambiente Supabase.
+- Botão de seguir e deixar de seguir nos perfis públicos (o banco e as notificações de "seguir" já existem).
+- Telas de comunidades: listagem, criação e página da comunidade (o schema já existe, as rotas ainda são esqueletos).
+- Fluxo de amizades (enviar e aceitar pedidos).
+- Definir as responsabilidades do backend próprio.
 - Refinar detalhes visuais (stories, menu, interações de hover).
-- Finalizar a funcionalidade completa de comunidades.

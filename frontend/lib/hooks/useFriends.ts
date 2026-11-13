@@ -1,7 +1,7 @@
 "use client";
 
 import { createClient } from "@/lib/supabase/client";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 export type Friend = {
   id: string;
@@ -22,35 +22,46 @@ function normalizeFriend(value: Friend | Friend[] | null): Friend | null {
   return Array.isArray(value) ? (value[0] ?? null) : value;
 }
 
+// Result of the last fetch, tagged with the limit it answers.
+// `loading` is derived from it, so the effect never sets state synchronously.
+type FriendsState = {
+  limit: number;
+  friends: Friend[];
+};
+
+const NO_FRIENDS: Friend[] = [];
+
 export function useFriends(limit: number = 6) {
-  const [friends, setFriends] = useState<Friend[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [state, setState] = useState<FriendsState | null>(null);
 
-  const fetchFriends = useCallback(async () => {
-    setLoading(true);
-    const supabase = createClient();
+  useEffect(() => {
+    let active = true;
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    async function loadFriends() {
+      const supabase = createClient();
 
-    if (!user) {
-      setLoading(false);
-      return;
-    }
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
 
-    // Fetch accepted friendships where current user is either requester or addressee
-    const { data } = await supabase
-      .from("friendships")
-      .select<string, RawFriendship>(
-        "requester_id, addressee_id, requester:requester_id(id, name, username, avatar_url), addressee:addressee_id(id, name, username, avatar_url)",
-      )
-      .eq("status", "accepted")
-      .or(`requester_id.eq.${user.id},addressee_id.eq.${user.id}`)
-      .limit(limit);
+      if (!user) {
+        if (active) setState({ limit, friends: [] });
+        return;
+      }
 
-    if (data) {
-      const friendsList: Friend[] = data
+      // Fetch accepted friendships where current user is either requester or addressee
+      const { data } = await supabase
+        .from("friendships")
+        .select<string, RawFriendship>(
+          "requester_id, addressee_id, requester:requester_id(id, name, username, avatar_url), addressee:addressee_id(id, name, username, avatar_url)",
+        )
+        .eq("status", "accepted")
+        .or(`requester_id.eq.${user.id},addressee_id.eq.${user.id}`)
+        .limit(limit);
+
+      if (!active) return;
+
+      const friendsList: Friend[] = (data ?? [])
         .map((friendship) => {
           // Return the friend that is NOT the current user
           const friend =
@@ -61,14 +72,16 @@ export function useFriends(limit: number = 6) {
         })
         .filter((friend): friend is Friend => friend !== null);
 
-      setFriends(friendsList);
+      setState({ limit, friends: friendsList });
     }
-    setLoading(false);
+
+    void loadFriends();
+    return () => {
+      active = false;
+    };
   }, [limit]);
 
-  useEffect(() => {
-    void fetchFriends();
-  }, [fetchFriends]);
+  const current = state?.limit === limit ? state : null;
 
-  return { friends, loading };
+  return { friends: current?.friends ?? NO_FRIENDS, loading: !current };
 }
