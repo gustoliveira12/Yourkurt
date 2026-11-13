@@ -14,6 +14,8 @@ export interface AvatarProps {
   quality?: number;
   isStory?: boolean;
   isRead?: boolean;
+  /** A foto acompanha o nome escrito ao lado: leitores de tela a ignoram. */
+  decorative?: boolean;
 }
 
 export function Avatar({
@@ -24,6 +26,7 @@ export function Avatar({
   quality = 100,
   isStory = false,
   isRead = false,
+  decorative = false,
 }: AvatarProps) {
   const [imgError, setImgError] = useState(false);
   const showImage = !!src && !imgError;
@@ -32,8 +35,9 @@ export function Avatar({
 
   return (
     <span
-      role="img"
-      aria-label={name ?? "User avatar"}
+      {...(decorative
+        ? { "aria-hidden": true }
+        : { role: "img", "aria-label": name ?? "Foto de perfil" })}
       className={clsx(
         `
         relative inline-flex shrink-0 items-center justify-center
