@@ -87,7 +87,7 @@ Para usar um banco local, rode `supabase start` e `supabase db reset` na raiz e 
 
 ## Migrations
 
-Alterações no banco entram como novos arquivos em `supabase/migrations/` e são aplicadas com `supabase db push`. Commite a migration logo depois do push: se o banco remoto tiver uma migration que não está no repositório, o próximo `db push` de outra pessoa falha.
+Alterações no banco entram como novos arquivos em `supabase/migrations/` e são aplicadas no banco da nuvem com `npx supabase db push --remote` (a partir da CLI 3, sem `--remote` o comando age no banco local). Use `--dry-run` antes para ver o que será aplicado. Commite a migration logo depois do push: se o banco remoto tiver uma migration que não está no repositório, o próximo `db push` de outra pessoa falha.
 
 ## Status do projeto
 
