@@ -6,6 +6,7 @@ import MobileNav from "@/components/navigation/MobileNav";
 import PageAside from "@/components/navigation/NavBar";
 import ProfileSidebar from "@/components/navigation/ProfileSidebar";
 import { useCurrentProfile } from "@/lib/hooks/useCurrentProfile";
+import { announceNotificationsRead } from "@/lib/hooks/useUnreadNotifications";
 import { createClient } from "@/lib/supabase/client";
 import {
 } from "@phosphor-icons/react";
@@ -16,6 +17,7 @@ type Notification = {
   id: string;
   type: string;
   entity_id: string | null;
+  post_id: string | null;
   created_at: string;
   read_at: string | null;
   actor: { name: string | null; username: string | null; avatar_url: string | null } | null;
@@ -28,13 +30,15 @@ const NOTIFICATION_TEXT: Record<string, string> = {
   follow: "começou a seguir você.",
   follow_request: "pediu para seguir você.",
   follow_accepted: "aceitou seu pedido para seguir.",
+  like: "curtiu seu post.",
+  comment: "comentou no seu post.",
 };
 
 function fetchNotifications(userId: string, cursor?: Pick<Notification, "created_at" | "id">) {
   let query = supabase
     .from("notifications")
     .select<string, Notification>(
-      "id, type, entity_id, created_at, read_at, actor:profiles!notifications_actor_id_fkey(name, username, avatar_url)",
+      "id, type, entity_id, post_id, created_at, read_at, actor:profiles!notifications_actor_id_fkey(name, username, avatar_url)",
     )
     .eq("user_id", userId);
 
@@ -56,9 +60,16 @@ export default function NotificationsPage() {
   const [loading, setLoading] = useState(true);
   const [hasMore, setHasMore] = useState(true);
   const [error, setError] = useState("");
-  const [markingRead, setMarkingRead] = useState(false);
   const [answeringId, setAnsweringId] = useState<string | null>(null);
+  // Momento em que esta visita marcou as notificações como lidas. As marcadas
+  // agora continuam com "Nova", inclusive as que chegam por "Carregar mais".
+  const [markedAt, setMarkedAt] = useState<number | null>(null);
   const userId = profile?.id;
+
+  function isNew(notification: Notification) {
+    if (!notification.read_at) return true;
+    return markedAt !== null && Date.parse(notification.read_at) === markedAt;
+  }
 
   async function loadNotifications() {
     if (!userId) return;
@@ -90,8 +101,29 @@ export default function NotificationsPage() {
       } else {
         setNotifications(data);
         setHasMore(data.length === PAGE_SIZE);
+        if (data.length > 0) void markAllRead(id, data[0].created_at);
       }
       setLoading(false);
+    }
+
+    // Abrir a tela marca como lidas, no banco, as notificações até a mais
+    // recente da lista e zera a bolinha do sino. Uma que chegue depois da busca
+    // continua não lida, porque a pessoa ainda não a viu.
+    async function markAllRead(id: string, newestCreatedAt: string) {
+      const readAt = new Date();
+      const { error: updateError } = await supabase
+        .from("notifications")
+        .update({ read_at: readAt.toISOString() })
+        .eq("user_id", id)
+        .is("read_at", null)
+        .lte("created_at", newestCreatedAt);
+
+      if (updateError) {
+        console.error("Erro ao marcar notificações como lidas:", updateError);
+      } else if (active) {
+        setMarkedAt(readAt.getTime());
+        announceNotificationsRead();
+      }
     }
 
     void loadInitialNotifications(userId);
@@ -131,31 +163,6 @@ export default function NotificationsPage() {
     setAnsweringId(null);
   }
 
-  async function markAllRead() {
-    if (!userId) return;
-    setMarkingRead(true);
-    setError("");
-    const readAt = new Date().toISOString();
-    const { error: updateError } = await supabase
-      .from("notifications")
-      .update({ read_at: readAt })
-      .eq("user_id", userId)
-      .is("read_at", null);
-
-    if (updateError) {
-      console.error("Erro ao marcar notificações como lidas:", updateError);
-      setError("Não foi possível marcar as notificações como lidas.");
-    } else {
-      setNotifications((previous) =>
-        previous.map((notification) => ({
-          ...notification,
-          read_at: notification.read_at ?? readAt,
-        })),
-      );
-    }
-    setMarkingRead(false);
-  }
-
   return (
     <div className="w-dvw min-h-dvh overflow-hidden relative flex h-screen items-center justify-center bg-background font-sans gap-4">
       <PageAside />
@@ -173,14 +180,6 @@ export default function NotificationsPage() {
           <div className="rounded-card overflow-hidden border border-border-base bg-surface shadow-card">
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border-base px-5 py-5">
               <h1 className="text-xl font-black text-foreground">Notificações</h1>
-              <button
-                type="button"
-                onClick={markAllRead}
-                disabled={markingRead || loading || !userId || notifications.length === 0}
-                className="text-sm font-semibold text-foreground-brand hover:underline disabled:opacity-50 disabled:no-underline"
-              >
-                {markingRead ? "Marcando..." : "Marcar todas como lidas"}
-              </button>
             </div>
             {error && <p role="alert" className="px-5 py-3 text-sm text-red-600">{error}</p>}
             {!userId && !profileLoading && (
@@ -198,7 +197,7 @@ export default function NotificationsPage() {
                   const actorName = notification.actor?.name || "Usuário";
                   const actorUsername = notification.actor?.username;
                   return (
-                    <li key={notification.id} className={`flex gap-3 px-5 py-4 ${notification.read_at ? "" : "bg-background-raised"}`}>
+                    <li key={notification.id} className={`flex gap-3 px-5 py-4 ${isNew(notification) ? "bg-background-raised" : ""}`}>
                       <Avatar src={notification.actor?.avatar_url} name={actorName} />
                       <div className="min-w-0 text-sm text-foreground">
                         {actorUsername ? (
@@ -208,8 +207,15 @@ export default function NotificationsPage() {
                         ) : (
                           <span className="font-bold">{actorName}</span>
                         )}{" "}
-                        {NOTIFICATION_TEXT[notification.type] ?? "enviou uma notificação."}
-                        {!notification.read_at && <span className="ml-2 text-xs font-semibold text-foreground-brand">Nova</span>}
+                        {notification.post_id ? (
+                          // Curtida e comentário levam ao post; os de seguir, ao perfil (pelo nome).
+                          <Link href={`/post/${notification.post_id}`} className="hover:underline">
+                            {NOTIFICATION_TEXT[notification.type] ?? "enviou uma notificação."}
+                          </Link>
+                        ) : (
+                          NOTIFICATION_TEXT[notification.type] ?? "enviou uma notificação."
+                        )}
+                        {isNew(notification) && <span className="ml-2 text-xs font-semibold text-foreground-brand">Nova</span>}
                         <time dateTime={notification.created_at} className="mt-1 block text-xs text-subtitle">
                           {new Date(notification.created_at).toLocaleString("pt-BR", {
                             dateStyle: "short",
