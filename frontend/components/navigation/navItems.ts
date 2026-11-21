@@ -15,6 +15,8 @@ export type NavItem = {
   exact?: boolean;
   /** Fica fora da barra inferior do celular (o cabeçalho já tem o atalho). */
   desktopOnly?: boolean;
+  /** Mostra sobre o ícone a bolinha com as notificações não lidas. */
+  showUnreadBadge?: boolean;
 };
 
 // Lista única de links do menu principal (lateral no computador e barra
@@ -25,7 +27,7 @@ export const NAV_ITEMS: NavItem[] = [
   { label: "Amigos", to: "/friends", icon: UsersIcon },
   { label: "Comunidade", to: "/communities", icon: UsersFourIcon },
   { label: "Configurações", to: "/settings", icon: GearSixIcon },
-  { label: "Notificações", to: "/notificacoes", icon: BellIcon, desktopOnly: true },
+  { label: "Notificações", to: "/notificacoes", icon: BellIcon, desktopOnly: true, showUnreadBadge: true },
 ];
 
 function normalizePath(path: string): string {

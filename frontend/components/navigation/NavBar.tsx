@@ -5,6 +5,8 @@ import clsx from "clsx";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import ThemeToggleCompact from "@/components/theme/ThemeToggleCompact";
+import { useUnreadNotifications } from "@/lib/hooks/useUnreadNotifications";
+import { NotificationBadge, unreadLabel } from "./NotificationBadge";
 import { type NavItem, NAV_ITEMS, isPathActive } from "./navItems";
 
 type AsideState = {
@@ -51,6 +53,7 @@ const PageAside = ({ items = NAV_ITEMS }: PageAsideProps) => {
 
   const isOpen = state.isExpanded || state.isPinned;
   const pathname = usePathname();
+  const unread = useUnreadNotifications();
 
   return (
     <div className="top-0 left-0 fixed sm:flex h-dvh z-40 bg-surface shadow-overflow-light hidden">
@@ -73,23 +76,25 @@ const PageAside = ({ items = NAV_ITEMS }: PageAsideProps) => {
         </div>
         <nav className="flex flex-col justify-center flex-1 p-2">
           <ul className="flex flex-col gap-1">
-            {items.map(({ to, icon: Icon, label, exact }) => {
+            {items.map(({ to, icon: Icon, label, exact, showUnreadBadge }) => {
               const isActive = isPathActive(pathname, to, exact);
               return (
                 <li key={to}>
                   <Link
                     href={to}
                     // O texto some com o menu fechado; o aria-label mantém o nome.
-                    aria-label={label}
+                    aria-label={showUnreadBadge ? unreadLabel(unread) : label}
                     aria-current={isActive ? "page" : undefined}
                     className="hover:bg-background-raised flex items-center w-full py-4 px-2.5 gap-3 font-bold uppercase rounded-lg text-subtitle"
                   >
-                    <Icon
-                      color={isActive ? "var(--foreground)" : "var(--subtitle)"}
-                      className="shrink-0"
-                      size={28}
-                      weight={isActive ? "fill" : "bold"}
-                    />
+                    <span className="relative shrink-0">
+                      <Icon
+                        color={isActive ? "var(--foreground)" : "var(--subtitle)"}
+                        size={28}
+                        weight={isActive ? "fill" : "bold"}
+                      />
+                      {showUnreadBadge && <NotificationBadge count={unread} />}
+                    </span>
                     <span
                       className={clsx(
                         "transition-all duration-300 whitespace-nowrap",
