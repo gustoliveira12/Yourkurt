@@ -32,7 +32,7 @@ Yourkurt é uma rede social interna inspirada no Orkut, focada em perfis, posts 
 - Excluir a conta apaga também foto, capa e imagens dos posts.
 
 **Outros**
-- Notificações (novos seguidores e pedidos para seguir), com marcação de lidas.
+- Notificações de curtidas, comentários, novos seguidores e pedidos para seguir, com a quantidade de não lidas no sino e a escolha de quais avisos receber em Configurações.
 - Tema claro e escuro, com a preferência salva no navegador.
 - Acessibilidade segundo a WCAG 2.1 nível AA: contraste, navegação por teclado e nomes para leitores de tela.
 - Navegação mobile e página 404 personalizada.
@@ -90,6 +90,16 @@ Para usar um banco local, rode `supabase start` e `supabase db reset` na raiz e 
 
 Alterações no banco entram como novos arquivos em `supabase/migrations/` e são aplicadas no banco da nuvem com `npx supabase db push --remote` (a partir da CLI 3, sem `--remote` o comando age no banco local). Use `--dry-run` antes para ver o que será aplicado. Commite a migration logo depois do push: se o banco remoto tiver uma migration que não está no repositório, o próximo `db push` de outra pessoa falha.
 
+## Testes do banco
+
+Os testes das regras do banco (RLS, funções e triggers) ficam em `supabase/tests/database/`, escritos com pgTAP. Com o Supabase local rodando, na raiz:
+
+```bash
+npx supabase test db
+```
+
+Cada arquivo roda numa transação desfeita no fim, então os dados locais não mudam.
+
 ## Status do projeto
 
 | Área                                         | Status          |
@@ -110,7 +120,7 @@ Alterações no banco entram como novos arquivos em `supabase/migrations/` e sã
 ## Próximos passos
 
 - Telas de comunidades: listagem, criação e página da comunidade (o schema já existe, as rotas ainda são esqueletos).
-- Preferências de notificação, e repost e salvar gravados no banco (hoje ficam só no navegador).
+- Repost e salvar gravados no banco (hoje ficam só no navegador).
 - Imagens em buckets privados, com URLs assinadas.
 - Definir as responsabilidades do backend próprio.
 
