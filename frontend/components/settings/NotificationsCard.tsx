@@ -80,18 +80,22 @@ export default function NotificationsCard() {
         </div>
       </div>
 
-      {OPTIONS.map(({ key, label }) => (
-        <label key={key} className="flex items-center gap-3 rounded-lg border border-border-base p-3">
-          <input
-            type="checkbox"
-            checked={prefs?.[key] ?? true}
-            disabled={!prefs || isSaving}
-            onChange={(e) => void save(key, e.target.checked)}
-            className="size-4 accent-background-brand cursor-pointer"
-          />
-          <span className="text-sm font-semibold text-foreground">{label}</span>
-        </label>
-      ))}
+      {/* Sem as preferências reais (carregando ou erro), as caixas não aparecem:
+          mostrar tudo marcado contradiria o que a pessoa salvou. */}
+      {prefs
+        ? OPTIONS.map(({ key, label }) => (
+            <label key={key} className="flex items-center gap-3 rounded-lg border border-border-base p-3">
+              <input
+                type="checkbox"
+                checked={prefs[key]}
+                disabled={isSaving}
+                onChange={(e) => void save(key, e.target.checked)}
+                className="size-4 accent-background-brand cursor-pointer"
+              />
+              <span className="text-sm font-semibold text-foreground">{label}</span>
+            </label>
+          ))
+        : !message && <p className="text-sm text-subtitle">Carregando preferências...</p>}
 
       <p className="text-sm text-subtitle">
         Pedidos para seguir sempre chegam: num perfil privado, é por eles que você aprova quem pode

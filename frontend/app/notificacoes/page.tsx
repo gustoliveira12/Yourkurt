@@ -61,14 +61,14 @@ export default function NotificationsPage() {
   const [hasMore, setHasMore] = useState(true);
   const [error, setError] = useState("");
   const [answeringId, setAnsweringId] = useState<string | null>(null);
-  // Momento em que esta visita marcou as notificações como lidas. As marcadas
-  // agora continuam com "Nova", inclusive as que chegam por "Carregar mais".
-  const [markedAt, setMarkedAt] = useState<number | null>(null);
+  const [markError, setMarkError] = useState("");
+  // Notificações que esta visita marcou como lidas. Continuam com "Nova",
+  // inclusive as que chegam por "Carregar mais" e as que a pessoa responde.
+  const [markedIds, setMarkedIds] = useState<ReadonlySet<string>>(new Set());
   const userId = profile?.id;
 
   function isNew(notification: Notification) {
-    if (!notification.read_at) return true;
-    return markedAt !== null && Date.parse(notification.read_at) === markedAt;
+    return !notification.read_at || markedIds.has(notification.id);
   }
 
   async function loadNotifications() {
@@ -110,20 +110,23 @@ export default function NotificationsPage() {
     // recente da lista e zera a bolinha do sino. Uma que chegue depois da busca
     // continua não lida, porque a pessoa ainda não a viu.
     async function markAllRead(id: string, newestCreatedAt: string) {
-      const readAt = new Date();
-      const { error: updateError } = await supabase
+      const { data: marked, error: updateError } = await supabase
         .from("notifications")
-        .update({ read_at: readAt.toISOString() })
+        .update({ read_at: new Date().toISOString() })
         .eq("user_id", id)
         .is("read_at", null)
-        .lte("created_at", newestCreatedAt);
+        .lte("created_at", newestCreatedAt)
+        .select("id");
 
       if (updateError) {
         console.error("Erro ao marcar notificações como lidas:", updateError);
-      } else if (active) {
-        setMarkedAt(readAt.getTime());
-        announceNotificationsRead();
+        if (active) {
+          setMarkError("Não foi possível marcar as notificações como lidas. Recarregue a página para tentar de novo.");
+        }
+        return;
       }
+      if (active) setMarkedIds(new Set(marked.map((row) => row.id)));
+      announceNotificationsRead();
     }
 
     void loadInitialNotifications(userId);
@@ -182,6 +185,7 @@ export default function NotificationsPage() {
               <h1 className="text-xl font-black text-foreground">Notificações</h1>
             </div>
             {error && <p role="alert" className="px-5 py-3 text-sm text-red-600">{error}</p>}
+            {markError && <p role="alert" className="px-5 py-3 text-sm text-red-600">{markError}</p>}
             {!userId && !profileLoading && (
               <p role="alert" className="px-5 py-8 text-center text-sm text-red-600">
                 {profileError ? "Não foi possível carregar seu usuário." : "Entre para ver suas notificações."}
