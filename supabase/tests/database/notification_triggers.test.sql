@@ -2,7 +2,7 @@
 -- Rodar: npx supabase test db
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(11);
+select plan(14);
 
 -- Entra como um usuário, como o PostgREST faz com o JWT.
 create function pg_temp.login(p_id uuid) returns void language sql as $$
@@ -12,6 +12,11 @@ $$;
 -- Avisos de um tipo recebidos por uma pessoa.
 create function pg_temp.count_notifications(p_user uuid, p_type text) returns bigint language sql as $$
   select count(*) from public.notifications where user_id = p_user and type = p_type;
+$$;
+
+-- Avisos de um tipo recebidos por uma pessoa e feitos por outra.
+create function pg_temp.count_from(p_user uuid, p_actor uuid, p_type text) returns bigint language sql as $$
+  select count(*) from public.notifications where user_id = p_user and actor_id = p_actor and type = p_type;
 $$;
 
 -- Ana e Bia têm perfil público; Caio, privado.
@@ -42,15 +47,23 @@ set local role authenticated;
 delete from public.reactions
 where post_id = 'bbbbbbbb-0000-0000-0000-000000000001' and user_id = 'aaaaaaaa-0000-0000-0000-000000000002';
 reset role;
-select is(pg_temp.count_notifications('aaaaaaaa-0000-0000-0000-000000000001', 'like'), 0::bigint,
-  'descurtir apaga o aviso da curtida');
+select is(pg_temp.count_notifications('aaaaaaaa-0000-0000-0000-000000000001', 'like'), 1::bigint,
+  'descurtir mantém o aviso: cada pessoa avisa uma vez por post');
+
+select pg_temp.login('aaaaaaaa-0000-0000-0000-000000000002');
+set local role authenticated;
+insert into public.reactions (post_id, user_id, type)
+values ('bbbbbbbb-0000-0000-0000-000000000001', 'aaaaaaaa-0000-0000-0000-000000000002', 'like');
+reset role;
+select is(pg_temp.count_notifications('aaaaaaaa-0000-0000-0000-000000000001', 'like'), 1::bigint,
+  'curtir de novo não cria outro aviso');
 
 select pg_temp.login('aaaaaaaa-0000-0000-0000-000000000001');
 set local role authenticated;
 insert into public.reactions (post_id, user_id, type)
 values ('bbbbbbbb-0000-0000-0000-000000000001', 'aaaaaaaa-0000-0000-0000-000000000001', 'like');
 reset role;
-select is(pg_temp.count_notifications('aaaaaaaa-0000-0000-0000-000000000001', 'like'), 0::bigint,
+select is(pg_temp.count_from('aaaaaaaa-0000-0000-0000-000000000001', 'aaaaaaaa-0000-0000-0000-000000000001', 'like'), 0::bigint,
   'curtir o próprio post não gera aviso');
 
 -- Comentário
@@ -72,14 +85,17 @@ set local role authenticated;
 select public.set_my_notification_preferences(false, true, false, true);
 reset role;
 
-select pg_temp.login('aaaaaaaa-0000-0000-0000-000000000002');
+select pg_temp.login('aaaaaaaa-0000-0000-0000-000000000003');
 set local role authenticated;
 insert into public.reactions (post_id, user_id, type)
-values ('bbbbbbbb-0000-0000-0000-000000000001', 'aaaaaaaa-0000-0000-0000-000000000002', 'like');
+values ('bbbbbbbb-0000-0000-0000-000000000001', 'aaaaaaaa-0000-0000-0000-000000000003', 'like');
+reset role;
+select pg_temp.login('aaaaaaaa-0000-0000-0000-000000000002');
+set local role authenticated;
 insert into public.follows (follower_id, following_id)
 values ('aaaaaaaa-0000-0000-0000-000000000002', 'aaaaaaaa-0000-0000-0000-000000000001');
 reset role;
-select is(pg_temp.count_notifications('aaaaaaaa-0000-0000-0000-000000000001', 'like'), 0::bigint,
+select is(pg_temp.count_from('aaaaaaaa-0000-0000-0000-000000000001', 'aaaaaaaa-0000-0000-0000-000000000003', 'like'), 0::bigint,
   'com curtidas desligadas, curtir não gera aviso');
 select is(pg_temp.count_notifications('aaaaaaaa-0000-0000-0000-000000000001', 'follow'), 0::bigint,
   'com novos seguidores desligados, seguir não gera aviso');
@@ -138,6 +154,12 @@ select is(
   0::bigint,
   'quem apaga a conta leva junto os avisos de curtida e comentário'
 );
+
+-- Índices das limpezas em cascata.
+select has_index('public', 'notifications', 'notifications_post_id_idx',
+  'apagar um post acha os avisos dele pelo índice');
+select has_index('public', 'notifications', 'notifications_comment_entity_idx',
+  'apagar um comentário acha o aviso dele pelo índice');
 
 select * from finish();
 rollback;
