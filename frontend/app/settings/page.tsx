@@ -7,11 +7,11 @@ import ProfileSidebar from "@/components/navigation/ProfileSidebar";
 import ChangePasswordCard from "@/components/settings/ChangePasswordCard";
 import ThemeToggle from "@/components/theme/ThemeToggle";
 import DeleteAccountCard from "@/components/settings/DeleteAccountCard";
+import NotificationsCard from "@/components/settings/NotificationsCard";
 import PrivacyCard from "@/components/settings/PrivacyCard";
 import { useCurrentProfile } from "@/lib/hooks/useCurrentProfile";
 import { createClient } from "@/lib/supabase/client";
 import {
-  BellIcon,
   MegaphoneIcon,
   LockOpenIcon,
   SignOutIcon,
@@ -37,40 +37,6 @@ type TeamPageMember = {
 };
 
 type TeamPageMembersMap = Record<string, TeamPageMember[]>;
-
-
-
-function SettingsCard({
-  title,
-  subtitle,
-  icon,
-  actionText,
-}: {
-  title: string;
-  subtitle: string;
-  icon: React.ReactNode;
-  actionText: string;
-}) {
-  return (
-    <div className="rounded-card border border-border-base bg-surface p-4 flex items-start justify-between gap-4">
-      <div className="flex items-start gap-3">
-        <span className="mt-0.5 rounded-lg bg-background p-2 text-foreground-brand">
-          {icon}
-        </span>
-        <div className="flex flex-col">
-          <h3 className="text-base font-semibold text-foreground">{title}</h3>
-          <p className="text-sm text-subtitle">{subtitle}</p>
-        </div>
-      </div>
-      <button
-        type="button"
-        className="rounded-lg border border-border-base px-3 py-2 text-sm font-semibold text-foreground hover:bg-background"
-      >
-        {actionText}
-      </button>
-    </div>
-  );
-}
 
 const subscribeNoop = () => () => {};
 
@@ -384,12 +350,7 @@ export default function SettingsPage() {
               </h2>
               <PrivacyCard />
               <ChangePasswordCard />
-              <SettingsCard
-                title="Notificações"
-                subtitle="Defina quando e como você deseja ser notificado."
-                actionText="Configurar"
-                icon={<BellIcon size={18} weight="fill" />}
-              />
+              <NotificationsCard />
 
               {profile?.isSuperAdmin && (
                 <Link
