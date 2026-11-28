@@ -1,13 +1,12 @@
-"use client";
+import { communityHref } from "@/lib/communities";
+import { redirect } from "next/navigation";
 
-import { useParams } from "next/navigation";
-
-export default function CommunityPage() {
-  const { slug } = useParams<{ slug: string }>();
-
-  return (
-    <main className="mx-auto max-w-3xl p-6">
-      <h1 className="text-2xl font-bold">Comunidade: {slug}</h1>
-    </main>
-  );
+// Links antigos (/communities/<slug>) levam à página nova.
+export default async function LegacyCommunityPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  redirect(communityHref(decodeURIComponent(slug)));
 }

@@ -18,15 +18,27 @@ const nextConfig: NextConfig = {
   },
   images: {
     qualities: [75, 90, 100],
-    remotePatterns: supabaseHostname
-      ? [
-          {
-            protocol: "https",
-            hostname: supabaseHostname,
-            pathname: "/storage/v1/object/public/**",
-          },
-        ]
-      : [],
+    // O otimizador recusa hosts em IP privado (127.0.0.1 do Storage local);
+    // liberado só fora de produção, para o dev com Supabase local.
+    dangerouslyAllowLocalIP: process.env.NODE_ENV !== "production",
+    remotePatterns: [
+      ...(supabaseHostname
+        ? [
+            {
+              protocol: "https" as const,
+              hostname: supabaseHostname,
+              pathname: "/storage/v1/object/public/**",
+            },
+          ]
+        : []),
+      // Storage do Supabase local (npx supabase start), só em http.
+      {
+        protocol: "http" as const,
+        hostname: "127.0.0.1",
+        port: "54321",
+        pathname: "/storage/v1/object/public/**",
+      },
+    ],
   },
 };
 

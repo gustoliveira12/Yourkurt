@@ -1,6 +1,7 @@
 "use client";
 
 import { Avatar } from "@/components/Avatar";
+import { DevBadge } from "@/components/DevBadge";
 import MobileHeader from "@/components/navigation/MobileHeader";
 import MobileNav from "@/components/navigation/MobileNav";
 import PageAside from "@/components/navigation/NavBar";
@@ -41,8 +42,11 @@ function PersonRow({ person, kind }: { person: FollowPerson; kind: FollowListKin
     <>
       <Avatar src={person.avatar_url} name={person.name} sizes="sm" decorative />
       <span className="flex min-w-0 flex-1 flex-col">
-        <span className="truncate font-bold text-foreground">{person.name}</span>
-        <span className="truncate text-sm text-subtitle">@{person.username}</span>
+        <span className="flex min-w-0 items-center gap-2">
+          <span className="truncate font-bold text-foreground">{person.name}</span>
+          {person.is_test_account && <DevBadge />}
+        </span>
+        <span className="truncate text-sm text-subtitle">u/{person.username}</span>
       </span>
       {badges.map((badge) => (
         <span

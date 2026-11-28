@@ -6,13 +6,23 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { MAX_CONTENT_LENGTH } from "@/lib/constants";
 import imageCompression from "browser-image-compression";
+import { fetchCommunityBadges, type CommunityBadgeKind } from "@/lib/communities";
 import type { Post, PostMedia } from "@/lib/hooks/usePosts";
 
 type CreatePostboxProps = {
   avatarUrl: string | null;
   userId: string;
-  profile: { name: string; username: string; avatar_url: string | null } | null;
+  profile: {
+    name: string;
+    username: string;
+    avatar_url: string | null;
+    is_test_account?: boolean;
+  } | null;
   onPostCreated: (post: Post) => void;
+  /** Quando presente, o post é publicado nessa comunidade (sempre como a própria pessoa). */
+  community?: { id: string; name: string; slug: string };
+  /** Ocupa a largura toda do contêiner em vez de max-w-lg. */
+  fullWidth?: boolean;
 };
 
 const EXTENSION_BY_MIME: Record<string, string> = {
@@ -53,6 +63,8 @@ export default function CreatePostbox({
   userId,
   profile,
   onPostCreated,
+  community,
+  fullWidth,
 }: CreatePostboxProps) {
   const MAX_IMAGES = 4;
   const profileIdentity = useMemo<PostingIdentity | null>(() => {
@@ -131,9 +143,10 @@ export default function CreatePostbox({
   const postingIdentities = useMemo(() => {
     const identities: PostingIdentity[] = [];
     if (profileIdentity) identities.push(profileIdentity);
-    identities.push(...teamIdentities);
+    // Em comunidade o post é sempre da pessoa: sem escolha de equipe.
+    if (!community) identities.push(...teamIdentities);
     return identities;
-  }, [profileIdentity, teamIdentities]);
+  }, [profileIdentity, teamIdentities, community]);
 
   const selectedIdentity = useMemo(
     () =>
@@ -233,10 +246,11 @@ export default function CreatePostbox({
       .insert({
         user_id: userId,
         author_team_page_id: selectedIdentity.type === "team" ? selectedIdentity.id : null,
+        community_id: community?.id ?? null,
         content: trimmed || "[midia]",
         is_public: true,
       })
-      .select("id, user_id, author_team_page_id, content, created_at, likes_count")
+      .select("id, user_id, author_team_page_id, community_id, content, created_at, likes_count")
       .single();
 
     if (submitError || !data) {
@@ -276,9 +290,21 @@ export default function CreatePostbox({
       return;
     }
 
+    // Etiqueta do próprio autor na comunidade; se falhar, o post sai sem ela.
+    let authorBadge: CommunityBadgeKind | null = null;
+    if (community) {
+      try {
+        const badges = await fetchCommunityBadges(supabase, [community.id], [userId]);
+        authorBadge = badges.get(`${community.id}:${userId}`) ?? null;
+      } catch {
+        authorBadge = null;
+      }
+    }
+
     onPostCreated({
-      ...(data as Omit<Post, "community_id" | "media" | "profiles">),
-      community_id: null,
+      ...(data as Omit<Post, "media" | "profiles" | "community" | "author_badge">),
+      community: community ? { name: community.name, slug: community.slug } : null,
+      author_badge: authorBadge,
       media: media.map((item) => ({
         ...item,
         public_url: supabase.storage.from("post-images").getPublicUrl(item.storage_path)
@@ -288,6 +314,9 @@ export default function CreatePostbox({
         name: selectedIdentity.name,
         username: selectedIdentity.username,
         avatar_url: selectedIdentity.avatar_url,
+        // Só a conta de teste do próprio usuário; página de time não tem etiqueta.
+        is_test_account:
+          selectedIdentity.type === "profile" ? Boolean(profile?.is_test_account) : false,
       },
     });
 
@@ -304,7 +333,7 @@ export default function CreatePostbox({
   }
 
   return (
-    <div className="flex flex-col w-full px-6 py-4 rounded-card bg-surface shadow-card gap-4 max-w-lg">
+    <div className={`flex flex-col w-full px-6 py-4 rounded-card bg-surface shadow-card gap-4 ${fullWidth ? "" : "max-w-lg"}`}>
       {error && (
         <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-sm text-red-600 dark:text-red-400 text-sm">
           {error}
@@ -337,7 +366,7 @@ export default function CreatePostbox({
           )}
           <textarea
             aria-label="Escreva seu post"
-            placeholder="O que está passando pela sua órbita?"
+            placeholder={community ? `Publicar em c/${community.slug}` : "O que está passando pela sua órbita?"}
             className="bg-background-raised w-full rounded-control transition-all duration-100 border border-border-base px-4 py-2 placeholder:text-subtitle text-foreground resize-none min-h-[80px] disabled:opacity-50"
             value={content}
             onChange={(e) => setContent(e.target.value)}

@@ -7,11 +7,14 @@ import ProfileSidebar from "@/components/navigation/ProfileSidebar";
 import { ProfileLink } from "@/components/ProfileLink";
 import { Avatar } from "@/components/Avatar";
 import { useCurrentProfile } from "@/lib/hooks/useCurrentProfile";
-import { useInteractions } from "@/lib/hooks/useInteractions";
+import PostActions from "@/components/PostActions";
 import { useComments, type CommentItem } from "@/lib/hooks/useComments";
 import { type Post, type PostMedia } from "@/lib/hooks/usePosts";
 import { createClient } from "@/lib/supabase/client";
 import { MAX_CONTENT_LENGTH } from "@/lib/constants";
+import { CommunityBadge } from "@/components/communities/CommunityBadge";
+import { DevBadge } from "@/components/DevBadge";
+import { communityHref, fetchCommunityBadges, type CommunityBadgeKind } from "@/lib/communities";
 import { profileHref } from "@/lib/profile";
 import {
   ArrowLeftIcon,
@@ -23,7 +26,7 @@ import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 const supabase = createClient();
 
@@ -54,6 +57,7 @@ type RawPostDetail = {
   user_id: string;
   author_team_page_id?: string | null;
   community_id?: string | null;
+  community?: { name: string; slug: string } | { name: string; slug: string }[] | null;
   content: string;
   media?: PostMedia[] | null;
   created_at: string;
@@ -63,11 +67,13 @@ type RawPostDetail = {
         name: string;
         username: string;
         avatar_url: string | null;
+        is_test_account?: boolean;
       }
     | Array<{
         name: string;
         username: string;
         avatar_url: string | null;
+        is_test_account?: boolean;
       }>
     | null;
 };
@@ -80,7 +86,7 @@ export default function PostDetailPage() {
   const params = useParams<{ id: string }>();
   const postId = Array.isArray(params.id) ? params.id[0] : params.id;
   const { profile } = useCurrentProfile();
-  const { interactions, loading: interactionsLoading } = useInteractions(postId);
+  const replyRef = useRef<HTMLTextAreaElement>(null);
   const { comments, loading: commentsLoading, error: commentsError, addComment } =
     useComments(postId);
   const [post, setPost] = useState<Post | null>(null);
@@ -91,6 +97,35 @@ export default function PostDetailPage() {
   const [commentSubmitError, setCommentSubmitError] = useState<string | null>(null);
   const [viewerIndex, setViewerIndex] = useState<number | null>(null);
   const [viewerZoomed, setViewerZoomed] = useState(false);
+
+  // Etiquetas do autor do post e dos comentaristas, sem derrubar a tela se a RPC falhar.
+  const [badges, setBadges] = useState<Map<string, CommunityBadgeKind>>(new Map());
+  const badgeCommunityId = post?.community_id ?? null;
+  const badgeUserKey = [
+    post?.user_id ?? "",
+    ...Array.from(new Set(comments.map((comment) => comment.user_id))),
+  ].join(",");
+  useEffect(() => {
+    if (!badgeCommunityId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setBadges(new Map());
+      return;
+    }
+    let cancelled = false;
+    const userIds = badgeUserKey.split(",").filter(Boolean);
+    fetchCommunityBadges(supabase, [badgeCommunityId], userIds)
+      .then((result) => {
+        if (!cancelled) setBadges(result);
+      })
+      .catch(() => {
+        if (!cancelled) setBadges(new Map());
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [badgeCommunityId, badgeUserKey]);
+  const badgeFor = (userId: string) =>
+    badgeCommunityId ? (badges.get(`${badgeCommunityId}:${userId}`) ?? null) : null;
 
   const postImages = useMemo(() => normalizeImages(post), [post]);
 
@@ -108,7 +143,7 @@ export default function PostDetailPage() {
       const { data, error } = await supabase
         .from("posts")
         .select(
-          "id, user_id, author_team_page_id, community_id, content, created_at, likes_count, media:post_media(*), profiles(name, username, avatar_url)",
+          "id, user_id, author_team_page_id, community_id, content, created_at, likes_count, media:post_media(*), community:communities(name, slug), profiles(name, username, avatar_url, is_test_account)",
         )
         .eq("id", postId)
         .maybeSingle();
@@ -154,6 +189,10 @@ export default function PostDetailPage() {
         user_id: rawPost.user_id,
         author_team_page_id: rawPost.author_team_page_id ?? null,
 community_id: rawPost.community_id ?? null,
+        community: Array.isArray(rawPost.community)
+          ? (rawPost.community[0] ?? null)
+          : (rawPost.community ?? null),
+        author_badge: null,
         media:
           rawPost.media?.map((item) => ({
             ...item,
@@ -186,7 +225,7 @@ community_id: rawPost.community_id ?? null,
         user_id: profile.id,
         content: trimmed,
       })
-      .select("id, post_id, user_id, content, created_at, profiles(name, username, avatar_url)")
+      .select("id, post_id, user_id, content, created_at, profiles(name, username, avatar_url, is_test_account)")
       .single();
 
     if (error) {
@@ -268,7 +307,17 @@ community_id: rawPost.community_id ?? null,
                           {post.profiles?.name ?? "Usuário"}
                         </ProfileLink>
                       </h2>
-                      <span className="text-subtitle">@{post.profiles?.username ?? "usuario"}</span>
+                      {badgeFor(post.user_id) && <CommunityBadge kind={badgeFor(post.user_id)!} />}
+                      {post.profiles?.is_test_account && <DevBadge />}
+                      <span className="text-subtitle">u/{post.profiles?.username ?? "usuario"}</span>
+                      {post.community && (
+                        <Link
+                          href={communityHref(post.community.slug)}
+                          className="text-foreground-brand hover:underline"
+                        >
+                          em c/{post.community.slug}
+                        </Link>
+                      )}
                       <span className="text-subtitle">·</span>
                       <span className="text-subtitle">{timeAgo(post.created_at)}</span>
                     </div>
@@ -317,11 +366,14 @@ community_id: rawPost.community_id ?? null,
                   </time>
                 </div>
 
-                <div className="mt-5 flex items-center gap-8 border-t border-border-base pt-4 text-sm text-subtitle">
-                  <span>{interactionsLoading ? "..." : interactions.commentsCount} comentários</span>
-                  <span>{interactionsLoading ? "..." : interactions.repostsCount} reposts</span>
-                  <span>{post.likes_count} curtidas</span>
-                </div>
+                <PostActions
+                  key={post.id}
+                  postId={post.id}
+                  initialLikes={post.likes_count}
+                  commentsCount={commentsLoading ? undefined : comments.length}
+                  onComment={() => replyRef.current?.focus()}
+                  className="mt-5 border-t border-border-base pt-4"
+                />
               </article>
             ) : null}
 
@@ -330,6 +382,7 @@ community_id: rawPost.community_id ?? null,
                 <Avatar src={profile?.avatarUrl} name={profile?.name ?? "Seu perfil"} sizes="sm" />
                 <div className="flex-1">
                   <textarea
+                    ref={replyRef}
                     value={commentContent}
                     onChange={(e) => setCommentContent(e.target.value)}
                     placeholder="Publicar sua resposta"
@@ -390,7 +443,9 @@ community_id: rawPost.community_id ?? null,
                           >
                             {comment.profiles?.name ?? "Usuário"}
                           </ProfileLink>
-                          <span className="text-subtitle">@{comment.profiles?.username ?? "usuario"}</span>
+                          {badgeFor(comment.user_id) && <CommunityBadge kind={badgeFor(comment.user_id)!} />}
+                          {comment.profiles?.is_test_account && <DevBadge />}
+                          <span className="text-subtitle">u/{comment.profiles?.username ?? "usuario"}</span>
                           <span className="text-subtitle">·</span>
                           <span className="text-subtitle">{timeAgo(comment.created_at)}</span>
                         </div>

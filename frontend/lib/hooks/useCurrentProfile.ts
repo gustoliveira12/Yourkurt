@@ -11,6 +11,7 @@ export type CurrentProfile = {
   headerUrl: string | null;
   isAdmin: boolean;
   isSuperAdmin: boolean;
+  isTestAccount: boolean;
 };
 
 const supabase = createClient();
@@ -42,7 +43,7 @@ export function useCurrentProfile() {
 
       const { data, error: profileError } = await supabase
         .from("profiles")
-        .select("id, name, username, avatar_url, header_url")
+        .select("id, name, username, avatar_url, header_url, is_test_account")
         .eq("id", user.id)
         .maybeSingle();
 
@@ -80,6 +81,7 @@ export function useCurrentProfile() {
         headerUrl: data?.header_url ?? null,
         isAdmin,
         isSuperAdmin,
+        isTestAccount: Boolean(data?.is_test_account),
       });
 
       setLoading(false);

@@ -330,7 +330,7 @@ export default function SignupPage() {
                   {name.trim() || "Seu nome"}
                 </p>
                 <p className="text-sm text-subtitle">
-                  @{username.trim().toLowerCase() || "seu.usuario"}
+                  u/{username.trim().toLowerCase() || "seu.usuario"}
                 </p>
               </div>
             </div>

@@ -16,7 +16,7 @@ export default function Home() {
     <div className="w-dvw min-h-dvh overflow-hidden relative flex h-screen items-center justify-center bg-background font-sans gap-2">
       <PageAside />
       <MobileHeader />
-      <main className="overflow-auto h-dvh flex-1 w-full flex items-start justify-center pt-20 gap-6 sm:pt-12">
+      <main className="overflow-auto h-dvh flex-1 w-full flex items-start justify-center pt-20 gap-6 sm:pt-12 xl:pr-4">
         <ProfileSidebar
           alt="Foto de perfil"
           size={1}
@@ -25,11 +25,11 @@ export default function Home() {
           src={profile?.avatarUrl ?? null}
           headerUrl={profile?.headerUrl}
         />
-        <div className="flex flex-col md:gap-12 items-center md:min-w-168 md:px-3">
-          <div className="flex flex-col w-full gap-4 max-w-2xl">
+        <div className="flex min-w-0 max-w-174 flex-1 flex-col items-center md:gap-12 md:px-3">
+          <div className="flex w-full flex-col gap-4">
             <h1 className="sr-only">Feed</h1>
-            {/* No celular a coluna da direita some: a caixa de post fica no topo do feed. */}
-            <RightNavbar onPostCreated={addPost} className="flex sm:hidden px-2" />
+            {/* Abaixo de xl (1280px) não cabem três colunas: a caixa de post vai para o topo do feed, na largura dele. */}
+            <RightNavbar onPostCreated={addPost} className="flex px-2 md:px-0 xl:hidden" fullWidth />
             {loading && (
               <p className="text-center text-foreground-muted py-8">Carregando posts...</p>
             )}
@@ -43,7 +43,10 @@ export default function Home() {
               <PostCard
                 key={post.id}
                 post={post}
-                canDelete={post.user_id === profile?.id}
+                canDelete={
+                  post.user_id === profile?.id ||
+                  (Boolean(profile?.isAdmin) && post.community_id !== null)
+                }
                 deleting={deletingPostId === post.id}
                 onDelete={deletePost}
                 detailHref={`/post/${post.id}`}
@@ -51,7 +54,7 @@ export default function Home() {
             ))}
           </div>
         </div>
-        <RightNavbar onPostCreated={addPost} className="hidden sm:flex" />
+        <RightNavbar onPostCreated={addPost} className="hidden w-80 shrink-0 xl:flex" />
       </main>
       <MobileNav />
     </div>

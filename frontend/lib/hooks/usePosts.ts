@@ -1,6 +1,7 @@
 "use client";
 
 import { createClient } from "@/lib/supabase/client";
+import { fetchCommunityBadges, type CommunityBadgeKind } from "@/lib/communities";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 const supabase = createClient();
@@ -9,6 +10,7 @@ export type PostAuthor = {
   name: string;
   username: string;
   avatar_url: string | null;
+  is_test_account?: boolean;
 };
 
 export type PostMedia = {
@@ -25,6 +27,8 @@ export type Post = {
   user_id: string;
   author_team_page_id: string | null;
   community_id: string | null;
+  community: { name: string; slug: string } | null;
+  author_badge: CommunityBadgeKind | null;
   content: string;
   media: PostMedia[];
   created_at: string;
@@ -37,6 +41,7 @@ type RawPost = {
   user_id: string;
   author_team_page_id?: string | null;
   community_id?: string | null;
+  community?: { name: string; slug: string } | { name: string; slug: string }[] | null;
   content: string;
   media?: PostMedia[] | null;
   created_at: string;
@@ -48,6 +53,7 @@ type RawProfile = {
   name: string;
   username: string;
   avatar_url: string | null;
+  is_test_account?: boolean;
 };
 
 type RawTeamPage = {
@@ -57,7 +63,13 @@ type RawTeamPage = {
   avatar_url: string | null;
 };
 
-export function usePosts(authorId?: string | null) {
+export type PostsFilter = {
+  authorId?: string | null;
+  communityId?: string | null;
+};
+
+// `null` em qualquer campo do filtro significa "ainda não buscar".
+export function usePosts({ authorId, communityId }: PostsFilter = {}) {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -65,17 +77,20 @@ export function usePosts(authorId?: string | null) {
   const requestId = useRef(0);
 
   const fetchPosts = useCallback(async () => {
-    if (authorId === null) return;
+    if (authorId === null || communityId === null) return;
     const currentRequest = ++requestId.current;
     setLoading(true);
     setError(null);
     let query = supabase
       .from("posts")
-      .select<string, RawPost>("*, media:post_media(*)")
+      .select<string, RawPost>("*, media:post_media(*), community:communities(name, slug)")
       .eq("is_public", true);
 
     if (authorId !== undefined) {
       query = query.eq("user_id", authorId);
+    }
+    if (communityId !== undefined) {
+      query = query.eq("community_id", communityId);
     }
 
     const { data, error } = await query
@@ -99,7 +114,7 @@ export function usePosts(authorId?: string | null) {
       if (uniqueUserIds.length > 0) {
         const { data: profilesData } = await supabase
           .from("profiles")
-          .select<string, RawProfile>("id, name, username, avatar_url")
+          .select<string, RawProfile>("id, name, username, avatar_url, is_test_account")
           .in("id", uniqueUserIds);
 
         if (profilesData) {
@@ -110,6 +125,7 @@ export function usePosts(authorId?: string | null) {
                 name: profile.name,
                 username: profile.username,
                 avatar_url: profile.avatar_url,
+                is_test_account: profile.is_test_account,
               },
             ]),
           );
@@ -136,7 +152,22 @@ export function usePosts(authorId?: string | null) {
         }
       }
 
-const mappedPosts = rawPosts.map((item) => {
+      // Etiquetas só para posts de comunidade. Se a RPC falhar, o feed segue sem elas.
+      let badges = new Map<string, CommunityBadgeKind>();
+      const communityPosts = rawPosts.filter((item) => item.community_id);
+      if (communityPosts.length > 0) {
+        try {
+          badges = await fetchCommunityBadges(
+            supabase,
+            Array.from(new Set(communityPosts.map((item) => item.community_id as string))),
+            Array.from(new Set(communityPosts.map((item) => item.user_id))),
+          );
+        } catch {
+          badges = new Map();
+        }
+      }
+
+      const mappedPosts: Post[] = rawPosts.map((item) => {
         const media =
           item.media?.map((m) => ({
             ...m,
@@ -149,6 +180,10 @@ const mappedPosts = rawPosts.map((item) => {
           user_id: item.user_id,
           author_team_page_id: item.author_team_page_id ?? null,
           community_id: item.community_id ?? null,
+          community: Array.isArray(item.community) ? (item.community[0] ?? null) : (item.community ?? null),
+          author_badge: item.community_id
+            ? (badges.get(`${item.community_id}:${item.user_id}`) ?? null)
+            : null,
           content: item.content,
           media,
           created_at: item.created_at,
@@ -167,7 +202,7 @@ const mappedPosts = rawPosts.map((item) => {
       setError(error.message);
     }
     setLoading(false);
-  }, [authorId]);
+  }, [authorId, communityId]);
 
 useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect

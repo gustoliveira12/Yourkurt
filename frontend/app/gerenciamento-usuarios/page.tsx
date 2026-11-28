@@ -1,5 +1,6 @@
 "use client";
 
+import { DevBadge } from "@/components/DevBadge";
 import MobileHeader from "@/components/navigation/MobileHeader";
 import MobileNav from "@/components/navigation/MobileNav";
 import PageAside from "@/components/navigation/NavBar";
@@ -21,6 +22,7 @@ type ManagedUser = {
   is_admin: boolean;
   is_super_admin: boolean;
   created_at: string;
+  is_test_account: boolean;
 };
 
 type RoleFilter = "all" | "user" | "admin" | "super_admin";
@@ -164,6 +166,47 @@ export default function SuperAdminPage() {
     );
 
     setStatusMessage("Permissões atualizadas com sucesso.");
+    setBusyUserId(null);
+  }
+
+  // Marca ou desmarca a conta de teste (tag "Dev"). Só o super admin pode.
+  async function toggleTestAccount(user: ManagedUser) {
+    if (!profile?.isSuperAdmin || busyUserId) return;
+
+    const next = !user.is_test_account;
+    const label = user.name ?? user.username ?? "esta conta";
+    const confirmed = window.confirm(
+      next
+        ? `Marcar ${label} como conta de teste? A tag "Dev" aparecerá ao lado do nome.`
+        : `Desmarcar ${label} como conta de teste? A tag "Dev" será removida.`,
+    );
+    if (!confirmed) return;
+
+    setBusyUserId(user.id);
+    setStatusMessage("");
+
+    const supabase = createClient();
+    const { error } = await supabase.rpc("set_user_test_account", {
+      p_user_id: user.id,
+      p_is_test: next,
+    });
+
+    if (error) {
+      setStatusMessage(
+        error.message === "not_super_admin"
+          ? "Só o super admin pode marcar contas de teste."
+          : error.message === "user_not_found"
+            ? "Usuário não encontrado."
+            : error.message || "Erro ao atualizar a conta de teste.",
+      );
+      setBusyUserId(null);
+      return;
+    }
+
+    setUsers((prev) =>
+      prev.map((item) => (item.id === user.id ? { ...item, is_test_account: next } : item)),
+    );
+    setStatusMessage(next ? "Conta marcada como conta de teste." : "Conta desmarcada como conta de teste.");
     setBusyUserId(null);
   }
 
@@ -334,8 +377,11 @@ export default function SuperAdminPage() {
                         <tr key={user.id} className="border-t border-border-base">
                           <td className="px-4 py-3">
                             <div className="flex flex-col">
-                              <span className="font-semibold text-foreground">{user.name ?? "Sem nome"}</span>
-                              <span className="text-subtitle">@{user.username ?? "usuario"}</span>
+                              <span className="flex flex-wrap items-center gap-2">
+                                <span className="font-semibold text-foreground">{user.name ?? "Sem nome"}</span>
+                                {user.is_test_account && <DevBadge />}
+                              </span>
+                              <span className="text-subtitle">u/{user.username ?? "usuario"}</span>
                             </div>
                           </td>
                           <td className="px-4 py-3 text-subtitle">{user.email ?? "-"}</td>
@@ -384,6 +430,14 @@ export default function SuperAdminPage() {
                                 className="rounded-md border border-border-base px-2 py-1 text-xs font-semibold text-foreground hover:bg-background disabled:opacity-50"
                               >
                                 Tornar Super Admin
+                              </button>
+                              <button
+                                type="button"
+                                disabled={isBusy}
+                                onClick={() => void toggleTestAccount(user)}
+                                className="rounded-md border border-border-base px-2 py-1 text-xs font-semibold text-foreground hover:bg-background disabled:opacity-50"
+                              >
+                                {user.is_test_account ? "Desmarcar conta de teste" : "Marcar como conta de teste"}
                               </button>
                             </div>
                           </td>

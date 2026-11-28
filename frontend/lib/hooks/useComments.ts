@@ -7,6 +7,7 @@ export type CommentAuthor = {
   name: string;
   username: string;
   avatar_url: string | null;
+  is_test_account?: boolean;
 };
 
 export type CommentItem = {
@@ -51,7 +52,7 @@ export function useComments(postId: string) {
       const { data, error: fetchError } = await supabase
         .from("comments")
         .select<string, RawComment>(
-          "id, post_id, user_id, content, created_at, profiles(name, username, avatar_url)",
+          "id, post_id, user_id, content, created_at, profiles(name, username, avatar_url, is_test_account)",
         )
         .eq("post_id", postId)
         .order("created_at", { ascending: true });
