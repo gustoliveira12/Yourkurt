@@ -16,7 +16,7 @@ const inputClass =
 
 function getDeleteErrorMessage(rawMessage: string) {
   if (rawMessage.includes("owns_resources")) {
-    return "Você é dono de páginas de equipe. Exclua ou transfira essas páginas antes de apagar a conta.";
+    return "Você é dono de uma página de equipe. Peça a um administrador para removê-la antes de apagar a conta.";
   }
 
   if (rawMessage.includes("super_admin_cannot_delete")) {

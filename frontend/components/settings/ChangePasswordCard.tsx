@@ -103,6 +103,13 @@ export default function ChangePasswordCard() {
       icon={<LockKeyIcon size={18} weight="fill" />}
       title="Senha e e-mail"
       description="Altere sua senha e o e-mail que você usa para entrar."
+      onToggle={(open) => {
+        // Como no botão antigo: abrir ou fechar limpa o aviso anterior. Ao
+        // fechar, as senhas digitadas também saem da memória da tela.
+        setMessage("");
+        setIsSuccess(false);
+        if (!open) reset();
+      }}
     >
       <section aria-labelledby="alterar-senha" className="flex flex-col gap-3">
         <h4 id="alterar-senha" className="text-sm font-semibold text-foreground">

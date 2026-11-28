@@ -370,7 +370,7 @@ community_id: rawPost.community_id ?? null,
                   key={post.id}
                   postId={post.id}
                   initialLikes={post.likes_count}
-                  commentsCount={commentsLoading ? undefined : comments.length}
+                  commentsCount={commentsLoading || commentsError ? undefined : comments.length}
                   onComment={() => replyRef.current?.focus()}
                   className="mt-5 border-t border-border-base pt-4"
                 />
@@ -388,7 +388,7 @@ community_id: rawPost.community_id ?? null,
                     placeholder="Publicar sua resposta"
                     aria-label="Sua resposta"
                     maxLength={MAX_CONTENT_LENGTH}
-                    className="min-h-24 w-full resize-none rounded-2xl border border-border-base bg-background px-4 py-3 text-foreground placeholder:text-subtitle outline-none"
+                    className="min-h-24 w-full resize-none rounded-2xl border border-border-base bg-background px-4 py-3 text-foreground placeholder:text-subtitle outline-none focus-visible:border-orange-400 focus-visible:ring-2 focus-visible:ring-orange-400/30"
                   />
                   <div className="mt-3 flex items-center justify-between gap-3">
                     <p className="text-xs text-subtitle">
