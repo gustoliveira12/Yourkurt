@@ -47,20 +47,35 @@ ALTER TABLE public.profiles DISABLE TRIGGER profiles_privilege_guard;
 UPDATE public.profiles
 SET is_admin = true, is_super_admin = true
 WHERE id = '11111111-1111-1111-1111-111111111111';
+
+-- A tag "Dev" (is_test_account) só o super admin muda, pela função
+-- set_user_test_account. No seed, dev1, dev2 e dev3 já nascem marcados.
+UPDATE public.profiles
+SET is_test_account = true
+WHERE id IN ('11111111-1111-1111-1111-111111111111', '22222222-2222-2222-2222-222222222222',
+             '66666666-6666-6666-6666-666666666666');
 ALTER TABLE public.profiles ENABLE TRIGGER profiles_privilege_guard;
 
--- 3. Comunidade já aprovada. O trigger communities_guard_changes força
---    status = 'pending' e created_by = auth.uid() (vazio no seed), então também
---    é desligado. O trigger communities_add_owner continua ligado e cria a
---    inscrição do dono.
+-- 3. Comunidades. O trigger communities_guard_changes força status = 'pending'
+--    e created_by = auth.uid() (vazio no seed), então é desligado. O trigger
+--    communities_add_owner continua ligado e cria a inscrição de dono.
+--    Cybersec BR já aprovada (dev1 dono, dev3 membro) e Clube do Livro
+--    pendente, criada por dev3, para testar a fila de aprovação.
 ALTER TABLE public.communities DISABLE TRIGGER communities_guard_changes;
-INSERT INTO public.communities (id, name, slug, description, status, created_by)
+INSERT INTO public.communities (id, name, slug, description, theme, status, created_by)
 VALUES (
   '33333333-3333-3333-3333-333333333333', 'Cybersec BR', 'cybersec-br',
-  'Comunidade de testes para validação do frontend.', 'approved',
+  'Comunidade de testes para validação do frontend.', 'tecnologia', 'approved',
   '11111111-1111-1111-1111-111111111111'
+), (
+  '77777777-7777-7777-7777-777777777777', 'Clube do Livro', 'clube-do-livro',
+  'Leituras e conversas sobre livros.', 'estudos', 'pending',
+  '66666666-6666-6666-6666-666666666666'
 );
 ALTER TABLE public.communities ENABLE TRIGGER communities_guard_changes;
+
+INSERT INTO public.community_memberships (community_id, user_id, role)
+VALUES ('33333333-3333-3333-3333-333333333333', '66666666-6666-6666-6666-666666666666', 'member');
 
 -- 4. Posts de teste. Sem imagens: os arquivos não existiriam no Storage local.
 INSERT INTO public.posts (id, user_id, community_id, content)
