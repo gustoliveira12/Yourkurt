@@ -10,6 +10,8 @@ type CollapsibleCardProps = {
   description: string;
   children: ReactNode;
   defaultOpen?: boolean;
+  /** Chamado ao abrir ou fechar, com o novo estado. */
+  onToggle?: (open: boolean) => void;
 };
 
 // Cartão das Configurações que abre e fecha pelo cabeçalho. O conteúdo fica
@@ -21,6 +23,7 @@ export default function CollapsibleCard({
   description,
   children,
   defaultOpen = false,
+  onToggle,
 }: CollapsibleCardProps) {
   const [open, setOpen] = useState(defaultOpen);
   const contentId = useId();
@@ -32,7 +35,10 @@ export default function CollapsibleCard({
           type="button"
           aria-expanded={open}
           aria-controls={contentId}
-          onClick={() => setOpen((value) => !value)}
+          onClick={() => {
+            setOpen(!open);
+            onToggle?.(!open);
+          }}
           className="flex w-full items-start gap-3 rounded-card p-4 text-left hover:bg-background-raised transition-colors cursor-pointer"
         >
           <span className="mt-0.5 rounded-lg bg-background p-2 text-foreground-brand">{icon}</span>

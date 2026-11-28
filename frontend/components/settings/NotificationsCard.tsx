@@ -75,7 +75,6 @@ export default function NotificationsCard() {
       title="Notificações"
       description="Escolha quais avisos você quer receber no Yourkurt."
     >
-
       {/* Sem as preferências reais (carregando ou erro), as caixas não aparecem:
           mostrar tudo marcado contradiria o que a pessoa salvou. */}
       {prefs
