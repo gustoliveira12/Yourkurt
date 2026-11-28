@@ -56,6 +56,10 @@ const PageAside = ({ items = NAV_ITEMS }: PageAsideProps) => {
   const unread = useUnreadNotifications();
 
   return (
+    <>
+    {/* A nav é fixa e não ocupa espaço no layout: este espaçador reserva a largura
+        minimizada (w-16) para o conteúdo não ficar cortado atrás dela. */}
+    <div aria-hidden="true" className="hidden sm:block w-16 shrink-0" />
     <div className="top-0 left-0 fixed sm:flex h-dvh z-40 bg-surface shadow-overflow-light hidden">
       <aside
         className={clsx(
@@ -146,6 +150,7 @@ const PageAside = ({ items = NAV_ITEMS }: PageAsideProps) => {
         </div>
       </aside>
     </div>
+    </>
   );
 };
 

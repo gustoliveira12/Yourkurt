@@ -1,21 +1,14 @@
 "use client";
 
-import {
-  Bookmark,
-  Ellipsis,
-  Heart,
-  Loader2,
-  MessageSquare,
-  Repeat2,
-  Trash2,
-} from "lucide-react";
+import { Ellipsis, Loader2, Trash2 } from "lucide-react";
 import { Avatar } from "./Avatar";
 import Image from "next/image";
 import Link from "next/link";
-import clsx from "clsx";
 import { useState } from "react";
-import { useLikes } from "@/lib/hooks/useLikes";
-import { useInteractions } from "@/lib/hooks/useInteractions";
+import PostActions from "@/components/PostActions";
+import { CommunityBadge } from "@/components/communities/CommunityBadge";
+import { DevBadge } from "@/components/DevBadge";
+import { communityHref } from "@/lib/communities";
 import type { Post } from "@/lib/hooks/usePosts";
 import { profileHref } from "@/lib/profile";
 import { createClient } from "@/lib/supabase/client";
@@ -45,23 +38,10 @@ export default function PostCard({
   onDelete,
   detailHref,
 }: PostCardProps) {
-  const [reposted, setReposted] = useState(() => {
-    if (typeof window === "undefined") return false;
-    return localStorage.getItem(`reposted-${post.id}`) === "true";
-  });
-  const [bookmarked, setBookmarked] = useState(() => {
-    if (typeof window === "undefined") return false;
-    return localStorage.getItem(`bookmarked-${post.id}`) === "true";
-  });
   const [menuOpen, setMenuOpen] = useState(false);
-  const { liked, likesCount, toggleLike } = useLikes(post.id, post.likes_count);
-  const { interactions, loading: loadingInteractions } = useInteractions(post.id);
 
   const author = post.profiles;
   const authorName = author?.name ?? "Usuário";
-  const commentsLabel = loadingInteractions
-    ? "carregando comentários"
-    : `${interactions.commentsCount} ${interactions.commentsCount === 1 ? "comentário" : "comentários"}`;
   // Posts de equipe não têm link: ainda não existe tela de equipe.
   const authorHref = post.author_team_page_id ? null : profileHref(author?.username);
   const postImages = post.media
@@ -71,20 +51,6 @@ export default function PostCard({
         item.public_url ??
         supabase.storage.from("post-images").getPublicUrl(item.storage_path).data.publicUrl,
     );
-
-  // Save reposted state to localStorage
-  const handleRepost = () => {
-    const newRepostedState = !reposted;
-    setReposted(newRepostedState);
-    localStorage.setItem(`reposted-${post.id}`, newRepostedState.toString());
-  };
-
-  // Save bookmarked state to localStorage
-  const handleBookmark = () => {
-    const newBookmarkedState = !bookmarked;
-    setBookmarked(newBookmarkedState);
-    localStorage.setItem(`bookmarked-${post.id}`, newBookmarkedState.toString());
-  };
 
   const handleDelete = async () => {
     if (!canDelete || !onDelete || deleting) return;
@@ -117,17 +83,32 @@ export default function PostCard({
               </div>
             )}
             <div className="flex flex-col min-w-0">
-              <h2 className="text-lg font-bold text-foreground truncate">
-                {authorHref ? (
-                  <Link href={authorHref} className="hover:underline">
-                    {authorName}
-                  </Link>
-                ) : (
-                  authorName
-                )}
-              </h2>
+              <div className="flex items-center gap-2 min-w-0">
+                <h2 className="text-lg font-bold text-foreground truncate">
+                  {authorHref ? (
+                    <Link href={authorHref} className="hover:underline">
+                      {authorName}
+                    </Link>
+                  ) : (
+                    authorName
+                  )}
+                </h2>
+                {post.author_badge && <CommunityBadge kind={post.author_badge} />}
+                {author?.is_test_account && <DevBadge />}
+              </div>
               <div className="flex gap-4 text-subtitle flex-wrap">
-                <span>@{author?.username ?? "usuario"}</span>
+                <span>
+                  {post.author_team_page_id ? "@" : "u/"}
+                  {author?.username ?? "usuario"}
+                </span>
+                {post.community && (
+                  <Link
+                    href={communityHref(post.community.slug)}
+                    className="hover:underline text-foreground-brand"
+                  >
+                    em c/{post.community.slug}
+                  </Link>
+                )}
                 {detailHref ? (
                   <Link href={detailHref} className="hover:underline">
                     {timeAgo(post.created_at)}
@@ -242,71 +223,7 @@ export default function PostCard({
         </div>
       )}
       <div className="flex flex-col gap-2 px-3">
-        <div className="flex justify-between items-center">
-          <div className="flex gap-6 items-center">
-            <button
-              type="button"
-              onClick={() => void toggleLike()}
-              aria-label={`${liked ? "Descurtir" : "Curtir"}, ${likesCount} ${likesCount === 1 ? "curtida" : "curtidas"}`}
-              aria-pressed={liked}
-              className={clsx(
-                "flex gap-2 items-center group cursor-pointer transition-colors duration-150",
-                liked
-                  ? "text-rose-500 hover:text-rose-600 [&_svg]:fill-rose-500"
-                  : "text-foreground dark:hover:text-rose-300 hover:text-rose-600",
-              )}
-            >
-              <Heart aria-hidden="true" />
-              <span aria-hidden="true">{likesCount}</span>
-            </button>
-            {detailHref ? (
-              <Link
-                href={detailHref}
-                aria-label={`Comentar, ${commentsLabel}`}
-                className="flex gap-2 items-center hover:text-zinc-600 text-foreground cursor-pointer"
-              >
-                <MessageSquare aria-hidden="true" />
-                <span aria-hidden="true">{loadingInteractions ? "..." : interactions.commentsCount}</span>
-              </Link>
-            ) : (
-              // Já na tela do post: só mostra a contagem.
-              <span className="flex gap-2 items-center text-foreground">
-                <MessageSquare aria-hidden="true" />
-                <span className="sr-only">{commentsLabel}</span>
-                <span aria-hidden="true">{loadingInteractions ? "..." : interactions.commentsCount}</span>
-              </span>
-            )}
-            <button
-              type="button"
-              onClick={handleRepost}
-              aria-label={`Repostar, ${loadingInteractions ? "carregando" : `${interactions.repostsCount} reposts`}`}
-              aria-pressed={reposted}
-              className={clsx(
-                "flex gap-2 items-center cursor-pointer",
-                reposted
-                  ? "text-sky-500 fill-sky-500"
-                  : "text-foreground dark:hover:text-sky-200 hover:text-sky-600",
-              )}
-            >
-              <Repeat2 aria-hidden="true" />
-              <span aria-hidden="true">{loadingInteractions ? "..." : interactions.repostsCount}</span>
-            </button>
-          </div>
-          <button
-            type="button"
-            onClick={handleBookmark}
-            aria-label={bookmarked ? "Remover dos salvos" : "Salvar post"}
-            aria-pressed={bookmarked}
-            className="cursor-pointer py-2 px-4 text-foreground rounded-sm hover:bg-background-brand/15 hover:text-foreground-brand transition-all duration-150"
-          >
-            <Bookmark
-              aria-hidden="true"
-              className={clsx(
-                bookmarked ? "fill-background-brand text-foreground-brand" : "",
-              )}
-            />
-          </button>
-        </div>
+        <PostActions postId={post.id} initialLikes={post.likes_count} commentHref={detailHref} />
       </div>
     </div>
   );

@@ -14,9 +14,11 @@ export type FollowPerson = {
   follow_status: "accepted" | "pending";
   /** Vocês se seguem mutuamente (amigos). */
   is_friend: boolean;
+  /** Conta de teste: mostra a tag Dev ao lado do nome. */
+  is_test_account: boolean;
 };
 
-type Row = FollowPerson & { total_count: number };
+type Row = Omit<FollowPerson, "is_test_account"> & { total_count: number };
 
 // Resultado da última busca, marcado com a lista que ele responde.
 // `loading` é derivado dele, então o efeito nunca chama setState de forma síncrona.
@@ -55,6 +57,19 @@ export function useFollowList(kind: FollowListKind, limit = 100) {
       }
 
       const rows = (data ?? []) as Row[];
+
+      // get_my_follow_lists não devolve a tag Dev; lê a coluna direto pelos ids.
+      const testIds = new Set<string>();
+      if (rows.length > 0) {
+        const { data: flags } = await supabase
+          .from("profiles")
+          .select("id, is_test_account")
+          .in("id", rows.map((row) => row.id));
+        if (!active) return;
+        for (const flag of flags ?? []) {
+          if (flag.is_test_account) testIds.add(flag.id);
+        }
+      }
       setState({
         key,
         people: rows.map((row) => ({
@@ -64,6 +79,7 @@ export function useFollowList(kind: FollowListKind, limit = 100) {
           avatar_url: row.avatar_url,
           follow_status: row.follow_status,
           is_friend: row.is_friend,
+          is_test_account: testIds.has(row.id),
         })),
         total: Number(rows[0]?.total_count ?? 0),
         error: null,

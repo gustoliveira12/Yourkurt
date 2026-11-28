@@ -8,7 +8,7 @@ import { createClient } from "@/lib/supabase/client";
 import { PROFILE_IMAGE_BUCKETS, removeUserFiles } from "@/lib/storage";
 
 function normalizeHandle(value: string) {
-  return value.trim().replace(/^@/, "");
+  return value.trim().replace(/^(u\/|@)/i, "");
 }
 
 const inputClass =
@@ -16,7 +16,7 @@ const inputClass =
 
 function getDeleteErrorMessage(rawMessage: string) {
   if (rawMessage.includes("owns_resources")) {
-    return "Você é dono de comunidades ou páginas de equipe. Exclua ou transfira esses itens antes de apagar a conta.";
+    return "Você é dono de páginas de equipe. Exclua ou transfira essas páginas antes de apagar a conta.";
   }
 
   if (rawMessage.includes("super_admin_cannot_delete")) {
@@ -62,6 +62,25 @@ async function removePostImages(supabase: SupabaseClient, userId: string) {
       .in("storage_path", paths);
     if (deleteError) throw new Error(deleteError.message);
     if (data.length < pageSize) return;
+  }
+}
+
+// O banco apaga os pedidos de comunidade pendentes ou recusados junto com a
+// conta, mas não os arquivos deles no Storage. Uma falha aqui só deixa arquivos
+// soltos, então não impede a exclusão.
+async function removePendingCommunityImages(supabase: SupabaseClient, userId: string) {
+  try {
+    const { data, error } = await supabase
+      .from("communities")
+      .select("id")
+      .eq("created_by", userId)
+      .in("status", ["pending", "rejected"]);
+    if (error) throw new Error(error.message);
+    for (const community of data ?? []) {
+      await removeUserFiles(supabase, "community-images", community.id);
+    }
+  } catch (error) {
+    console.error("Falha ao limpar as imagens dos pedidos de comunidade:", error);
   }
 }
 
@@ -118,6 +137,7 @@ export default function DeleteAccountCard({ username }: { username: string }) {
       }
 
       await removePostImages(supabase, user.id);
+      await removePendingCommunityImages(supabase, user.id);
       for (const bucket of PROFILE_IMAGE_BUCKETS) {
         await removeUserFiles(supabase, bucket, user.id);
       }
@@ -194,12 +214,12 @@ export default function DeleteAccountCard({ username }: { username: string }) {
           </label>
 
           <label className="flex flex-col gap-1 text-sm font-medium text-foreground">
-            Digite seu @ (@{username}) para confirmar
+            Digite seu nome de usuário (u/{username}) para confirmar
             <input
               type="text"
               value={confirmText}
               onChange={(e) => setConfirmText(e.target.value)}
-              placeholder={`@${username}`}
+              placeholder={`u/${username}`}
               autoComplete="off"
               className={inputClass}
               required

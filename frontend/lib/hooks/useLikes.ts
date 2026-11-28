@@ -47,7 +47,8 @@ export function useLikes(postId: string, initialLikesCount: number) {
   }, [postId]);
 
   async function toggleLike() {
-    if (!userId || isToggling) return;
+    // Antes de saber se a pessoa já curtiu, um clique tentaria curtir de novo (409).
+    if (!userId || isToggling || loading) return;
 
     setIsToggling(true);
 

@@ -19,6 +19,7 @@ import {
   PencilSimpleLineIcon,
 } from "@phosphor-icons/react";
 import Image from "next/image";
+import { DevBadge } from "@/components/DevBadge";
 import Link from "next/link";
 import { type ChangeEvent, useEffect, useState } from "react";
 
@@ -34,6 +35,7 @@ type ProfileState = {
   birthday: string;
   avatarUrl: string;
   headerUrl: string;
+  isTestAccount: boolean;
 };
 
 type FollowStats = {
@@ -55,6 +57,7 @@ const INITIAL_PROFILE: ProfileState = {
   birthday: "",
   avatarUrl: "",
   headerUrl: "",
+  isTestAccount: false,
 };
 
 const INITIAL_FOLLOW_STATS: FollowStats = {
@@ -84,7 +87,7 @@ export default function ProfilePage() {
     addPost,
     deletePost,
     deletingPostId,
-  } = usePosts(profile.id || null); // null enquanto o perfil carrega: não busca nada
+  } = usePosts({ authorId: profile.id || null }); // null enquanto o perfil carrega: não busca nada
   const {
     replies,
     loading: repliesLoading,
@@ -113,7 +116,7 @@ export default function ProfilePage() {
       // Bio, aniversário, localização e site não são legíveis direto na tabela
       // (dependem da privacidade do perfil); o próprio usuário lê tudo por RPC.
       // Perfil e contagens em paralelo: uma ida ao servidor em vez de três.
-      const [profileResult, followingResult, followersResult] = await Promise.all([
+      const [profileResult, followingResult, followersResult, flagResult] = await Promise.all([
         supabase.rpc("get_my_profile"),
         supabase
           .from("follows")
@@ -125,6 +128,8 @@ export default function ProfilePage() {
           .select("follower_id", { count: "exact", head: true })
           .eq("following_id", authUser.id)
           .eq("status", "accepted"),
+        // A tag Dev não vem de get_my_profile; a coluna é legível direto.
+        supabase.from("profiles").select("is_test_account").eq("id", authUser.id).maybeSingle(),
       ]);
       const { error } = profileResult;
       const data = profileResult.data?.[0];
@@ -156,6 +161,7 @@ export default function ProfilePage() {
         birthday: data?.birthday ?? "",
         avatarUrl: data?.avatar_url ?? "",
         headerUrl: data?.header_url ?? "",
+        isTestAccount: Boolean(flagResult.data?.is_test_account),
       });
 
       if (followingResult.error || followersResult.error) {
@@ -542,10 +548,13 @@ export default function ProfilePage() {
               ) : (
                 <>
                   <div className="mt-4">
-                    <h1 className="text-2xl font-black text-foreground tracking-tight">
-                      {profile.name || "Usuário"}
-                    </h1>
-                    <p className="text-subtitle">@{profile.username || "usuario"}</p>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h1 className="text-2xl font-black text-foreground tracking-tight">
+                        {profile.name || "Usuário"}
+                      </h1>
+                      {profile.isTestAccount && <DevBadge />}
+                    </div>
+                    <p className="text-subtitle">u/{profile.username || "usuario"}</p>
                     <p className="mt-3 text-foreground leading-relaxed max-w-2xl">
                       {profile.bio || "Adicione uma bio para aparecer aqui."}
                     </p>
@@ -717,8 +726,8 @@ export default function ProfilePage() {
                                     </p>
                                     <p className="truncate text-xs text-subtitle">
                                       {reply.posts.profiles && !Array.isArray(reply.posts.profiles)
-                                        ? `@${reply.posts.profiles.username}`
-                                        : "@usuario"}
+                                        ? `u/${reply.posts.profiles.username}`
+                                        : "u/usuario"}
                                     </p>
                                   </div>
                                 </div>

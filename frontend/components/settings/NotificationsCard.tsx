@@ -3,6 +3,7 @@
 import { BellIcon } from "@phosphor-icons/react";
 import { useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import CollapsibleCard from "./CollapsibleCard";
 
 type Preferences = {
   likes: boolean;
@@ -69,16 +70,11 @@ export default function NotificationsCard() {
   }
 
   return (
-    <div className="rounded-card border border-border-base bg-surface p-4 flex flex-col gap-4">
-      <div className="flex items-start gap-3">
-        <span className="mt-0.5 rounded-lg bg-background p-2 text-foreground-brand">
-          <BellIcon size={18} weight="fill" />
-        </span>
-        <div className="flex flex-col">
-          <h3 className="text-base font-semibold text-foreground">Notificações</h3>
-          <p className="text-sm text-subtitle">Escolha quais avisos você quer receber no Yourkurt.</p>
-        </div>
-      </div>
+    <CollapsibleCard
+      icon={<BellIcon size={18} weight="fill" />}
+      title="Notificações"
+      description="Escolha quais avisos você quer receber no Yourkurt."
+    >
 
       {/* Sem as preferências reais (carregando ou erro), as caixas não aparecem:
           mostrar tudo marcado contradiria o que a pessoa salvou. */}
@@ -107,6 +103,6 @@ export default function NotificationsCard() {
           {message}
         </p>
       )}
-    </div>
+    </CollapsibleCard>
   );
 }

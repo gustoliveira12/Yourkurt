@@ -7,6 +7,8 @@ import { useState, useEffect } from "react";
 import { UserIcon } from "@phosphor-icons/react";
 import { createClient } from "@/lib/supabase/client";
 import { useFriends } from "@/lib/hooks/useFriends";
+import { DevBadge } from "@/components/DevBadge";
+import { profileHref } from "@/lib/profile";
 
 interface NavProps extends AvatarProps {
   size: number;
@@ -30,6 +32,7 @@ export default function LeftNavbar({
 }: NavProps) {
   const [error, setError] = useState(false);
   const [stats, setStats] = useState<ProfileStats | null>(null);
+  const [isTestAccount, setIsTestAccount] = useState(false);
   // Amigos = quem você segue e segue você de volta (get_my_follow_lists).
   const { friends, total: friendsCount, loading: loadingFriends } = useFriends(6);
 
@@ -46,14 +49,18 @@ export default function LeftNavbar({
       if (!userId) return;
 
       // head: true pede só a contagem, sem baixar as linhas.
-      const [posts, communities] = await Promise.all([
+      const [posts, communities, ownProfile] = await Promise.all([
         supabase.from("posts").select("id", { count: "exact", head: true }).eq("user_id", userId),
         supabase
           .from("community_memberships")
-          .select("id", { count: "exact", head: true })
-          .eq("user_id", userId),
+          .select("id, communities!inner(status)", { count: "exact", head: true })
+          .eq("user_id", userId)
+          .eq("communities.status", "approved"),
+        supabase.from("profiles").select("is_test_account").eq("id", userId).maybeSingle(),
       ]);
       if (!active) return;
+
+      setIsTestAccount(Boolean(ownProfile.data?.is_test_account));
 
       setStats({
         postsCount: posts.count ?? 0,
@@ -111,17 +118,20 @@ export default function LeftNavbar({
         </Link>
         <div className="flex flex-col px-6 py-4 gap-4 relative pt-10">
           <div className="flex flex-col w-full">
-            <Link
-              href="/perfil"
-              className="text-xl text-foreground font-bold hover:underline w-fit"
-            >
-              {name}
-            </Link>
+            <div className="flex flex-wrap items-center gap-2">
+              <Link
+                href="/perfil"
+                className="text-xl text-foreground font-bold hover:underline w-fit"
+              >
+                {name}
+              </Link>
+              {isTestAccount && <DevBadge />}
+            </div>
             <Link
               href="/perfil"
               className="text-subtitle hover:underline w-fit"
             >
-              @{at}
+              u/{at}
             </Link>
           </div>
           {/* Números do perfil: termo + valor (dl), não títulos. */}
@@ -162,7 +172,7 @@ export default function LeftNavbar({
             friends.map((friend) => (
               <Link
                 key={friend.id}
-                href={`/perfil/${encodeURIComponent(friend.username)}`}
+                href={profileHref(friend.username) ?? "/perfil"}
                 className="flex flex-col justify-center items-center gap-2 text-xs text-subtitle truncate max-w-16 hover:opacity-80 transition-opacity"
               >
                 <div className="flex flex-col rounded-full size-16 items-center justify-center">

@@ -4,6 +4,7 @@ import { DownloadSimpleIcon, ShieldCheckIcon } from "@phosphor-icons/react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import CollapsibleCard from "./CollapsibleCard";
 
 type Preferences = {
   id: string;
@@ -95,21 +96,18 @@ export default function PrivacyCard() {
   }
 
   return (
-    <div className="rounded-card border border-border-base bg-surface p-4 flex flex-col gap-4">
-      <div className="flex items-start gap-3">
-        <span className="mt-0.5 rounded-lg bg-background p-2 text-foreground-brand">
-          <ShieldCheckIcon size={18} weight="fill" />
-        </span>
-        <div className="flex flex-col">
-          <h3 className="text-base font-semibold text-foreground">Privacidade e dados</h3>
-          <p className="text-sm text-subtitle">
-            Controle quem vê seu perfil e baixe uma cópia dos seus dados.{" "}
-            <Link href="/privacidade" className="font-semibold text-foreground-brand underline">
-              Política de Privacidade
-            </Link>
-          </p>
-        </div>
-      </div>
+    <CollapsibleCard
+      icon={<ShieldCheckIcon size={18} weight="fill" />}
+      title="Privacidade e dados"
+      description="Controle quem vê seu perfil e baixe uma cópia dos seus dados."
+    >
+      <p className="text-sm text-subtitle">
+        Saiba como seus dados são usados na{" "}
+        <Link href="/privacidade" className="font-semibold text-foreground-brand underline">
+          Política de Privacidade
+        </Link>
+        .
+      </p>
 
       <label className="flex items-start gap-3 rounded-lg border border-border-base p-3">
         <input
@@ -122,8 +120,9 @@ export default function PrivacyCard() {
         <span className="flex flex-col">
           <span className="text-sm font-semibold text-foreground">Perfil privado</span>
           <span className="text-sm text-subtitle">
-            Só quem você aprovar vê seus posts, bio, localização, site e aniversário. Nome, @,
-            foto e capa continuam visíveis.
+            Só quem você aprovar vê seus posts, bio, localização, site e aniversário. Nome, nome
+            de usuário, foto e capa continuam visíveis. Posts feitos em comunidades são sempre
+            públicos.
           </span>
         </span>
       </label>
@@ -162,6 +161,6 @@ export default function PrivacyCard() {
           {message}
         </p>
       )}
-    </div>
+    </CollapsibleCard>
   );
 }

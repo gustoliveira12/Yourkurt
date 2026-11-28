@@ -12,279 +12,19 @@ import PrivacyCard from "@/components/settings/PrivacyCard";
 import { useCurrentProfile } from "@/lib/hooks/useCurrentProfile";
 import { createClient } from "@/lib/supabase/client";
 import {
-  MegaphoneIcon,
   LockOpenIcon,
+  UsersThreeIcon,
   SignOutIcon,
 } from "@phosphor-icons/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useEffect, useState, useSyncExternalStore } from "react";
-
-type TeamPageItem = {
-  id: string;
-  name: string;
-  slug: string;
-};
-
-type TeamPageMember = {
-  id: string;
-  user_id: string;
-  role: string;
-  can_post: boolean;
-  name: string | null;
-  username: string | null;
-  avatar_url: string | null;
-};
-
-type TeamPageMembersMap = Record<string, TeamPageMember[]>;
-
-const subscribeNoop = () => () => {};
+import { useState } from "react";
 
 export default function SettingsPage() {
   const router = useRouter();
   const { profile } = useCurrentProfile();
-  // false on the server and during hydration, true afterwards (no setState-in-effect).
-  const hasMounted = useSyncExternalStore(
-    subscribeNoop,
-    () => true,
-    () => false,
-  );
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [logoutError, setLogoutError] = useState("");
-  const [teamName, setTeamName] = useState("");
-  const [teamSlug, setTeamSlug] = useState("");
-  const [teamAvatarUrl, setTeamAvatarUrl] = useState("");
-  const [teamMessage, setTeamMessage] = useState("");
-  const [isCreatingTeam, setIsCreatingTeam] = useState(false);
-  const [teamPages, setTeamPages] = useState<TeamPageItem[]>([]);
-  const [teamMembersByPage, setTeamMembersByPage] = useState<TeamPageMembersMap>({});
-
-  useEffect(() => {
-    async function loadTeamPages() {
-      if (!profile?.id || !profile.isAdmin) {
-        setTeamPages([]);
-        setTeamMembersByPage({});
-        return;
-      }
-
-      const supabase = createClient();
-      const { data } = await supabase
-        .from("team_memberships")
-        .select("team_pages(id, name, slug), role, can_post")
-        .eq("user_id", profile.id);
-
-      if (!data) {
-        setTeamPages([]);
-        setTeamMembersByPage({});
-        return;
-      }
-
-      const mapped: TeamPageItem[] = [];
-
-      data.forEach((row) => {
-        const rawTeam = Array.isArray(row.team_pages)
-          ? row.team_pages[0]
-          : row.team_pages;
-
-        if (!rawTeam) return;
-
-        if (row.role !== "owner" && row.role !== "admin") {
-          return;
-        }
-
-        mapped.push({
-          id: rawTeam.id,
-          name: rawTeam.name,
-          slug: rawTeam.slug,
-        });
-      });
-
-      setTeamPages(mapped);
-    }
-
-    void loadTeamPages();
-  }, [profile?.id, profile?.isAdmin]);
-
-  useEffect(() => {
-    async function loadTeamMembers() {
-      if (!profile?.id || !profile.isAdmin || teamPages.length === 0) {
-        setTeamMembersByPage({});
-        return;
-      }
-
-      const supabase = createClient();
-      const teamPageIds = teamPages.map((page) => page.id);
-
-      const { data, error } = await supabase
-        .from("team_memberships")
-        .select("id, team_page_id, user_id, role, can_post")
-        .in("team_page_id", teamPageIds);
-
-      if (error || !data) {
-        setTeamMembersByPage({});
-        return;
-      }
-
-      const userIds = [...new Set(data.map((row) => row.user_id))];
-
-      const profilesById = new Map<string, { name: string | null; username: string | null; avatar_url: string | null }>();
-
-      if (userIds.length > 0) {
-        const { data: profilesData } = await supabase
-          .from("profiles")
-          .select("id, name, username, avatar_url")
-          .in("id", userIds);
-
-        (profilesData ?? []).forEach((row) => {
-          profilesById.set(row.id, {
-            name: row.name,
-            username: row.username,
-            avatar_url: row.avatar_url,
-          });
-        });
-      }
-
-      const nextMembersByPage: TeamPageMembersMap = {};
-
-      data.forEach((row) => {
-        const profileInfo = profilesById.get(row.user_id);
-
-        const item: TeamPageMember = {
-          id: row.id,
-          user_id: row.user_id,
-          role: row.role,
-          can_post: Boolean(row.can_post),
-          name: profileInfo?.name ?? null,
-          username: profileInfo?.username ?? null,
-          avatar_url: profileInfo?.avatar_url ?? null,
-        };
-
-        if (!nextMembersByPage[row.team_page_id]) {
-          nextMembersByPage[row.team_page_id] = [];
-        }
-
-        nextMembersByPage[row.team_page_id].push(item);
-      });
-
-      setTeamMembersByPage(nextMembersByPage);
-    }
-
-    void loadTeamMembers();
-  }, [profile?.id, profile?.isAdmin, teamPages]);
-
-  const canManageTeamPages = hasMounted && Boolean(profile?.isAdmin);
-
-  function normalizeSlug(value: string) {
-    return value
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9\s-]/g, "")
-      .replace(/\s+/g, "-")
-      .replace(/-+/g, "-")
-      .replace(/^-|-$/g, "");
-  }
-
-  async function handleCreateTeamPage() {
-    if (!profile?.id || !profile.isAdmin || isCreatingTeam) return;
-
-    const cleanName = teamName.trim();
-    const cleanSlug = normalizeSlug(teamSlug || teamName);
-
-    if (!cleanName || !cleanSlug) {
-      setTeamMessage("Informe um nome valido para a equipe.");
-      return;
-    }
-
-    setIsCreatingTeam(true);
-    setTeamMessage("");
-
-    try {
-      const supabase = createClient();
-      const { data: pageData, error: pageError } = await supabase
-        .from("team_pages")
-        .insert({
-          name: cleanName,
-          slug: cleanSlug,
-          avatar_url: teamAvatarUrl.trim() || null,
-          created_by: profile.id,
-        })
-        .select("id, name, slug")
-        .single();
-
-      if (pageError || !pageData) {
-        throw new Error(pageError?.message || "Não foi possível criar a equipe.");
-      }
-
-      const { error: membershipError } = await supabase.from("team_memberships").insert({
-        team_page_id: pageData.id,
-        user_id: profile.id,
-        role: "owner",
-        can_post: true,
-      });
-
-      if (membershipError) {
-        throw new Error(membershipError.message || "Não foi possível vincular você à equipe.");
-      }
-
-      setTeamPages((prev) => [...prev, pageData]);
-      setTeamName("");
-      setTeamSlug("");
-      setTeamAvatarUrl("");
-      setTeamMessage("Equipe criada. Agora você já pode postar em nome dela.");
-    } catch (error) {
-      setTeamMessage(error instanceof Error ? error.message : "Erro ao criar equipe.");
-    } finally {
-      setIsCreatingTeam(false);
-    }
-  }
-
-  async function handleTeamMemberPermissionChange(
-    teamPageId: string,
-    member: TeamPageMember,
-    nextValues: { can_post?: boolean; role?: string },
-  ) {
-    const nextCanPost = nextValues.can_post ?? member.can_post;
-    const nextRole = nextValues.role ?? member.role;
-
-    try {
-      const supabase = createClient();
-      const { data, error } = await supabase.rpc("set_team_member_permissions", {
-        p_team_page_id: teamPageId,
-        p_user_id: member.user_id,
-        p_can_post: nextCanPost,
-        p_role: nextRole,
-      });
-
-      if (error) {
-        throw new Error(error.message || "Não foi possível atualizar permissões do membro.");
-      }
-
-      const updated = data as { id: string; user_id: string; role: string; can_post: boolean } | null;
-
-      if (!updated) {
-        throw new Error("Resposta vazia da atualização de permissões.");
-      }
-
-      setTeamMembersByPage((prev) => ({
-        ...prev,
-        [teamPageId]: (prev[teamPageId] ?? []).map((item) =>
-          item.id === member.id
-            ? {
-                ...item,
-                role: updated.role,
-                can_post: Boolean(updated.can_post),
-              }
-            : item,
-        ),
-      }));
-
-      setTeamMessage("Permissões do membro atualizadas com sucesso.");
-    } catch (error) {
-      setTeamMessage(
-        error instanceof Error ? error.message : "Erro ao atualizar permissões do membro.",
-      );
-    }
-  }
 
   async function handleSignOut() {
     setIsSigningOut(true);
@@ -373,183 +113,28 @@ export default function SettingsPage() {
                   </span>
                 </Link>
               )}
-            </div>
 
-            <div className="flex flex-col gap-3">
-              <h2 className="text-sm font-bold uppercase tracking-wider text-subtitle">
-                Equipes e páginas
-              </h2>
-
-              <div className="rounded-xl border border-border-base bg-background-raised p-4 flex flex-col gap-3">
-                <div className="flex items-start gap-3">
-                  <span className="mt-0.5 rounded-lg bg-background p-2 text-foreground-brand">
-                    <MegaphoneIcon size={18} weight="fill" />
+              {profile?.isAdmin && (
+                <Link
+                  href="/admin/communities"
+                  className="rounded-xl border border-border-base bg-background-raised p-4 flex items-start justify-between gap-4 hover:bg-background transition-colors"
+                >
+                  <div className="flex items-start gap-3">
+                    <span className="mt-0.5 rounded-lg bg-background p-2 text-foreground-brand">
+                      <UsersThreeIcon size={18} weight="fill" />
+                    </span>
+                    <div className="flex flex-col">
+                      <h3 className="text-base font-semibold text-foreground">Pedidos de comunidades</h3>
+                      <p className="text-sm text-subtitle">
+                        Analise os pedidos de novas comunidades: aprove ou recuse.
+                      </p>
+                    </div>
+                  </div>
+                  <span className="rounded-lg border border-border-base px-3 py-2 text-sm font-semibold text-foreground">
+                    Abrir
                   </span>
-                  <div className="flex flex-col">
-                    <h3 className="text-base font-semibold text-foreground">Criar equipe para publicações</h3>
-                    <p className="text-sm text-subtitle">
-                      Crie uma página (ex.: marketing) e publique no nome dela.
-                    </p>
-                  </div>
-                </div>
-
-                {!canManageTeamPages && (
-                  <p className="rounded-lg border border-border-base bg-background px-3 py-2 text-sm text-subtitle">
-                    Sua conta é de usuário comum. Apenas administradores podem criar equipes.
-                  </p>
-                )}
-
-                <div className="grid gap-2 md:grid-cols-2">
-                  <label className="flex flex-col gap-1 text-sm font-medium text-foreground">
-                    Nome da equipe
-                    <input
-                      value={teamName}
-                      onChange={(e) => setTeamName(e.target.value)}
-                      placeholder="Ex.: Marketing"
-                      disabled={!canManageTeamPages}
-                      className="rounded-lg border border-border-base bg-background px-3 py-2 text-sm font-normal text-foreground"
-                    />
-                  </label>
-                  <label className="flex flex-col gap-1 text-sm font-medium text-foreground">
-                    Slug
-                    <input
-                      value={teamSlug}
-                      onChange={(e) => setTeamSlug(e.target.value)}
-                      placeholder="Ex.: time-marketing"
-                      disabled={!canManageTeamPages}
-                      className="rounded-lg border border-border-base bg-background px-3 py-2 text-sm font-normal text-foreground"
-                    />
-                  </label>
-                </div>
-
-                <label className="flex flex-col gap-1 text-sm font-medium text-foreground">
-                  URL do avatar da página (opcional)
-                  <input
-                    type="url"
-                    value={teamAvatarUrl}
-                    onChange={(e) => setTeamAvatarUrl(e.target.value)}
-                    placeholder="https://..."
-                    disabled={!canManageTeamPages}
-                    className="rounded-lg border border-border-base bg-background px-3 py-2 text-sm font-normal text-foreground"
-                  />
-                </label>
-
-                <div className="flex items-center justify-between gap-3">
-                  <button
-                    type="button"
-                    onClick={handleCreateTeamPage}
-                    disabled={isCreatingTeam || !canManageTeamPages}
-                    className="rounded-lg border border-border-base px-3 py-2 text-sm font-semibold text-foreground hover:bg-background disabled:opacity-70"
-                  >
-                    {isCreatingTeam ? "Criando..." : "Criar equipe"}
-                  </button>
-
-                  <span className="text-xs text-subtitle">{teamPages.length} equipe(s) com permissão de postagem</span>
-                </div>
-
-                {teamPages.length > 0 && (
-                  <div className="flex flex-wrap gap-2">
-                    {teamPages.map((page) => (
-                      <span
-                        key={page.id}
-                        className="rounded-full border border-border-base bg-background px-3 py-1 text-xs text-foreground"
-                      >
-                        {page.name} (@{page.slug})
-                      </span>
-                    ))}
-                  </div>
-                )}
-
-                {teamMessage && (
-                  <p className="rounded-lg border border-border-base bg-background px-3 py-2 text-sm text-foreground">
-                    {teamMessage}
-                  </p>
-                )}
-
-                {teamPages.length > 0 && (
-                  <div className="flex flex-col gap-3 pt-2">
-                    <h3 className="text-sm font-bold uppercase tracking-wider text-subtitle">
-                      Permissões da equipe
-                    </h3>
-
-                    {teamPages.map((page) => {
-                      const pageMembers = teamMembersByPage[page.id] ?? [];
-
-                      return (
-                        <div
-                          key={page.id}
-                          className="rounded-xl border border-border-base bg-background px-3 py-3"
-                        >
-                          <div className="mb-3 flex items-center justify-between gap-3">
-                            <div>
-                              <p className="text-sm font-semibold text-foreground">{page.name}</p>
-                              <p className="text-xs text-subtitle">@{page.slug}</p>
-                            </div>
-                            <span className="text-[11px] uppercase tracking-wider text-subtitle">
-                              {pageMembers.length} membro(s)
-                            </span>
-                          </div>
-
-                          {pageMembers.length === 0 ? (
-                            <p className="text-sm text-subtitle">
-                              Nenhum membro vinculado ainda.
-                            </p>
-                          ) : (
-                            <div className="space-y-2">
-                              {pageMembers.map((member) => (
-                                <div
-                                  key={member.id}
-                                  className="flex flex-col gap-2 rounded-lg border border-border-base bg-background-raised p-3 md:flex-row md:items-center md:justify-between"
-                                >
-                                  <div className="min-w-0">
-                                    <p className="truncate text-sm font-semibold text-foreground">
-                                      {member.name ?? "Usuário sem nome"}
-                                    </p>
-                                    <p className="text-xs text-subtitle">
-                                      {member.username ? `@${member.username}` : "Perfil sem username"}
-                                    </p>
-                                  </div>
-
-                                  <div className="flex flex-col gap-2 md:flex-row md:items-center">
-                                    <select
-                                      value={member.role}
-                                      onChange={(event) =>
-                                        void handleTeamMemberPermissionChange(page.id, member, {
-                                          role: event.target.value,
-                                        })
-                                      }
-                                      className="rounded-lg border border-border-base bg-background px-2 py-1.5 text-xs text-foreground"
-                                    >
-                                      <option value="owner">Owner</option>
-                                      <option value="admin">Admin</option>
-                                      <option value="editor">Editor</option>
-                                      <option value="member">Member</option>
-                                    </select>
-
-                                    <label className="flex items-center gap-2 text-xs text-subtitle">
-                                      <input
-                                        type="checkbox"
-                                        checked={member.can_post}
-                                        onChange={(event) =>
-                                          void handleTeamMemberPermissionChange(page.id, member, {
-                                            can_post: event.target.checked,
-                                          })
-                                        }
-                                        className="h-4 w-4 rounded border-border-base"
-                                      />
-                                      Pode postar
-                                    </label>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
+                </Link>
+              )}
             </div>
 
             <div className="flex flex-col gap-3">

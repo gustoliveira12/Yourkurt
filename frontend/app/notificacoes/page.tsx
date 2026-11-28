@@ -1,11 +1,14 @@
 "use client";
 
 import { Avatar } from "@/components/Avatar";
+import { DevBadge } from "@/components/DevBadge";
 import MobileHeader from "@/components/navigation/MobileHeader";
 import MobileNav from "@/components/navigation/MobileNav";
 import PageAside from "@/components/navigation/NavBar";
 import ProfileSidebar from "@/components/navigation/ProfileSidebar";
+import { communityHref } from "@/lib/communities";
 import { useCurrentProfile } from "@/lib/hooks/useCurrentProfile";
+import { profileHref } from "@/lib/profile";
 import { announceNotificationsRead } from "@/lib/hooks/useUnreadNotifications";
 import { createClient } from "@/lib/supabase/client";
 import {
@@ -18,9 +21,10 @@ type Notification = {
   type: string;
   entity_id: string | null;
   post_id: string | null;
+  community: { name: string; slug: string } | null;
   created_at: string;
   read_at: string | null;
-  actor: { name: string | null; username: string | null; avatar_url: string | null } | null;
+  actor: { name: string | null; username: string | null; avatar_url: string | null; is_test_account: boolean | null } | null;
 };
 
 const supabase = createClient();
@@ -32,13 +36,15 @@ const NOTIFICATION_TEXT: Record<string, string> = {
   follow_accepted: "aceitou seu pedido para seguir.",
   like: "curtiu seu post.",
   comment: "comentou no seu post.",
+  community_approved: "aprovou sua comunidade.",
+  community_rejected: "recusou o pedido da sua comunidade.",
 };
 
 function fetchNotifications(userId: string, cursor?: Pick<Notification, "created_at" | "id">) {
   let query = supabase
     .from("notifications")
     .select<string, Notification>(
-      "id, type, entity_id, post_id, created_at, read_at, actor:profiles!notifications_actor_id_fkey(name, username, avatar_url)",
+      "id, type, entity_id, post_id, created_at, read_at, community:communities(name, slug), actor:profiles!notifications_actor_id_fkey(name, username, avatar_url, is_test_account)",
     )
     .eq("user_id", userId);
 
@@ -205,17 +211,26 @@ export default function NotificationsPage() {
                       <Avatar src={notification.actor?.avatar_url} name={actorName} />
                       <div className="min-w-0 text-sm text-foreground">
                         {actorUsername ? (
-                          <Link href={`/perfil/${encodeURIComponent(actorUsername)}`} className="font-bold hover:underline">
+                          <Link href={profileHref(actorUsername) ?? "/perfil"} className="font-bold hover:underline">
                             {actorName}
                           </Link>
                         ) : (
                           <span className="font-bold">{actorName}</span>
-                        )}{" "}
+                        )}
+                        {notification.actor?.is_test_account && <DevBadge />}{" "}
                         {notification.post_id ? (
                           // Curtida e comentário levam ao post; os de seguir, ao perfil (pelo nome).
                           <Link href={`/post/${notification.post_id}`} className="hover:underline">
                             {NOTIFICATION_TEXT[notification.type] ?? "enviou uma notificação."}
                           </Link>
+                        ) : notification.community ? (
+                          // Aprovação e recusa levam à comunidade, onde o motivo aparece.
+                          <>
+                            <Link href={communityHref(notification.community.slug)} className="hover:underline">
+                              {NOTIFICATION_TEXT[notification.type] ?? "enviou uma notificação."}
+                            </Link>{" "}
+                            <span className="font-bold">{notification.community.name}</span>
+                          </>
                         ) : (
                           NOTIFICATION_TEXT[notification.type] ?? "enviou uma notificação."
                         )}
