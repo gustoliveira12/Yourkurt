@@ -11,7 +11,7 @@ Yourkurt é uma rede social interna inspirada no Orkut, focada em perfis, posts 
 
 **Perfis e seguidores**
 - Perfil com avatar, imagem de capa e dados editáveis.
-- Perfis públicos em `/perfil/<username>`, com botão de seguir e contagem de seguidores e seguindo.
+- Perfis públicos em `/u/<username>`, com botão de seguir e contagem de seguidores e seguindo.
 - Perfil privado: seguir vira um pedido que o dono aceita ou recusa, e só seguidores aprovados veem posts, bio, localização, site e aniversário.
 - Do aniversário, as outras pessoas veem só o dia e o mês.
 - Amigos são as pessoas que você segue e que seguem você de volta; a página `/friends` lista amigos, seguidores e quem você segue.
@@ -22,9 +22,17 @@ Yourkurt é uma rede social interna inspirada no Orkut, focada em perfis, posts 
 - Curtidas e contagem de comentários e reposts.
 - Aba de respostas no perfil.
 
+**Comunidades**
+- Pedido de criação em `/communities/create`, num passo a passo com prévia ao vivo; a comunidade só aparece depois que um admin aprova em `/admin/communities`.
+- Cada comunidade tem um tema e uma página em `/c/<slug>`.
+- Botão "Membro/Dono" para entrar e sair da comunidade.
+- Posts de comunidade são públicos para todas as pessoas com conta e aparecem com "em c/<slug>".
+- Admins podem apagar posts de comunidade.
+- Etiquetas ao lado do nome, como "Admin".
+
 **Páginas de equipe e administração**
 - Páginas de equipe: membros autorizados podem publicar em nome da equipe.
-- Painel de gerenciamento de usuários e permissões (`/gerenciamento-usuarios`), restrito ao super admin.
+- Painel de gerenciamento de usuários e permissões (`/gerenciamento-usuarios`), restrito ao super admin, que também marca contas de teste com a etiqueta "Dev".
 
 **Privacidade (LGPD)**
 - Política de Privacidade em `/privacidade`.
@@ -119,7 +127,7 @@ Cada arquivo roda numa transação desfeita no fim, então os dados locais não 
 
 ## Próximos passos
 
-- Telas de comunidades: listagem, criação e página da comunidade (o schema já existe, as rotas ainda são esqueletos).
+- Comunidades: os três feeds, a comunidade oficial e a moderação.
 - Repost e salvar gravados no banco (hoje ficam só no navegador).
 - Imagens em buckets privados, com URLs assinadas.
 - Definir as responsabilidades do backend próprio.

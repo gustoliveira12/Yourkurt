@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 // Dados do controlador (LGPD, art. 9º, III). Atualize aqui se mudar.
 const CONTROLLER_NAME = "Gustavo Oliveira";
 const CONTROLLER_EMAIL = "gustavo.hmoliveira@proton.me";
-const LAST_UPDATED = "11 de novembro de 2026";
+const LAST_UPDATED = "27 de novembro de 2026";
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -114,6 +114,11 @@ export default function PrivacyPolicyPage() {
             <li>
               <strong>Perfil privado:</strong> bio, localização, site, aniversário e posts só
               aparecem para quem você aprovar como seguidor.
+            </li>
+            <li>
+              Posts feitos em comunidades são visíveis para todas as pessoas com conta no Yourkurt,
+              mesmo que o seu perfil seja privado. Os posts feitos no seu perfil continuam seguindo
+              a sua configuração de privacidade.
             </li>
             <li>
               Do aniversário, as outras pessoas veem só o dia e o mês, nunca o ano.
